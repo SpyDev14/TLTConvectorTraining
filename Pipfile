@@ -1,0 +1,27 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+django-solo = "*"
+django-cleanup = "*"
+django-environ = "*"
+django-admin-rangefilter = "*"
+django-phonenumber-field = "*"
+
+# Excel
+pandas = "*"
+openpyxl = "*"
+phonenumbers = "*" # & For PhonenumberField
+
+# Other packages
+pillow = "*" # For ImageField
+requests = "*"
+psycopg2 = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
