@@ -23,13 +23,13 @@ def export_to_excel(
 	date_format: str = '%d.%m.%Y %H:%M',
 	formatters: dict[str, Callable[[Any], Any]] | None = None) -> FileResponse:
 	"""
-	Экспорт QuerySet в Excel, возвращает HTTPRequest с файлом для скачивания.
+	Экспорт QuerySet в Excel. Возвращает HTTP FileResponse с файлом для скачивания.
 	Не будет экспортировать поля один ко многим.
 
-	Args:
+	Params:
 		queryset: QuerySet для экспорта.
 		filename: Имя файла для экспорта.
-		sheet_name: Название листа в Excel (По умолчанию "Данные").
+		sheet_name: Название листа в Excel.
 		max_cells_check:
 			Максимальное количество первых клеток для подсчёта
 			ширины столбца, минимум 1.

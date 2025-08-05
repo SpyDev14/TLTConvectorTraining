@@ -6,8 +6,5 @@
 
 def global_data_context_processor(request):
 	return {
-		'global': {	# Или стоит без global и forms? Только data. И вместо data объект global? Подумать.
-			'data': { },	# Модели
-			'forms': { },	# Формы? Подумать.
-		}
+		'global': { }
 	}

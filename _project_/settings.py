@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import sys
 from pathlib import Path
 from environ import Env
-from django.utils import timezone
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -47,6 +47,12 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+
+	# Libs
+	'solo',
+
+	# This project
+	'core'
 ]
 
 MIDDLEWARE = [
@@ -137,7 +143,7 @@ if not LOGS_DIR.exists():
 
 LOGGING = {
 	'version': 1,
-	'disable_existing_loggers': True, # Отключить иные обработчики
+	'disable_existing_loggers': False, # Отключить иные обработчики
 
 	'formatters': {
 		'standart': {
@@ -155,34 +161,26 @@ LOGGING = {
 		},
 		'file': {
 			'level': 'INFO',
-			'class': 'logging.handlers.TimedRotatingFileHandler',
+			'class': 'logging.FileHandler',
 			'formatter': 'standart',
-			'filename': LOGS_DIR / f'logs.log',
-			'when': 'midnight',
-			'backupCount': 3,
-			'utc': False, # Использовать локальное время
+			'filename': LOGS_DIR / f'logs.log'
 		},
-		'debug_file': {
-			'level': 'DEBUG',
-			'class': 'logging.handlers.TimedRotatingFileHandler',
-			'formatter': 'standart',
-			'filename': LOGS_DIR / f'debug.log',
-			'when': 'midnight',
-			'backupCount': 3,
-			'utc': False, # Использовать локальное время
-		}
 	},
 
-	'django': {
-		'handlers': ['debug_file'],
-		'level': 'DEBUG',
-		'propagate': True,
-	},
 	'root': {
 		'handlers': ['console', 'file'],
 		'level': 'DEBUG' if DEBUG else 'INFO'
 	}
 }
+if not 'runserver' in sys.argv:
+	# Чтобы не спамило дебаг логами при миграциях
+	LOGGING['root']['level'] = 'INFO'
+
+# MARK: Для AdminModelRegistartor
+DEFAULT_MODEL_ADMIN_CLASSES = {
+	'solo.models.SingletonModel': 'solo.admin.SingletonModelAdmin'
+}
+
 
 
 # MARK: Libs
