@@ -166,7 +166,6 @@ def export_to_excel(
 def make_export_to_excel_action(
 		name: str,
 		*,
-		set_ordering: str | Iterable[str] | None = None,
 		add_date_to_name: bool = False,
 		filename_date_format: str = '%d.%m.%Y',
 		**kwargs):
@@ -176,10 +175,6 @@ def make_export_to_excel_action(
 	Params:
 		name:
 			Название выходного файла.
-		set_ordering:
-			Позволяет установить сортировку по столбцам для
-			экспорта в excel (Использует метод `.order_by()` объекта
-			`QuerySet`). По умолчанию сортировка будет как переданно.
 		add_date_to_name:
 			Добавить ли текущую дату к названию файла (вынесено сюда
 			из-за частой необходимости)
@@ -193,16 +188,8 @@ def make_export_to_excel_action(
 	if add_date_to_name:
 		name = f"{name} {timezone.now().strftime(filename_date_format)}"
 
-	if isinstance(set_ordering, str):
-		set_ordering = (set_ordering, )
-
-	if set_ordering is not None and not hasattr(set_ordering, '__iter__'):
-		raise TypeError("custom_ordering should be iterable object or string!")
-
 	@action(description = "Экспортировать выбранное в Excel")
 	def admin_action(modeladmin, request, queryset: QuerySet):
-		if set_ordering:
-			queryset = queryset.order_by(*set_ordering)
 		return export_to_excel(
 			queryset, name, **kwargs
 		)
