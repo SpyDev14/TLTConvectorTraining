@@ -2,8 +2,10 @@ from datetime 	import date
 from typing 	import Iterable, Sequence, Callable, Any
 from io 		import BytesIO
 
-from django.db.models 	import QuerySet, Model
-from django.http 		import FileResponse
+from django.contrib.admin 	import action
+from django.db.models 		import QuerySet, Model
+from django.utils 			import timezone
+from django.http 			import FileResponse
 
 from openpyxl.worksheet.worksheet import Worksheet
 from phonenumbers 	import format_number, PhoneNumberFormat, PhoneNumber
@@ -18,6 +20,7 @@ def export_to_excel(
 	*,
 	sheet_name: str | None = "Данные",
 	max_cells_check: int = 20,
+	max_cells_width: int = 64,
 	fields: Sequence[str] | None = None,
 	verbose_names: Sequence[str | None] | None = None,
 	date_format: str = '%d.%m.%Y %H:%M',
@@ -33,6 +36,8 @@ def export_to_excel(
 		max_cells_check:
 			Максимальное количество первых клеток для подсчёта
 			ширины столбца, минимум 1.
+		max_cells_width:
+			Максимальная ширина ячейки.
 		fields: Список полей модели (если None — все поля).
 		verbose_names:
 			Читаемые названия колонок (соответствуют fields).
@@ -72,7 +77,8 @@ def export_to_excel(
 
 	# Поля для экспорта
 	else:
-		fields = (field.name for field in model_meta.fields)
+		fields = tuple(field.name for field in model_meta.fields)
+		print(fields)
 
 
 	# Кастомные форматтировщики
@@ -136,7 +142,16 @@ def export_to_excel(
 				len(str(cell.value)) if cell.value else 0
 				for cell in column[:max_cells_check]
 			)
-			worksheet.column_dimensions[column_letter].width = max_cell_width + 2 # (С запасом)
+
+			# К сожалению, по умолчанию стиль расположения текста в
+			# ячейках - слева снизу, и исправить это можно только перебором
+			# ВСЕХ ячеек в таблице, что будет очень неэффективно, поэтому
+			# придётся проигнорировать страшный вид :^(
+			# PS: Но это касательно 
+			worksheet.column_dimensions[column_letter].width = min(
+				max_cell_width + 2, # (С запасом)
+				max_cells_width # Из параметров
+			)
 
 	# Подготавливаем буффер для чтения: устанавливаем курсор в начало
 	buffer.seek(0)
@@ -147,3 +162,49 @@ def export_to_excel(
 		as_attachment = True,
 		content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 	)
+
+def make_export_to_excel_action(
+		name: str,
+		*,
+		set_ordering: str | Iterable[str] | None = None,
+		add_date_to_name: bool = False,
+		filename_date_format: str = '%d.%m.%Y',
+		**kwargs):
+	"""Возвращает admin-action функцию, экспортирующую
+	и отправляющую обратно записи в excel формате.
+
+	Params:
+		name:
+			Название выходного файла.
+		set_ordering:
+			Позволяет установить сортировку по столбцам для
+			экспорта в excel (Использует метод `.order_by()` объекта
+			`QuerySet`). По умолчанию сортировка будет как переданно.
+		add_date_to_name:
+			Добавить ли текущую дату к названию файла (вынесено сюда
+			из-за частой необходимости)
+		filename_date_format:
+			Используется вместе с `add_date_to_name`, формат `strftime`.
+			**НЕ ИСПОЛЬЗУЙТЕ** символы, недопустимые для имени файла.
+		kwargs:
+			Будет передано в развёрнутом виде в функцию `export_to_excel`,
+			подробнее смотрите там.
+	"""
+	if add_date_to_name:
+		name = f"{name} {timezone.now().strftime(filename_date_format)}"
+
+	if isinstance(set_ordering, str):
+		set_ordering = (set_ordering, )
+
+	if set_ordering is not None and not hasattr(set_ordering, '__iter__'):
+		raise TypeError("custom_ordering should be iterable object or string!")
+
+	@action(description = "Экспортировать выбранное в Excel")
+	def admin_action(modeladmin, request, queryset: QuerySet):
+		if set_ordering:
+			queryset = queryset.order_by(*set_ordering)
+		return export_to_excel(
+			queryset, name, **kwargs
+		)
+
+	return admin_action
