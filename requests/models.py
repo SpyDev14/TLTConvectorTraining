@@ -2,9 +2,6 @@
 from django.db import models
 
 from phonenumber_field.modelfields 	import PhoneNumberField
-from solo.models 					import SingletonModel
-
-from shared.string_processing.resizing import truncate_string
 
 
 class FeedbackRequest(models.Model):
