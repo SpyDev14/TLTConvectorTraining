@@ -1,1 +1,2 @@
-from .general import *
+from .singletons 	import *
+from .general 		import *

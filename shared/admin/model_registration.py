@@ -6,17 +6,16 @@ from django.db.models 		import Model
 from django.conf 			import settings
 from django.apps 			import apps
 
-from shared.console.ansi_codes import GREEN, D_CYAN, RESET
+from shared.console.ansi_codes import *
+
 
 _logger = getLogger(__name__)
 
-# Я не стал записывать здесь Model: ModelAdmin, так как это сделает код
-# менее надёжным, ведь любая модель будет наследником Model и по умолчанию для
-# любой модели мы и так используем ModelAdmin.
-# Тем не менее, если указать здесь Model: CustomModelAdmin - это сработает.
+# Задавать в DEFAULT_MODEL_ADMIN_CLASSES в настройках, подробнее в документации
+# AdminModelRegister.
+# Тем не менее, если указать Model: CustomModelAdmin - это сработает.
 _default_admin_classes_for_models: dict[type[Model], type[ModelAdmin]] = { }
 _defaults_loaded: bool = False
-
 
 def _get_default_admin_class_for_model(model_class: type[Model]) -> type[ModelAdmin] | None:
 	for cls in model_class.mro():
@@ -52,9 +51,10 @@ def _set_default_admin_class_for_model_subclasses(model_class: type[Model], admi
 
 	_default_admin_classes_for_models[model_class] = admin_class
 	_logger.debug(
-		f"{D_CYAN}AMRegistrator{RESET}: admin class {admin_class.__qualname__} succesfully setted "
-		f"as default admin class for subclasses of {model_class.__name__}."
+		f"{CYAN}AMRegistrator{RESET}: admin class {L_GREEN}{admin_class.__qualname__}{RESET} succesfully setted "
+		f"as default admin class for subclasses of {L_GREEN}{model_class.__name__}{RESET}."
 	)
+
 
 def _load_default_admin_classes_for_models():
 	"""
@@ -70,7 +70,15 @@ def _load_default_admin_classes_for_models():
 	```
 	Теперь все `SingletonModel` в админке по умолчанию будут
 	регистрироваться под `SingletonModelAdmin`.
+
+	Raises:
+		RuntimeError:
+			- Уже загружено (повторный вызов)
 	"""
+	global _defaults_loaded
+	if _defaults_loaded:
+		raise RuntimeError('Already loaded')
+
 	mapping: dict[str, str] = getattr(settings, 'DEFAULT_MODEL_ADMIN_CLASSES', {})
 
 	for model_path, admin_path in mapping.items():
@@ -85,6 +93,9 @@ def _load_default_admin_classes_for_models():
 			model_class = model_class,
 			admin_class = admin_class
 		)
+
+	_defaults_loaded = True
+
 
 class AdminModelRegistrator:
 	"""
@@ -124,42 +135,49 @@ class AdminModelRegistrator:
 	- **models.py**
 	```
 	class MyModel(Model): ...
+	class MySpecialModel(Model): ...
 	class MyModelForExclude(Model): ...
 	class MyModelForExcludeAlt(Model): ...
 	class MySingletonModel(SingletonModel): ...
 	```
 	- **admin.py**
 	```
-	# Допустим, получили от куда-то из вне
-	collected_models_for_exclude = {MyModelForExclude}
 
 	registrator = AdminModelRegistrator(
-		MyAppConfig.name,
-		logger = logging.getLogger(__name__),
-		exclude_models = collected_models_for_exclude,
+		app_name = MyAppConfig.name,
+		# Рекомендуемый способ для исключения моделей
+		exclude_models = {MyModelForExclude},
 	)
 
-	# Рекомендуемый способ для исключения моделей
-	registrator.exclude_model(models.MyModelForExcludeAlt)
+	# Допустим, получили от куда-то из вне
+	collected_models_for_exclude = {models.MyModelForExcludeAlt}
+	registrator.exclude_models(collected_models_for_exclude)
 
-	@registrator.set_for_model(models.MyModel)
-	class MyModelAdmin(ModelAdmin):
+	# Делаем что-то и поэтому нужно исключить конкретно эту модель
+	registrator.exclude_model()
+	class MySpecialModelInline(StackedInline):
 		...
 
+	# Нужна кастомная ModelAdmin
+	@registrator.set_for_model(models.MyModel)
+	class MyModelAdmin(ModelAdmin):
+		inlines = [MySpecialModelInline]
+
+	# Проводим регистрацию всех моделей из приложения MyApp
+	# с учётом всех настроек
 	registrator.register()
 	```
 	Теперь в нашей админке будут зарегистрированны все модели из приложения
-	`my_app`, кроме `MyModelForExclude` и `MyModelForExcludeAlt`.
+	`my_app`, кроме `MyModelForExclude`, `MyModelForExcludeAlt` и `MySpecialModel`.
 	`MyModel` будет зарегистрированна под `MyModelAdmin`, а `MySingletonModel`
 	будет зарегистрированна под `SingletonModelAdmin`.
 	"""
 	def __init__(self,
-			app_name: str,
 			*,
+			app_name: str,
 			excluded_models: set[type[Model]] = set(),
 			custom_admin_classes_for_models: \
-				dict[type[Model], type[ModelAdmin]] = dict(),
-			logger: Logger | None = None):
+				dict[type[Model], type[ModelAdmin]] = dict()):
 		"""
 		Params:
 			app_name:
@@ -173,16 +191,10 @@ class AdminModelRegistrator:
 
 			custom_admin_classes_for_models:
 				Кастомные `ModelAdmin` для конкретных моделей по умолчанию.
-
-			logger:
-				Укажите логгер, чтобы получать более подробную информацию
-				в логах о месте ошибки, иначе будет использован логгер этого модуля.
 		"""
 		self._app_name = app_name
 		self._excluded_models = excluded_models
 		self._custom_admin_classes_for_models = custom_admin_classes_for_models
-
-		self._logger = logger if logger else _logger
 
 		if not _defaults_loaded:
 			_load_default_admin_classes_for_models()
@@ -223,10 +235,15 @@ class AdminModelRegistrator:
 		<small>Ps: ошибка возникнет только при переходе на страницу модели в админке.</small>
 		"""
 		for model in apps.get_app_config(self._app_name).get_models():
+			START_LOG_TEXT = (
+				f"{CYAN}AMRegistrator{RESET}: "
+				f"model {L_GREEN}{model.__name__}{RESET}\t"
+				f"from {L_MAGENTA}{self._app_name}{RESET}"
+			)
 			if model in self._excluded_models:
-				_logger.debug(f"{D_CYAN}AMRegistrator{RESET}: model {GREEN}{model.__name__}{RESET} is excluded.")
+				_logger.debug(f"{START_LOG_TEXT} is {L_RED}excluded{RESET}.")
 				continue
-			
+
 			admin_class = ModelAdmin
 
 			if model in self._custom_admin_classes_for_models:
@@ -237,6 +254,5 @@ class AdminModelRegistrator:
 
 			site.register(model, admin_class)
 			_logger.debug(
-				f"{D_CYAN}AMRegistrator{RESET}: model {GREEN}{model.__name__}{RESET} succesful registered "
-				f"with {GREEN}{admin_class.__name__}{RESET} admin class."
+				f"{START_LOG_TEXT} succesful registered with {L_GREEN}{admin_class.__name__}{RESET} admin class."
 			)

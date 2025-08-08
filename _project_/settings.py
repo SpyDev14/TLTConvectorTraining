@@ -50,9 +50,14 @@ INSTALLED_APPS = [
 
 	# Libs
 	'solo',
+	'mptt',
+	'ckeditor',
+	'rangefilter',
 
 	# This project
-	'core'
+	'core',
+	'business',
+	'feedback_requests',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +82,9 @@ TEMPLATES = [
 				'django.template.context_processors.request',
 				'django.contrib.auth.context_processors.auth',
 				'django.contrib.messages.context_processors.messages',
+
+				# This project
+				'core.context_data.global_data_context_processor'
 			],
 		},
 	},
@@ -128,7 +136,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
-MEDIA_ROOT  = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'media'
+IMAGES_ROOT = MEDIA_ROOT / 'images'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -178,10 +187,12 @@ if not 'runserver' in sys.argv:
 
 # MARK: Для AdminModelRegistartor
 DEFAULT_MODEL_ADMIN_CLASSES = {
-	'solo.models.SingletonModel': 'solo.admin.SingletonModelAdmin'
+	'solo.models.SingletonModel': 	'solo.admin.SingletonModelAdmin',
+	'mptt.models.MPTTModel': 		'mptt.admin.DraggableMPTTAdmin'
 }
 
-
+# Настройка предупреждений
+SILENCED_SYSTEM_CHECKS = ["ckeditor.W001"]
 
 # MARK: Libs
 PHONENUMBER_DEFAULT_REGION = "RU" # Код страны (ISO 3166-1 alpha-2)

@@ -5,20 +5,22 @@ name = "pypi"
 
 [packages]
 django = "*"
-django-solo = "*"
+django-solo = "*" # Models
+django-mptt = "*"
+django-ckeditor = "*"
+django-ordered-model = "*" 
+django-phonenumber-field = "*" # Utils
 django-cleanup = "*"
 django-environ = "*"
+django-admin-sortable2 = "*"
 django-admin-rangefilter = "*"
-django-phonenumber-field = "*"
-
-# Excel
-pandas = "*"
+pillow = "*" # Image processing
+tinify = "*" # TinyPNG API
+django-imagekit = "*"
+pandas = "*" # Excel
 openpyxl = "*"
-phonenumbers = "*" # & For PhonenumberField
-
-# Other packages
-pillow = "*" # For ImageField
-requests = "*"
+phonenumbers = "*" # and for django-phonenumber-field
+requests = "*" # None-specified
 psycopg2 = "*"
 
 [dev-packages]
