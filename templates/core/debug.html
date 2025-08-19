@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table border="1" cellpadding="5" cellspacing="0">
+	<thead>
+		<tr>
+			<th>Page</th>
+			<th>Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- Основные поля модели -->
+		<tr><td>slug</td><td>{{ page.slug }}</td></tr>
+		<tr><td>is_generic_page</td><td>{{ page.is_generic_page }}</td></tr>
+		<tr><td>url_path</td><td>{{ page.url_path }}</td></tr>
+		<tr><td>template_name</td><td>{{ page.template_name }}</td></tr>
+		<tr><td>verbose_name</td><td>{{ page.verbose_name }}</td></tr>
+		<tr><td>html_title</td><td>{{ page.html_title }}</td></tr>
+		<tr><td>description</td><td>{{ page.description }}</td></tr>
+		<tr><td>h1</td><td>{{ page.h1 }}</td></tr>
+		<tr><td>ceo_content</td><td>{{ page.ceo_content }}</td></tr>
+		
+		<!-- Методы и свойства -->
+		<tr><td>get_absolute_url()</td><td>{{ page.get_absolute_url }}</td></tr>
+		<tr><td>get_admin_change_url()</td><td>{{ page.get_admin_change_url }}</td></tr>
+		<tr><td>extra_context (property)</td><td>{{ page.extra_context }}</td></tr>
+		
+		<!-- Служебные поля -->
+		<tr><td>id</td><td>{{ page.id }}</td></tr>
+		<tr><td>pk (primary key)</td><td>{{ page.pk }}</td></tr>
+		<tr><td>string representation</td><td>{{ page }}</td></tr>
+	</tbody>
+</table>
+<style>
+	main {
+		align-items: flex-start;
+		gap: 1rem;
+		flex-direction: row;
+	}
+</style>
+{% endblock %}

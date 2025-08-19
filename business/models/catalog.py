@@ -36,6 +36,10 @@ class Category(MPTTModel):
 		return self.name
 
 	def clean(self):
+		# Не изменение
+		if self.pk is None:
+			return
+
 		# Запрет изменения типа категории при наличии детей
 		if not self.is_parent_category and self.childrens.exists():
 			raise ValidationError('Нельзя изменить тип: есть подкатегории')

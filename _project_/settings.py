@@ -14,6 +14,8 @@ import sys
 from pathlib import Path
 from environ import Env
 
+from shared.logging.instruments import add_global_filter
+from shared.console.ansi_codes 	import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +35,31 @@ SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG')
+def _add_if_debug(obj) -> tuple:
+	"""Используйте вместе с оператором распаковки `*`
+	Пример:
+	```
+	PARAMS = [
+		'common',
+		*_add_if_debug('...')
+	]
+	```
+	"""
+	if DEBUG: return (obj,)
+	return ()
+
+def _add_keys_if_debug(dictionary: dict) -> dict:
+	"""Используйте вместе с оператором распаковки `**`
+	Пример:
+	```
+	PARAMS = {
+		'common': 42,
+		**_add_keys_if_debug({'key': '...'})
+	}
+	```
+	"""
+	if DEBUG: return dictionary
+	return {}
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
@@ -53,6 +80,7 @@ INSTALLED_APPS = [
 	'mptt',
 	'ckeditor',
 	'rangefilter',
+	'debug_toolbar',
 
 	# This project
 	'core',
@@ -61,6 +89,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+	# Libs (required top position)
+	*_add_if_debug('debug_toolbar.middleware.DebugToolbarMiddleware'),
+	
+	# Django
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
@@ -84,7 +116,7 @@ TEMPLATES = [
 				'django.contrib.messages.context_processors.messages',
 
 				# This project
-				'core.context_data.global_data_context_processor'
+				'core.context_processors.global_data_context_processor',
 			],
 		},
 	},
@@ -136,6 +168,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
+MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 IMAGES_ROOT = MEDIA_ROOT / 'images'
 
@@ -150,9 +183,17 @@ LOGS_DIR = BASE_DIR / str(env('LOGS_DIR'))
 if not LOGS_DIR.exists():
 	LOGS_DIR.mkdir(parents = True)
 
+# WARN: Токен ТГ бота светится в логах при ошибках сети / запросах с DEBUG
+# TODO: Настроить обработчик urllib3.connectionpool в режиме DEBUG
 LOGGING = {
 	'version': 1,
 	'disable_existing_loggers': False, # Отключить иные обработчики
+
+	'filters': {
+		'tg_token': {
+			'()': 'shared.logging.filters.TelegramBotTokenFilter'
+		}
+	},
 
 	'formatters': {
 		'standart': {
@@ -160,6 +201,14 @@ LOGGING = {
 			'style': '{',
 			'datefmt': '%Y-%m-%d %H:%M:%S',
 		},
+		'django-console': {
+			'format': '[{levelname}] %s{name}%s: {message}' % (D_GREEN, RESET),
+			'style': '{',
+		},
+		'AMRegistrator': {
+			'format': '[{levelname}] %sAMRegistrator%s: {message}' % (CYAN, RESET),
+			'style': '{',
+		}
 	},
 
 	'handlers': {
@@ -174,25 +223,56 @@ LOGGING = {
 			'formatter': 'standart',
 			'filename': LOGS_DIR / f'logs.log'
 		},
+		'django-console': {
+			'level': 'DEBUG',
+			'class': 'logging.StreamHandler',
+			'formatter': 'django-console',
+		},
+		'AMRegistrator': {
+			'level': 'DEBUG',
+			'class': 'logging.StreamHandler',
+			'formatter': 'AMRegistrator',
+		}
 	},
 
 	'root': {
 		'handlers': ['console', 'file'],
 		'level': 'DEBUG' if DEBUG else 'INFO'
+	},
+	'loggers': {
+		'shared.admin.model_registration': {
+			'handlers': ['AMRegistrator'],
+			'level': 'DEBUG',
+			'propagate': False
+		},
+		'django': {
+			'handlers': ['django-console', 'file'],
+			'level': 'INFO',
+			'propagate': False
+		},
 	}
 }
+add_global_filter(LOGGING, 'tg_token')
+
 if not 'runserver' in sys.argv:
 	# Чтобы не спамило дебаг логами при миграциях
 	LOGGING['root']['level'] = 'INFO'
-
-# MARK: Для AdminModelRegistartor
-DEFAULT_MODEL_ADMIN_CLASSES = {
-	'solo.models.SingletonModel': 	'solo.admin.SingletonModelAdmin',
-	'mptt.models.MPTTModel': 		'mptt.admin.DraggableMPTTAdmin'
-}
+	LOGGING['loggers'].pop('shared.admin.model_registration')
 
 # Настройка предупреждений
 SILENCED_SYSTEM_CHECKS = ["ckeditor.W001"]
+
+
+# MARK: Project
+# FIXME: нельзя указать приложение из этого проекта, иначе - ошибка!
+# Но можно создать ModelAdmin где-нибудь в shared и указать тут - это сработает,
+# но с моделями такое уже не прокатит.
+DEFAULT_MODEL_ADMIN_CLASSES = {
+	'solo.models.SingletonModel': 	'solo.admin.SingletonModelAdmin',
+	'mptt.models.MPTTModel': 		'mptt.admin.DraggableMPTTAdmin',
+	# пока не работает с нашими приложениями, нужно фиксить
+}
+
 
 # MARK: Libs
 PHONENUMBER_DEFAULT_REGION = "RU" # Код страны (ISO 3166-1 alpha-2)

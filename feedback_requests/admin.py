@@ -6,12 +6,12 @@ from rangefilter.filters import DateRangeFilter
 from shared.string_processing.resizing 	import truncate_string
 from shared.admin.model_registration 	import AdminModelRegistrator
 from shared.admin.exporting 			import make_export_to_excel_action
-from feedback_requests.models 					import FeedbackRequest
-from feedback_requests.apps 						import RequestsConfig
+from feedback_requests.models 			import FeedbackRequest
+from feedback_requests.apps 			import FeedbackRequestsConfig
 
 
 registrator = AdminModelRegistrator(
-	app_name = RequestsConfig.name
+	app_name = FeedbackRequestsConfig.name
 )
 
 @registrator.set_for_model(FeedbackRequest)

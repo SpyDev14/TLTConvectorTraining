@@ -2,21 +2,270 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Base | TLT Convector</title>
+	<title>{{ page.title }}</title>
+	<link rel="shortcut icon" href="{{ global.site_settings.favicon.url }}">
 	<meta name="description" content="Description">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+	<script>{{ global.site_settings.head_script|safe }}</script>
 </head>
-<body>
-	<h3>Empty</h3>
-	<main>
-	{% block content %}
-	{% endblock %}
-	</main>
-</body>
+<!-- Стили сверху, чтобы можно было переопределять в наследующихся темплейтах -->
 <style>
 	:root {
-		font-family: 'Segoe UI', system-ui;
+		font-family: 'JetBrains Mono', 'Segoe UI', system-ui;
+		background-color: #292a2d;
+		color: white;
+
+		--light-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		--dark-bg: #0000001F;
+	}
+
+	html {
+		height: 100%;
+	}
+
+	body {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		margin: 0;
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		padding: 0.5rem;
+	}
+
+	main {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+	}
+
+	hr {
+		border: none;
+		background-color: #525252;
+		height: 0.1rem;
+		border-radius: 9999rem;
+	}
+	
+	a {
+		color: #3B82F6;
+		text-decoration: none;
+	} a:hover {
+		text-decoration: underline;
+	} a:visited {
+		color: #3B82F6;
+	}
+	
+	h1, h2, h3, h4 {
+		margin-bottom: 0.125rem;
+	}
+
+	code {
+		font-size: 1rem;
+		background-color: #424242;
+		padding-inline: 0.5rem;
+		border-radius: 0.25rem;
+	}
+
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.8rem;
+	}
+	form div {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+	form input {
+		min-width: 18rem;
+		font-family: inherit;
+		background-color: white;
+		border: none;
+		padding-inline: 0.5rem;
+		padding-block: 0.125rem;
+		border-radius: 0.25rem;
+		font-weight: inherit;
+	}
+
+	button {
+		font-size: inherit;
+		font-family: inherit;
+		border: none;
+		background-color: #4d6bfe;
+		padding: 0.2rem 0.8rem;
+		color: white;
+		border-radius: 0.4rem;
+		text-decoration: none;
+		font-weight: 500;
+	}
+	button:hover {
+		text-decoration: none;
+		background-color: #4d6bfeD0;
+	}
+
+	.button-like a {
+		background-color: #4d6bfe;
+		padding: 0.2rem 0.8rem;
+		color: white;
+		border-radius: 0.4rem;
+		text-decoration: none;
+		font-weight: 500;
+	}
+	.button-like a:hover {
+		text-decoration: none;
+		background-color: #4d6bfeD0;
+	}
+	.button-like a.green {
+		background-color: #4CAF50;
+	}
+	.button-like a.green:hover {
+		background-color: #4CAF50D0;
+	}
+
+</style>
+<style>
+	/* ВЫПАДАЮЩЕЕ МЕНЮ - ИСПРАВЛЕННАЯ ВЕРСИЯ */
+	.dropdown {
+		position: relative;
+		display: inline-block;
+	}
+
+	.dropdown-toggle {
+		background-color: #4d6bfe;
+		color: white;
+		border-radius: 0.4rem;
+		text-decoration: none;
+		font-weight: 500;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.dropdown-toggle:hover {
+		background-color: #4d6bfeD0;
+		text-decoration: none;
+	}
+
+	.dropdown-menu {
+		display: none;
+		position: absolute;
+		top: calc(100% + 1px);
+		left: 0;
+		background-color: #292a2d;
+		border-radius: 0.4rem;
+		padding: 0.5rem;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		z-index: 1000;
+		min-width: 160px;
+		max-height: 70vh;
+		overflow-y: auto;
+		grid-template-columns: 1fr;
+		gap: 0.3rem;
+	}
+
+	/* Мостик для плавного перехода */
+	/* .dropdown-menu::before {
+		content: "";
+		position: absolute;
+		top: -5px;
+		left: 0;
+		right: 0;
+		height: 5px;
+		} */
+
+	.dropdown:hover .dropdown-menu,
+	.dropdown-menu:hover {
+		display: grid;
+	}
+
+	.dropdown-menu a {
+		display: block;
+		padding: 0.3rem 0.8rem;
+		background-color: #3a3c40;
+		border-radius: 0.3rem;
+		white-space: nowrap;
+		transition: background-color 0.2s;
+	}
+
+	.dropdown-menu a:hover {
+		background-color: #4d6bfe;
+		text-decoration: none;
+	}
+
+	/* Адаптация под границы экрана */
+	.dropdown-menu.right-edge {
+		left: auto;
+		right: 0;
 	}
 </style>
+<body>
+	<div class="content">
+		<div style="display: flex; justify-content: space-between; align-items: center;">
+			<div>
+				Вы на странице: <code>{{ page.verbose_name }}</code> |
+				URL: <code>{% if page.url_path %}{{ page.url_path }}{% else %}/{% endif %}</code> |
+				Slug: <code>{{ page.slug }}</code> |
+				Template: <code>{{ page.template_name }}</code> |
+				View: <code>{{ debug_info.view }}</code>
+			</div>
+			<div class="button-like" style="display: flex; gap: 0.5rem; align-items: center;">
+				<a href="{{page.get_admin_change_url}}" class="button-like green">→ Смотреть в админке </a>
+				<div class="dropdown">
+					<a class="dropdown-toggle">Страницы ▼</a>
+					<div class="dropdown-menu right-edge">
+						{% for g_page in global.pages.values %}
+						<a href="/{{ g_page.url_path }}">{{ g_page }}</a>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div><hr></div>
+		<main>
+			{% block content %}
+			<div>Тут пусто. Ага.</div>
+			<style>
+				main {
+					justify-content: center;
+				}
+				.dark-bg {
+					background-color: var(--dark-bg);
+					padding: 1rem;
+					border-radius: 0.5rem;
+					box-shadow: var(--light-shadow);
+				}
+			</style>
+			{% endblock %}
+		</main>
+		<footer>
+			<hr>
+			<div style="display: flex; justify-content: center;">
+				<div>
+					<div>
+						Время работы: {{ global.company_contacts.work_time_text }}
+					</div>
+					<hr>
+					<div>
+						Почта: {{ global.company_contacts.email }}
+					</div>
+					<hr>
+					<div>
+						Адрес: {{ global.company_contacts.addres }}
+					</div>
+					<hr>
+					<div>
+						{{ global.company_contacts.first_phone_number }} |
+						{{ global.company_contacts.secondary_phone_number }}
+					</div>
+				</div>
+			</div>
+		</footer>
+	</div>
+</body>
 </html>

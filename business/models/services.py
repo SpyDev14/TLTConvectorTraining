@@ -19,7 +19,15 @@ class Service(models.Model):
 	# short_description = models.TextField('Краткое описание услуги', max_length = 768,
 	# 	help_text = "Отображается на странице всех услуг в списке услуг")
 
+	class Meta:
+		verbose_name = 'Услуга'
+		verbose_name_plural = 'Услуги'
+
 
 class PerformedServiceExample(models.Model):
 	service = models.ForeignKey(Service, models.CASCADE, 'examples', verbose_name = 'Услуга')
 	image = models.ImageField('Изображение', upload_to = _SERVICE_IMGS_PATH / 'examples')
+
+	class Meta:
+			verbose_name = 'Пример выполненой услуги'
+			verbose_name_plural = 'Примеры выполненой услуги'

@@ -1,5 +1,5 @@
 from importlib	import import_module
-from logging 	import Logger, getLogger
+from logging 	import getLogger
 
 from django.contrib.admin 	import ModelAdmin, site
 from django.db.models 		import Model
@@ -51,11 +51,12 @@ def _set_default_admin_class_for_model_subclasses(model_class: type[Model], admi
 
 	_default_admin_classes_for_models[model_class] = admin_class
 	_logger.debug(
-		f"{CYAN}AMRegistrator{RESET}: admin class {L_GREEN}{admin_class.__qualname__}{RESET} succesfully setted "
+		f"admin class {L_GREEN}{admin_class.__qualname__}{RESET} succesfully setted "
 		f"as default admin class for subclasses of {L_GREEN}{model_class.__name__}{RESET}."
 	)
 
-
+# FIXME: вызывает ошибку "приложение ещё не загружено" при работе с моделями и админ-классами
+# из наших приложений
 def _load_default_admin_classes_for_models():
 	"""
 	Загружает стандартные админ-классы для моделей из настроек
@@ -122,6 +123,8 @@ class AdminModelRegistrator:
 	Добавьте в **settings.py** словарь (`dict`) с названием `DEFAULT_MODEL_ADMIN_CLASSES`
 	с парами ключ-значение вида: `'$модуль.КлассМодели': '$модуль.АдминКласс'` чтобы задать
 	админ-классы по умолчанию для указанных моделей и их подклассов.
+	Ps: плохо работает с админками и моделями из наших приложений, нужно фиксить (ошибка -
+	приложение ещё не загружено).
 	(Пример ниже).
 	<hr>
 
@@ -236,8 +239,7 @@ class AdminModelRegistrator:
 		"""
 		for model in apps.get_app_config(self._app_name).get_models():
 			START_LOG_TEXT = (
-				f"{CYAN}AMRegistrator{RESET}: "
-				f"model {L_GREEN}{model.__name__}{RESET}\t"
+				f"model {L_GREEN}{model.__name__}{RESET} "
 				f"from {L_MAGENTA}{self._app_name}{RESET}"
 			)
 			if model in self._excluded_models:

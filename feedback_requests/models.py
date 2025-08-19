@@ -1,7 +1,7 @@
 # Я решил не создавать отдельную папку т.к тут будет максимум 1-2 модели, не более.
 from django.db import models
 
-from phonenumber_field.modelfields 	import PhoneNumberField
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class FeedbackRequest(models.Model):

@@ -1,5 +1,19 @@
-{% extends 'base' %}
+{% extends 'base.html' %}
 
 {% block content %}
-<h4>Generic content</h4>
+<h1>{% if page.h1 %}{{ page.h1 }}{% else %}Заголовок{% endif %}</h1>
+{{ page.ceo_content|safe }}
+
+<style>
+	main {
+		justify-content: center;
+
+		/* width: 65vw;
+		margin-top: 2rem;
+		margin-inline: auto;
+		padding: 2rem 1rem;
+		border-radius: 0.5rem;
+		background-color: var(--dark-bg); */
+	}
+</style>
 {% endblock content %}
