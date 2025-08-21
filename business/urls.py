@@ -1,14 +1,8 @@
 from django.urls import path
 
-from feedback_requests.forms 	import FeedbackRequestForm
-from core.views 				import FormPageView
+from business import views
 
 
 urlpatterns = [
-	path('', FormPageView.as_view(
-			page_slug = 'home',
-			form_class = FeedbackRequestForm,
-			success_url = 'success/',
-		),
-	),
+	path('', views.HomePageView.as_view(), name = 'home'),
 ]

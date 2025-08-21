@@ -6,7 +6,8 @@ from django.db.models 		import Model
 from django.conf 			import settings
 from django.apps 			import apps
 
-from shared.console.ansi_codes import *
+from shared.console.ansi_codes 	import *
+from shared.reflection 			import typename
 
 
 _logger = getLogger(__name__)
@@ -52,11 +53,10 @@ def _set_default_admin_class_for_model_subclasses(model_class: type[Model], admi
 	_default_admin_classes_for_models[model_class] = admin_class
 	_logger.debug(
 		f"admin class {L_GREEN}{admin_class.__qualname__}{RESET} succesfully setted "
-		f"as default admin class for subclasses of {L_GREEN}{model_class.__name__}{RESET}."
+		f"as default admin class for subclasses of {L_GREEN}{typename(model_class)}{RESET}."
 	)
 
-# FIXME: вызывает ошибку "приложение ещё не загружено" при работе с моделями и админ-классами
-# из наших приложений
+
 def _load_default_admin_classes_for_models():
 	"""
 	Загружает стандартные админ-классы для моделей из настроек
@@ -237,9 +237,10 @@ class AdminModelRegistrator:
 		и попадёт в админ-панель! Учитывайте это и проводите миграции сразу же.<br>
 		<small>Ps: ошибка возникнет только при переходе на страницу модели в админке.</small>
 		"""
+		_logger.debug('-' * 48)
 		for model in apps.get_app_config(self._app_name).get_models():
 			START_LOG_TEXT = (
-				f"model {L_GREEN}{model.__name__}{RESET} "
+				f"model {L_GREEN}{typename(model)}{RESET} "
 				f"from {L_MAGENTA}{self._app_name}{RESET}"
 			)
 			if model in self._excluded_models:
@@ -256,5 +257,5 @@ class AdminModelRegistrator:
 
 			site.register(model, admin_class)
 			_logger.debug(
-				f"{START_LOG_TEXT} succesful registered with {L_GREEN}{admin_class.__name__}{RESET} admin class."
+				f"{START_LOG_TEXT} succesful registered with {L_GREEN}{typename(admin_class)}{RESET} admin class."
 			)

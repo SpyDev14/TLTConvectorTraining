@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from shared.admin.model_registration 	import AdminModelRegistrator
+from core.admin.bases 					import BaseRenderableModelAdmin
 from business.apps 						import BusinessConfig
 from business 							import models
 
@@ -30,12 +31,20 @@ class ProductAdditionalElementsInline(_TabularInline):
 	model = models.ProductAdditionalElements
 
 @registrator.set_for_model(models.Product)
-class ProductModel(admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):
 	inlines = [
 		ProductPhotoInline,
 		ProductCharacteristicsInline,
 		ProductAdditionalElementsInline,
 	]
+
+registrator.exclude_model(models.PerformedServiceExample)
+class PerformedServiceExampleInline(_TabularInline):
+	model = models.PerformedServiceExample
+
+@registrator.set_for_model(models.Service)
+class ServiceAdmin(BaseRenderableModelAdmin):
+	inlines = [PerformedServiceExampleInline]
 
 
 registrator.register()

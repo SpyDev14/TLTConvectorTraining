@@ -3,8 +3,12 @@ from django.db 		import models
 
 from ckeditor.fields import RichTextField
 
+from core.models.bases import BaseRenderableModel
 
-class Article(models.Model):
+
+class Article(BaseRenderableModel):
+	# У этой модели отдельно заголовок, отдельно название.
+	# NOTE: Может удалить title и использовать name?
 	title = models.CharField(max_length = 128, verbose_name = "Заголовок")
 	image = models.ImageField(upload_to = settings.IMAGES_ROOT/'articles')
 	content = RichTextField(verbose_name = "Содержимое")
@@ -15,4 +19,4 @@ class Article(models.Model):
 		verbose_name_plural = "Статьи"
 
 	def __str__(self):
-		return f"{self.title} от {self.created_at.strftime("%d/%m/%Y, %H:%M")}"
+		return f"{self.name} от {self.created_at.strftime("%d/%m/%Y, %H:%M")}"

@@ -1,9 +1,12 @@
 {% load static %}
+{% load render_as_template %}
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{ page.title }}</title>
-	<link rel="shortcut icon" href="{{ global.site_settings.favicon.url }}">
+	<!-- На случай ошибок, по хорошему такого не должно быть -->
+	{% if page.html_title %}
+		<title>{{ page.html_title }}</title>
+	{% endif %}
 	<meta name="description" content="Description">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
@@ -208,8 +211,8 @@
 	<div class="content">
 		<div style="display: flex; justify-content: space-between; align-items: center;">
 			<div>
-				Вы на странице: <code>{{ page.verbose_name }}</code> |
-				URL: <code>{% if page.url_path %}{{ page.url_path }}{% else %}/{% endif %}</code> |
+				Вы на странице: <code>{{ page.name }}</code> |
+				URL: <code>{{ page.get_absolute_url }}</code> |
 				Slug: <code>{{ page.slug }}</code> |
 				Template: <code>{{ page.template_name }}</code> |
 				View: <code>{{ debug_info.view }}</code>
@@ -220,7 +223,7 @@
 					<a class="dropdown-toggle">Страницы ▼</a>
 					<div class="dropdown-menu right-edge">
 						{% for g_page in global.pages.values %}
-						<a href="/{{ g_page.url_path }}">{{ g_page }}</a>
+						<a href="{{ g_page.get_absolute_url }}">{{ g_page }}</a>
 						{% endfor %}
 					</div>
 				</div>

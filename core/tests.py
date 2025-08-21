@@ -1,5 +1,6 @@
-from django.test import TestCase
-from core.models import TelegramSendingChannel
+from django.test 			import TestCase
+from core.models.general 	import TelegramSendingChannel
+
 
 # Я не буду писать тесты, но я хотел проверить именно это взаимодействие
 # и вместо проверки в shell решил сделать вот так

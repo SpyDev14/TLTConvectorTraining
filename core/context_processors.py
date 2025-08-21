@@ -5,11 +5,11 @@
 
 # Ну или не делать такую систему вовсе, это тоже неплохо работает и
 # соблюдает KISS.
-from core.models.singletons import *
 from solo.models 			import SingletonModel
 
 from shared.string_processing.cases import camel_to_snake_case
-from core.models 					import Page, ExtraContext
+from core.models.singletons 		import *
+from core.models.general 			import Page, ExtraContext
 
 
 SINGLETON_MODELS: set[type[SingletonModel]] = {

@@ -6,16 +6,16 @@ from django.db 				import models
 
 from ckeditor.fields import RichTextField
 
-from business.models import Category
+from core.models.bases 	import BaseRenderableModel
+from business.models 	import Category
 
 # В отдельной функции, а не в clean, чтобы сообщение было прикреплено к полю category
 _PRODUCTS_IMGS_BASE_PATH: Path = settings.IMAGES_ROOT / 'products'
-class Product(models.Model):
+class Product(BaseRenderableModel):
 	photos: models.Manager['ProductPhoto']
 	characteristics: models.Manager['ProductCharacteristic']
 	additional_elements: models.Manager['ProductAdditionalElements']
 
-	name = models.CharField('Название', max_length = 64)
 	category = models.ForeignKey(Category, models.CASCADE, related_name = 'products',
 		verbose_name = 'Категория')
 	description = RichTextField('Описание')

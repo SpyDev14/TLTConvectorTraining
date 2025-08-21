@@ -1,19 +1,17 @@
 {% extends 'base.html' %}
+{% load render_as_template %}
 
 {% block content %}
 <h1>{% if page.h1 %}{{ page.h1 }}{% else %}Заголовок{% endif %}</h1>
-{{ page.ceo_content|safe }}
+
+{% render_as_template page.content %}
 
 <style>
 	main {
 		justify-content: center;
-
-		/* width: 65vw;
-		margin-top: 2rem;
+		width: 70%;
 		margin-inline: auto;
-		padding: 2rem 1rem;
-		border-radius: 0.5rem;
-		background-color: var(--dark-bg); */
+		text-align: center;
 	}
 </style>
 {% endblock content %}

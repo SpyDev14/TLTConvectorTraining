@@ -62,8 +62,7 @@ def _add_keys_if_debug(dictionary: dict) -> dict:
 	return {}
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
-
-INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -270,7 +269,9 @@ SILENCED_SYSTEM_CHECKS = ["ckeditor.W001"]
 DEFAULT_MODEL_ADMIN_CLASSES = {
 	'solo.models.SingletonModel': 	'solo.admin.SingletonModelAdmin',
 	'mptt.models.MPTTModel': 		'mptt.admin.DraggableMPTTAdmin',
-	# пока не работает с нашими приложениями, нужно фиксить
+
+	# Project
+	'core.models.bases.BaseRenderableModel': 'core.admin.bases.BaseRenderableModelAdmin',
 }
 
 

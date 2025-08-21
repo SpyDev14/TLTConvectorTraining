@@ -7,6 +7,7 @@ from django.forms 				import ModelForm, fields
 
 from shared.string_processing.resizing 	import truncate_string
 from shared.admin.model_registration 	import AdminModelRegistrator
+from core.admin.bases 					import BaseRenderableModelAdmin
 from core.apps 							import CoreConfig
 from core 								import models
 
@@ -33,7 +34,7 @@ class ExtraContextInline(admin.TabularInline):
 	extra = 0
 
 @registrator.set_for_model(models.Page)
-class PageAdmin(admin.ModelAdmin):
+class PageAdmin(BaseRenderableModelAdmin):
 	inlines = [ExtraContextInline]
 
 @registrator.set_for_model(models.TelegramSendingChannel)
@@ -47,7 +48,7 @@ class TelegramSendingChannelAdmin(admin.ModelAdmin):
 		return count_of_channels < count_of_specializations
 	
 	def save_model(self, request, obj: models.TelegramSendingChannel, form, change):
-		if msg := obj._tg_token_validation_varning_message:
+		if msg := obj._tg_token_validation_warning_message:
 			warning(request, msg)
 
 		return super().save_model(request, obj, form, change)

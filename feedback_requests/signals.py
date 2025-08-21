@@ -6,7 +6,7 @@ from django.dispatch 			import receiver
 
 from requests import HTTPError
 
-from feedback_requests.config	import TELEGRAM_SEND_NOTIFICATIONS
+from feedback_requests.config 	import TELEGRAM_SEND_NOTIFICATIONS
 from feedback_requests.models 	import FeedbackRequest
 from core.models.general 		import TelegramSendingChannel
 

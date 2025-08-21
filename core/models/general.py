@@ -14,27 +14,24 @@ import requests
 
 from shared.string_processing 	import camel_to_snake_case
 from shared.models.validators 	import *
+from shared.models.managers 	import IndividualizedBulkOperationsManager
 from shared.telegram.params 	import MessageParseMode
 from shared.reflection 			import typename
+from core.models.bases 			import BaseRenderableModel
 from core.config 				import TELEGRAM_SENDING
 from core.apps 					import CoreConfig
 
 _logger = logging.getLogger(__name__)
 
-# ERROR: А как быть со страницами, отображающими объекты в бд? Статья, товар?
-# IDEA: Нужно создать базовую модель с данными страницы, но как это лучше всего реализовать?
-class Page(models.Model):
+
+class Page(BaseRenderableModel):
 	extra_context_manager: models.Manager['ExtraContext']
 
-	slug = models.SlugField("Slug", max_length = 32, help_text="Уникальный ID страницы", unique = True)
 	is_generic_page = models.BooleanField('Это динамически-генерируемая страница?', default = True,
 		help_text = mark_safe(
 			'✅: Будет автоматически доступно по указанному url. Используйте для страниц без логики.<br>'
 			'❌: Выбирайте, когда для обработки страницы нужно использовать кастомный view.<br>'
 			'Влияет на работу логики поля <code>URL path</code>. '))
-	# INFO: Возможно, для is_generic_page:❌ лучше было бы указывать name view, а не сам путь,
-	# а сам путь получать через св-во, которое бы через reverse() получало полный в такой ситуации.
-	# Так как при такой системе из кода можно будет получить ссылку на страницу только через запрос к БД
 	#                                        так как страница на / будет по пути '' vvvv
 	url_path = models.CharField("URL путь", max_length = 64, unique = True, blank = True,
 		validators = [StringStartswith('/', invert = True), StringEndswith('/')],
@@ -59,19 +56,15 @@ class Page(models.Model):
 	template_name = models.CharField('Название django-темплейта',
 		validators = [template_with_this_name_exists],
 		help_text = 'Путь к файлу, включая расширение')
-	verbose_name = models.CharField("Человеко-читаемое название страницы", max_length = 64)
-	html_title = models.CharField("HTML Title", max_length = 32)
-	description = models.CharField("HTML Description", max_length = 32, blank = True)
-	h1 = models.CharField('H1 Заголовок', max_length = 128, blank = True)
-	ceo_content = RichTextField("CEO контент", blank = True,
-		help_text = "Основное наполнение страницы")
+	h1 = models.CharField('H1 Заголовок', max_length = 127, blank = True)
+	content = RichTextField('Контент', blank = True)
+		# help_text = mark_safe(
+		# 	'Поддерживаются django-теги, будет обработано через темплейт, контекст глобальный.<br>'
+		# 	'Для лучшей настройки, проверяйте исходный код через кнопку "Raw"'))
 
 	class Meta:
-		verbose_name = "Страница"
-		verbose_name_plural = "Страницы"
-
-	def __str__(self):
-		return self.verbose_name
+		verbose_name = 'Страница'
+		verbose_name_plural = 'Страницы'
 
 	def clean(self):
 		if not self.is_generic_page:
@@ -89,13 +82,13 @@ class Page(models.Model):
 		return f"/{self.url_path}"
 
 	def get_admin_change_url(self):
-		# Не самая лучшая идея записывать url админки вот так
 		return f'/admin/{CoreConfig.name}/{typename(self).lower()}/{self.pk}/change/'
 
 	@cached_property
 	def extra_context(self):
 		"""Для темплейтов"""
 		return {ctx.key: ctx.value for ctx in self.extra_context_manager.all()}
+
 
 class ExtraContext(models.Model):
 	key = models.CharField('Ключ', max_length = 64)
@@ -119,24 +112,19 @@ class ExtraContext(models.Model):
 			return f'{self.key} for page "{self.page}"'
 
 
-# TODO: Протестировать
-# WARN: Кэширование даст сбой, если использовать массовое изменение / удаление т.к
-# методы save & delete не вызываются для массовых операций
 class TelegramSendingChannel(models.Model):
-	_cached_instances: dict['TelegramSendingChannel.Specialization', Self | None] = {}
-	_cache_lock: Lock = Lock()
-
-	# Ядерный костылище, нарушает SRP
-	_tg_token_validation_varning_message: str | None = None
-	# Не стал делать через setattr т.к пускай всё будет явно, без "магии".
-	# Используется в админке
-
-
 	class Specialization(models.TextChoices):
 		NEW_REQUEST_NOTIFICATIONS = (
 			'new_request_notifications', 'Уведомления о новых заявках')
 		LOGS = ('logs', 'Логи')
 		# Добавлять новые специализации тут
+
+	_cached_instances: dict[Specialization, Self | None] = {}
+	_cache_lock: Lock = Lock()
+
+	# Ядерный костылище, нарушает SRP
+	_tg_token_validation_warning_message: str | None = None
+	# Используется в админке
 
 	token_env_name = models.CharField('ENV-переменная с токеном', validators = [env_variable_name],
 		help_text = 'Название ENV переменной с токеном этого бота. '
@@ -146,6 +134,11 @@ class TelegramSendingChannel(models.Model):
 		'первой попытке отправить сообщение, будте внимательны!')
 	specialization = models.CharField('Специализация канала', choices = Specialization.choices,
 		unique = True, help_text = "Может быть только один канал для конкретной специализации")
+
+	# Стандартные bulk операции сломают встроенное кэширование.
+	# Конечно, врядли кто-то в коде тут их будет делать, но в django есть встроенные операции
+	# которые могут их неявно вызвать.
+	objects = IndividualizedBulkOperationsManager()
 
 	class Meta:
 		verbose_name = 'Канал отправки сообщений в Telegram'
@@ -245,7 +238,7 @@ class TelegramSendingChannel(models.Model):
 			except requests.RequestException as ex:
 				_logger.error(f'Ошибка при попытке выяснить существует ли токен в Телеграмм-системе: {ex}')
 
-				self._tg_token_validation_varning_message = (
+				self._tg_token_validation_warning_message = (
 					'Не удалось выяснить, существует ли токен указанный для канала '
 					f'"{self}" в Телеграмм-системе, '
 					'есть риск ошибок в будущем, если был задан некорректный токен.'

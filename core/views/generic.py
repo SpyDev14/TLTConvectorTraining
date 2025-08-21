@@ -1,9 +1,9 @@
-from django.shortcuts 			import get_object_or_404, redirect
-from django.forms 				import ModelForm
-from django.http 				import HttpRequest
+from django.shortcuts 	import get_object_or_404, redirect
+from django.forms 		import ModelForm
+from django.http 		import HttpRequest
 
-from core.models 					import Page
-from core.views 					import BasePageView
+from core.models.general 	import Page
+from core.views 			import BasePageView
 
 
 class ConcretePageView(BasePageView):

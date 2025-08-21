@@ -6,7 +6,7 @@ from django.views 				import View
 
 from shared.string_processing.cases import camel_to_snake_case
 from shared.reflection 				import typename
-from core.models 					import Page
+from core.models.general 			import Page
 
 
 class BasePageView(ABC, View):
