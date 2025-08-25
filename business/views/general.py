@@ -1,5 +1,4 @@
-from django.shortcuts 			import redirect
-from django.http 				import HttpRequest
+from django.views.generic.edit 	import ModelFormMixin, ProcessFormView, CreateView
 
 from feedback_requests.forms 	import FeedbackRequestForm
 from core.views 				import FormPageView

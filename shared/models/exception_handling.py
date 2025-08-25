@@ -8,9 +8,6 @@ _logger = getLogger(__name__)
 
 class HandleAndLogNotMigratedModelError:
 	"""
-	**Внимание!** Ловит исключение ТОЛЬКО если оно возникает (как это ни странно). Если
-	обращения к базе НЕ происходит - ошибки не будет.
-	
 	Ловит исключение, возникающее если происходит обращение к модели, не прошедшей миграции.
 	Логгирует в переданный логгер, иначе логирует в свой собственный, что будет менее информативно.
 
@@ -48,13 +45,11 @@ class HandleAndLogNotMigratedModelError:
 		return self
 
 	def __exit__(self, exc_type, exc_value, traceback):
-		_logger.debug(f"HandleAndLogNotMigratedModelError: exc_type is {exc_type}")
 		if exc_type is not OperationalError:
-			_logger.debug("HandleAndLogNotMigratedModelError: Is not OperationalError")
 			return False
 
 		if not str(exc_value).startswith("no such"):
-			_logger.debug(f"HandleAndLogNotMigratedModelError: Is not startswith 'no such', exc_value: {exc_value}")
+			_logger.debug(f"HandleAndLogNotMigratedModel Error: exc_value not startswith 'no such', exc_value: {exc_value}")
 			return False
 
 		self._logger.error(

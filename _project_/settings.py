@@ -16,6 +16,7 @@ from environ import Env
 
 from shared.logging.instruments import add_global_filter
 from shared.console.ansi_codes 	import *
+from _project_.constants 		import LEVEL_ONLY_LOGGER
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -207,6 +208,10 @@ LOGGING = {
 		'AMRegistrator': {
 			'format': '[{levelname}] %sAMRegistrator%s: {message}' % (CYAN, RESET),
 			'style': '{',
+		},
+		'level-only': {
+			'format': '[{levelname}] {message}',
+			'style': '{'
 		}
 	},
 
@@ -231,6 +236,11 @@ LOGGING = {
 			'level': 'DEBUG',
 			'class': 'logging.StreamHandler',
 			'formatter': 'AMRegistrator',
+		},
+		'console-level-only': {
+			'level': 'DEBUG',
+			'class': 'logging.StreamHandler',
+			'formatter': 'level-only'
 		}
 	},
 
@@ -249,6 +259,11 @@ LOGGING = {
 			'level': 'INFO',
 			'propagate': False
 		},
+		LEVEL_ONLY_LOGGER: {
+			'handlers': ['console-level-only'],
+			'level': 'DEBUG',
+			'propagate': False
+		}
 	}
 }
 add_global_filter(LOGGING, 'tg_token')

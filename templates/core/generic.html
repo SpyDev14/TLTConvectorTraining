@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
-{% load render_as_template %}
+{% load project_custom_tags %}
 
 {% block content %}
 <h1>{% if page.h1 %}{{ page.h1 }}{% else %}Заголовок{% endif %}</h1>
 
-{% render_as_template page.content %}
+{% if page.render_content %}
+	{% render_as_template page.content %}
+{% else %}
+	{{ page.content|safe }}
+{% endif %}
 
 <style>
 	main {

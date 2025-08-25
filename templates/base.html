@@ -1,12 +1,12 @@
 {% load static %}
-{% load render_as_template %}
+{% load project_custom_tags %}
+{% if False %}
+	{% log_context %}
+{% endif %}
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- На случай ошибок, по хорошему такого не должно быть -->
-	{% if page.html_title %}
-		<title>{{ page.html_title }}</title>
-	{% endif %}
+	<title>{{ page.html_title }}</title>
 	<meta name="description" content="Description">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
@@ -214,8 +214,7 @@
 				Вы на странице: <code>{{ page.name }}</code> |
 				URL: <code>{{ page.get_absolute_url }}</code> |
 				Slug: <code>{{ page.slug }}</code> |
-				Template: <code>{{ page.template_name }}</code> |
-				View: <code>{{ debug_info.view }}</code>
+				Template: <code>{{ page.template_name }}</code>
 			</div>
 			<div class="button-like" style="display: flex; gap: 0.5rem; align-items: center;">
 				<a href="{{page.get_admin_change_url}}" class="button-like green">→ Смотреть в админке </a>

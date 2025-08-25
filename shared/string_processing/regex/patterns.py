@@ -2,4 +2,4 @@
 Модуль с заранее составленными, часто используемыми, regex паттернами.
 """
 
-TELEGRAM_BOT_TOKEN_PATTERN = r'\d{8,10}:[a-zA-Z0-9_-]{35}'
+TELEGRAM_BOT_TOKEN_PATTERN = r'\d{10}:[a-zA-Z0-9_-]{35}'
