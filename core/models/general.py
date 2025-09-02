@@ -16,6 +16,7 @@ import requests
 from shared.models.validators 	import *
 from shared.models.managers 	import IndividualizedBulkOperationsManager
 from shared.telegram.params 	import MessageParseMode
+from shared.reflection 			import typename
 from core.models.bases 			import BaseRenderableModel
 from core.constants 			import RENDERING_SUPPORTS_TEXT
 from core.config 				import TELEGRAM_SENDING, GENERIC_TEMPLATE
@@ -170,17 +171,13 @@ class ExtraContext(models.Model):
 		else:
 			return f'{self.key} for page "{self.page}"'
 
-# TODO: Перевести на встроенное кэширование с инвалидацией, вместо самописного
-# https://chat.deepseek.com/a/chat/s/a35b0278-5152-4e94-87a1-491bbc2f811c
+
 class TelegramSendingChannel(models.Model):
 	class Specialization(models.TextChoices):
 		NEW_REQUEST_NOTIFICATIONS = (
 			'new_request_notifications', 'Уведомления о новых заявках')
 		LOGS = ('logs', 'Логи')
 		# Добавлять новые специализации тут
-
-	_cached_instances: dict[Specialization, Self | None] = {}
-	_cache_lock: Lock = Lock()
 
 	# Ядерный костылище, нарушает SRP
 	_tg_token_validation_warning_message: str | None = None
@@ -202,16 +199,47 @@ class TelegramSendingChannel(models.Model):
 
 	class Meta:
 		verbose_name = 'Канал отправки сообщений в Telegram'
-		verbose_name_plural = 'Каналы отправки сообщений в Telegram'
+		verbose_name_plural = '📡 | Каналы отправки сообщений в Telegram'
 
 	def __str__(self):
 		return self.get_specialization_display()
 
+	# Сменил кеширования с dict & lock на встроенное, по умолчанию всё также в пямяти
+	@classmethod
+	def _get_cache_key(cls, specialization: Specialization):
+		return f"{typename(cls)}_for_{specialization}"
+
 	@classmethod
 	def _invalidate_cache(cls, specialization: Specialization):
-		with cls._cache_lock:
-			if specialization in cls._cached_instances:
-				cls._cached_instances.pop(specialization)
+		cache_key = cls._get_cache_key(specialization)
+		cache.delete(cache_key)
+		_logger.debug(f'Кешированный экземпляр {typename(cls)} для {specialization} был инвалидирован')
+
+	def _to_cache_instance(self):
+		cache_key = self._get_cache_key(self.specialization)
+		cache.set(cache_key, self, timeout = None)
+		_logger.debug(f'Экземпляр {typename(self)} для {self.specialization} был установлен в кеш')
+
+
+	@classmethod
+	def get_by_specialization(cls, specialization: Specialization) -> Self | None:
+		"""Используется кэширование"""
+		cache_key = cls._get_cache_key(specialization)
+		instance = cache.get(cache_key)
+
+		if instance:
+			_logger.debug(f'Экземпляр {typename(cls)} для {specialization} был в кеше, возвращаем из него')
+			return instance
+
+		_logger.debug(f'Экземпляра {typename(cls)} для {specialization} нет в кеше, получение из БД')
+		try:
+			instance = cls.objects.get(specialization = specialization)
+			instance._to_cache_instance()
+
+		except cls.DoesNotExist:
+			_logger.debug(f'Записи {typename(cls)} со специализацией {specialization} нет в БД')
+
+		return instance
 
 	def save(self, *args, **kwargs):
 		if self.pk:
@@ -228,23 +256,7 @@ class TelegramSendingChannel(models.Model):
 		self._invalidate_cache(self.specialization)
 		return super().delete(*args, **kwargs)
 
-	@classmethod
-	def get_by_specialization(cls, specialization: Specialization) -> Self | None:
-		"""Используется кэширование"""
-		with cls._cache_lock:
-			if specialization in cls._cached_instances:
-				return cls._cached_instances[specialization]
 
-		instance = None
-		try: instance = cls.objects.get(specialization = specialization)
-		except cls.DoesNotExist: pass
-
-		with cls._cache_lock:
-			cls._cached_instances[specialization] = instance
-
-		return instance
-
-	# NOTE: может лучше get_token()?
 	@property
 	def _token(self):
 		return getenv(self.token_env_name, '')
