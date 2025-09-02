@@ -1,15 +1,11 @@
 from typing import Any
-import logging
 
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts 		import get_object_or_404
-from django.db.models 		import QuerySet
 
 from core.models.general 	import Page
 from core.models.bases 		import BaseRenderableModel
 
-
-_logger = logging.getLogger(__name__)
 
 class PageInfoMixin:
 	"""
@@ -29,54 +25,15 @@ class PageInfoMixin:
 		})
 		return super().get_context_data(**kwargs)
 
-# NOTE: Чтобы базовый класс не отвечал за стратегию получения
-# объекта и можно было на чистой основе написать свою стратегию.
-class ConcreteRenderableModelMixin:
-	# Simple way
-	renderable_model: type[BaseRenderableModel] | None = None
-	renderable_slug: str | None = None
 
-	# Advanced way
-	renderable_queryset: QuerySet[BaseRenderableModel] | None = None
+# MARK: Page-details get_page() strategy
+class ConcretePageMixin:
+	page_slug: str | None = None
 
-	def get_renderable_queryset(self):
-		return self.renderable_queryset
-
-	def get_renderable_object(self):
-		queryset = self.get_renderable_queryset()
-
-		if queryset and (self.renderable_slug or self.renderable_model):
-			# NOTE: Может быть лучше вызывать исключение?
-			_logger.warning(
-				'Не указывайте и renderable_slug / renderable_model, и queryset одновременно, это '
-				'не имеет смысла и может запутать других разработчиков.'
-			)
-
-		if not queryset:
-			# Выбрал кратко и без повторения. Лаконично, но не слишком сложночитаемо.
-			# Ps: все ведь шарят за МОРЖевой := оператор?
-			if (no_slug := not self.renderable_slug) or (no_class := not self.renderable_model):
-				both = no_class and no_slug
-				raise ImproperlyConfigured(
-					f"{'renderable_slug' if no_slug else ''} "
-					f"{'и' if both else ''} "
-					f"{'renderable_model' if no_class else ''} "
-					f"не {'могут' if both else 'может'} быть пуст{'ы' if both else ''}"
-					" при пустом queryset."
-					" Либо установите значения в них, либо используйте queryset."
-				)
-
-			queryset = self.renderable_model.objects.filter(
-				slug = self.renderable_slug
-			)
-
-		# NOTE: Осознанно ждём ошибку, если указанного объекта нет.
-		return queryset.get()
-
-# NOTE: Не придумал, как после рефакторинга переделать эти миксины, чтобы их можно было
-# использовать и для Details и для List, как было раньше с get_page()
-class ConcretePageMixin(ConcreteRenderableModelMixin):
-	renderable_model = Page
+	def get_page(self):
+		if not self.page_slug:
+			raise ImproperlyConfigured('page_slug не может быть пуст!')
+		return Page._default_manager.get(slug = self.page_slug)
 
 
 class GenericPageMixin:
