@@ -50,7 +50,7 @@ class PageInfoMixin:
 class ConcretePageMixin:
 	"""
 	Миксин переопределяющий получение объекта
-	страницы на get_object_or_404 по заранее прописанному во View slug.
+	страницы на get_object_or_404 по заранее прописанному во View page_slug.
 	"""
 	page_slug: str | None = None
 
