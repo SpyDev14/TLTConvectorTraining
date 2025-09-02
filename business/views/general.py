@@ -1,22 +1,38 @@
-from core.views.bases import PageBasedListView
-
-from business.views.bases 	import PageWithFeedbackRequestFormView
-from business 				import models
-
+from core.config 	import GENERIC_TEMPLATE
+from core.views 	import BaseRenderableDetailView, PageBasedListView
+from business 		import models
 
 
-class HomePageView(PageWithFeedbackRequestFormView):
-	page_slug = 'home'
+# MARK: Article
+class ArticleListView(PageBasedListView):
+	page_slug = 'blog'
+	queryset = models.Article.objects.ceo_ordered()
 
-	def get_context_data(self, **kwargs):
-		context: dict = super().get_context_data(**kwargs)
-		context.update({
-			'last_articles': models.Article.objects.ceo_ordered()[:2]
-		})
-		return context
-
-
-class AboutUsPageView(PageWithFeedbackRequestFormView):
-	page_slug = 'about-us'
+class ArticleDetailView(BaseRenderableDetailView):
+	model = models.Article
+	template_name = GENERIC_TEMPLATE.MODEL_DETAIL
 
 
+# MARK: Product & Category
+class ProductDetailView(BaseRenderableDetailView):
+	model = models.Product
+	template_name = GENERIC_TEMPLATE.MODEL_DETAIL
+
+class CategoryDetailView(BaseRenderableDetailView):
+	model = models.Category
+	template_name = GENERIC_TEMPLATE.MODEL_DETAIL
+
+class CatalogPageView(PageBasedListView):
+	page_slug = 'catalog'
+	model = models.Category
+	template_name = GENERIC_TEMPLATE.MODEL_LIST
+
+# MARK: Service
+class ServiceListView(PageBasedListView):
+	page_slug = 'services'
+	model = models.Service
+	template_name = GENERIC_TEMPLATE.MODEL_LIST
+
+class ServiceDetailView(BaseRenderableDetailView):
+	model = models.Service
+	template_name = GENERIC_TEMPLATE.MODEL_DETAIL

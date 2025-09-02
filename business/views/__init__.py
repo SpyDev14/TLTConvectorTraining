@@ -1,2 +1,2 @@
-from .general 		import *
-from .models_repr 	import *
+from .general 	import *
+from .pages 	import *
