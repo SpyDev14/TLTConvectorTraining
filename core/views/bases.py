@@ -94,11 +94,8 @@ class PageWithFormView(ConcretePageView, generic.edit.FormMixin, generic.edit.Pr
 			form.save()
 		return super().form_valid(form)
 
-# Вот именно из за этого, я не могу сразу в методе get_page прописать нужную логику,
-# так как этот метод также должен быть и здесь.
-# Ещё был вариант сделать приватную локальную функцию здесь с нужной стратегией, но
-# мне этот вариант не понравился. Лучше mixin в публичном API, чем такая функция.
 # NOTE: Порядок наследования важен для добавления page_info!
+# IDEA: Переписать на RenderableModelBasedListView, а это сделать частной реализацией (для каталога)
 class PageBasedListView(ConcretePageMixin, PageInfoMixin, generic.ListView):
 	"""
 	Базовый View для List-страниц, где Page выступает в роли основы.
