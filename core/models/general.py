@@ -92,7 +92,7 @@ class Page(BaseRenderableModel):
 		# p по умолчанию идёт с отступами, которые как раз всё и "ломают" (большие отступы между строками)
 
 	class Meta:
-		verbose_name = 'Страница'
+		verbose_name = 'страницу'
 		verbose_name_plural = 'Страницы'
 
 	def clean(self):

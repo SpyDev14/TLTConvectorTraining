@@ -30,8 +30,18 @@ class ExtraContextInline(admin.TabularInline):
 
 @registrator.set_for_model(models.Page)
 class PageAdmin(BaseRenderableModelAdmin):
+	list_display = ('page', 'page_url', 'template_name')
 	inlines = [ExtraContextInline]
 	prepopulated_fields = {}
+
+	def page(self, obj):
+		return str(obj)
+	page.short_description = 'Страница'
+
+	def page_url(self, obj: models.Page):
+		return obj.get_absolute_url()
+	page_url.short_description = models.Page._meta.get_field('url_path').verbose_name
+
 
 @registrator.set_for_model(models.TelegramSendingChannel)
 class TelegramSendingChannelAdmin(admin.ModelAdmin):

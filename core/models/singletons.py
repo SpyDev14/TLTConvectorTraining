@@ -14,8 +14,8 @@ class SiteSettings(SingletonModel):
 		help_text = 'Этот текст будет вставлен в блок &ltscript&gt в &lthead&gt каждой html-страницы сайта')
 
 	class Meta:
-		verbose_name = 'Настройки сайта'
-	def __str__(self): return 'Настройки сайта'
+		verbose_name = '⚙ | Настройки сайта'
+	def __str__(self): return '⚙ | Настройки сайта'
 
 
 class CompanyContacts(SingletonModel):
@@ -30,5 +30,5 @@ class CompanyContacts(SingletonModel):
 		help_text = mark_safe('Формат: <code>53.556350, 49.216210</code>'))
 
 	class Meta:
-		verbose_name = 'Контакты компании'
-	def __str__(self): return 'Контакты компании'
+		verbose_name = '📠 | Контакты компании'
+	def __str__(self): return '📠 | Контакты компании'
