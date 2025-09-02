@@ -44,7 +44,7 @@ class IndividualizedBulkOperationsQuerySet(QuerySet):
 			obj.save()
 			created_objs.append(obj)
 		return created_objs
-	
+
 	def bulk_update(self, objs, fields, *args, **kwargs):
 		"""
 		Заменяет массовое обновление на индивидуальные сохранения

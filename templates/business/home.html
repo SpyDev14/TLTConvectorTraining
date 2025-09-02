@@ -3,27 +3,27 @@
 {% block content %}
 <img class="main-image" src="{{page.extra_context.main_image_url}}">
 <h3>{{page.h1}}</h3>
-<div style="max-width: 60vw; margin-bottom: 1rem;">
+<div style="max-width: 60vw;">
 	{{page.content|safe}}
 	<hr>
 </div>
-<form method="post">
-	<h3 style="margin: 0; margin-bottom: 0.5rem; text-align: center;">Оставить заявку</h3>
-	{% csrf_token %}
-	{{ form.as_div }}
-	<button type="submit">Оставить заявку</button>
-</form>
+<h1 style="background-color: darkred;">КАТАЛОГ</h1>
+--------------
+{% if last_articles %}
+	<h3>Наш блог</h3>
+	{% for article in last_articles %}
+	{% include 'business/components/article.html' %}
+	{% endfor %}
+{% endif %}
+{% include 'feedback_requests/feedback-request-form.html' %}
 
 <style>
+	main {
+		gap: 0.5;
+	}
 	.main-image {
 		border-radius: 0.5rem;
 		height: 28rem;
-	}
-
-	form {
-		background-color: var(--dark-bg);
-		padding: 1rem;
-		border-radius: 0.8rem;
 	}
 </style>
 {% endblock content %}

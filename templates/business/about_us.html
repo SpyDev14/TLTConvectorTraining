@@ -1,0 +1,21 @@
+{% extends 'core/generic/page.html' %}
+
+
+{% block content %}
+<h1>{{ page.h1 }}</h1>
+
+<div>
+	{% render_as_template page.content %}
+</div>
+
+{% include 'feedback_requests/feedback-request-form.html' %}
+
+<style>
+	main {
+		justify-content: center;
+		width: 70%;
+		margin-inline: auto;
+		gap: 0;
+	}
+</style>
+{% endblock content %}

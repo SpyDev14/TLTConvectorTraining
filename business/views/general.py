@@ -1,10 +1,22 @@
-from django.views.generic.edit 	import ModelFormMixin, ProcessFormView, CreateView
+from core.views.bases import PageBasedListView
 
-from feedback_requests.forms 	import FeedbackRequestForm
-from core.views 				import FormPageView
+from business.views.bases 	import PageWithFeedbackRequestFormView
+from business 				import models
 
 
-class HomePageView(FormPageView):
+
+class HomePageView(PageWithFeedbackRequestFormView):
 	page_slug = 'home'
-	form_class = FeedbackRequestForm
-	success_url = 'success/'
+
+	def get_context_data(self, **kwargs):
+		context: dict = super().get_context_data(**kwargs)
+		context.update({
+			'last_articles': models.Article.objects.ceo_ordered()[:2]
+		})
+		return context
+
+
+class AboutUsPageView(PageWithFeedbackRequestFormView):
+	page_slug = 'about-us'
+
+

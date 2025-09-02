@@ -120,7 +120,7 @@ class FullmatchRegexValidator(TargetValueTypeMixin, BaseValidator):
 	allowed_value_types = (str, )
 	check_regex: str = r'[\s\S]*' # Что угодно по умолчанию
 	error_msg = f"Строка не соответствует r'^{check_regex}$'"
-	
+
 	def __init__(self, check_regex, *, invert=False, **initkwargs):
 		super().__init__(invert=invert, **initkwargs)
 		self.check_regex = check_regex
@@ -148,6 +148,8 @@ def string_is_numeric(value: str):
 
 def template_with_this_name_exists(value: str):
 	_raise_if_not_str(value)
+	if not value:
+		return
 	try:
 		get_template(value)
 	except TemplateDoesNotExist:

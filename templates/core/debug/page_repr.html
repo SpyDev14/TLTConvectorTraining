@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load debug_tags %}
+
+
+{% block html_title_override_block %}
+<title>Debug Display of "{{page_info.html_title}}"</title>
+{% endblock %}
+
+{# пока работает только с page #}
+{% block content %}
+<div style="
+display: flex;
+align-items: flex-start;
+gap: 1rem;
+flex-grow: 1;
+flex-direction: row;">
+<div>
+	<div class="warn-info-block">Внимание! Не отображает информацию из конкретного view, обрабатывающего эту страницу.</div>
+	<details open>
+		<!-- page_info section -->
+		<summary><strong>page_info</strong> (BaseRenderableModel)</summary>
+		<hr>
+		<table>
+			<tr><th colspan="2">BaseRenderableModel</th></tr>
+			<tr><th>Field/Property</th><th>Value</th></tr>
+			<tr><td>name</td><td>{{ page_info.name }}</td></tr>
+			<tr><td>slug</td><td>{{ page_info.slug }}</td></tr>
+			<tr><td>html_title_override</td><td>{{ page_info.html_title_override }}</td></tr>
+			<tr><td>html_description</td><td>{{ page_info.html_description }}</td></tr>
+			<tr><td>h1_override</td><td>{{ page_info.h1_override }}</td></tr>
+			<tr><td>html_title</td><td>{{ page_info.html_title }}</td></tr>
+			<tr><td>h1</td><td>{{ page_info.h1 }}</td></tr>
+			<tr><td>get_absolute_url()</td><td>{{ page_info.get_absolute_url }}</td></tr>
+			<tr><td>get_admin_url()</td><td>{{ page_info.get_admin_url }}</td></tr>
+		</table>
+	</details>
+
+	<!-- page section -->
+	{% if page %}
+	<details open>
+		<summary><strong>page</strong> (Page model)</summary>
+		<hr>
+		<table>
+			<tr><th colspan="2">Page</th></tr>
+			<tr><th>Field/Property</th><th>Value</th></tr>
+			<tr><td>is_generic_page</td><td>{{ page.is_generic_page }}</td></tr>
+			<tr><td>url_path</td><td>{{ page.url_path }}</td></tr>
+			<tr><td>template_name</td><td>{{ page.template_name }}</td></tr>
+			<tr>
+				<td>content</td>
+				<td><details>{{ page.content }}</details></td>
+			</tr>
+			<tr><td>render_content</td><td>{{ page.render_content }}</td></tr>
+		</table>
+
+		<!-- extra_context section -->
+		<details style="margin-left: 2rem;">
+			<summary><strong>extra_context</strong> (related)</summary>
+
+			<table>
+				<tr><th>Key</th><th>Value</th></tr>
+				{% for key, value in page.extra_context.items %}
+				<tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+				{% empty %}
+				<tr><td colspan="2" style="text-align: center;">-</td></tr>
+				{% endfor %}
+			</table>
+		</details>
+	</details>
+
+
+<!-- object section -->
+{% elif object %}
+{% with meta=object|get_attr:"_meta" %}
+<details>
+	<summary><strong>object</strong> ({{ meta.verbose_name }})</summary>
+	<table>
+		<tr><th>Field</th><th>Value</th></tr>
+		{% for field in meta.fields %}
+		<tr>
+			<td>{{ field.name }}</td>
+			<td>{{ field.value_from_object|default:"-" }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</details>
+{% endwith %}
+{% endif %}
+</div>
+{% if object.content %}
+<div style="flex-grow: 1; justify-content: left;">
+	<table style="margin-top: 0;">
+		<tr><th>Rendered content (raw)</th></tr>
+		<tr><td><details>{% render_as_template object.content|escape|linebreaksbr %}</details></td></tr>
+		<tr><th>Rendered content</th></tr>
+		<tr><td><details open>{% render_as_template object.content %}</details></td></tr>
+	</table>
+</div>
+{% endif %}
+{% current_context %}
+
+</div>
+<style>
+	main {
+		align-items: stretch;
+	}
+
+	details { margin-bottom: 15px; }
+</style>
+{% endblock %}

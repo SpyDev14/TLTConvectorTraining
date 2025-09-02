@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<h1>{{ page_info.h1 }}</h1>
+
+<div class="dark-shell button-like">
+{% for gpage in global.pages.values %}
+	<a class="gray" style="padding-block: 0.3rem;"
+		{% if gpage.url_path %}
+			href="{% url 'debug-repr' gpage.url_path %}"
+		{% else %}
+			href="{% url 'debug-repr' %}"
+		{% endif %}
+	>{{gpage.name}}</a>
+{% endfor %}
+</div>
+<style>
+	main {
+		gap: 2rem;
+	}
+</style>
+{% endblock %}

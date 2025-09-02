@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="contact-box">
+	<div>Время работы: {{ global.company_contacts.work_time_text }}</div>
+	<div>Почта: {{ global.company_contacts.email }}</div>
+	<div>Адрес: {{ global.company_contacts.addres }}</div>
+	<div><hr></div>
+	<div>{{ global.company_contacts.first_phone_number }}</div>
+	<div>{{ global.company_contacts.secondary_phone_number }}</div>
+</div>
+<div class="map">{{ global.company_contacts.map_coordinates }}</div>
+<style>
+	main {
+		display: flex;
+		justify-content: space-around;
+		flex-direction: row;
+	}
+
+	.contact-box {
+		display: flex;
+		flex-direction: column;
+		align-content: center;
+	}
+
+	.map {
+		border: 0.1rem dashed gray;
+		padding: auto;
+		display: flex;
+		width: 32vw;
+		aspect-ratio: 1;
+		align-items: center;
+		justify-content: center;
+	}
+</style>
+{% endblock %}

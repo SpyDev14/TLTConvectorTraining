@@ -1,36 +1,84 @@
-# Сделать позже похожую систему, что была в LTP, но с расширенным
-# функционалом и с использованием context processors
+from typing import Callable, overload
 
-# Пока-что сделать топорную схему
+from django.conf 		import settings
+from django.db.models 	import QuerySet, Model
 
-# Ну или не делать такую систему вовсе, это тоже неплохо работает и
-# соблюдает KISS.
 from solo.models 			import SingletonModel
 
 from shared.string_processing.cases import camel_to_snake_case
+from shared.reflection 				import typename
 from core.models.singletons 		import *
 from core.models.general 			import Page, ExtraContext
+from core.models.bases 				import BaseRenderableModel
+
+from business import models
 
 
-SINGLETON_MODELS: set[type[SingletonModel]] = {
-	SiteSettings,
-	CompanyContacts
-}
+def _singletons_to_context(singleton_classes: set[type[SingletonModel]]):
+	return {
+		camel_to_snake_case(typename(model)): model.get_solo()
+		for model in singleton_classes
+	}
+
+
+def _model_qs_to_context_by_name[T](
+		qs: QuerySet[T],
+		key_field_name: str,
+		make_name: Callable[[type[T]], str] = \
+			lambda model_type: f"{camel_to_snake_case(typename(model_type))}s"
+	) -> dict[str, T]:
+	if not qs.exists():
+		return {}
+
+	name: str = make_name(qs.model)
+	key_field_value = getattr(qs.first(), key_field_name)
+
+	if not isinstance(key_field_value, str):
+		raise TypeError('Значение из указанного поля для ключа должно быть строкой')
+
+	values_dict = {}
+	for model in qs:
+		key: str = getattr(model, key_field_name)
+		values_dict[key.replace('-', '_')] = model
+	return {name: values_dict}
+
+def _base_renderable_model_qs_to_context(
+		qs: QuerySet[BaseRenderableModel],
+		key_field_name: str = 'slug',
+		make_name: Callable[[type[BaseRenderableModel]], str] | None = None
+	) -> dict[str, BaseRenderableModel]:
+	return _model_qs_to_context_by_name(
+		qs, key_field_name,
+		*((make_name,) if make_name else ())
+	)
+
 
 # Создаёт нагрузку на БД, но я думаю, не такую сильную, так что нормально
-def global_data_context_processor(request): return {
+# WARN: Нарушен OCP из SOLID, да и просто выглядит паршиво
+# TODO: Реализовать систему с провайдерами
+# https://chat.deepseek.com/a/chat/s/7cf344f9-d170-4542-9852-2badfc11257b
+def global_context(request): return {
 	'global': {
-		**{
-			camel_to_snake_case(model.__name__): model.get_solo()
-			for model in SINGLETON_MODELS
-		},
-		'pages': {
-			page.slug: page for page
-			in Page.objects.prefetch_related('extra_context_manager').all()
-		},
-		'extra_context': {
-			ctx.key: ctx.value for ctx
-			in ExtraContext.objects.filter(page = None)
-		},
+		**_singletons_to_context({
+			SiteSettings,
+			CompanyContacts
+		}),
+		**_model_qs_to_context_by_name(
+			ExtraContext.objects.filter(page = None),
+			'key', lambda model_type: camel_to_snake_case(typename(model_type))
+		),
+
+		**_base_renderable_model_qs_to_context(
+			Page.objects
+				.prefetch_related('extra_context_manager')
+				.order_by('name'),
+		),
+		**_base_renderable_model_qs_to_context(
+			models.Service.objects.all(),
+		)
 	},
+}
+
+def debug_context(request): return {
+	'DEBUG': settings.DEBUG,
 }

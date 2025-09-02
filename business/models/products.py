@@ -4,12 +4,13 @@ from django.core.exceptions import ValidationError
 from django.conf 			import settings
 from django.db 				import models
 
-from ckeditor.fields import RichTextField
+from ckeditor.fields 	import RichTextField
+from tinymce.models 	import HTMLField
 
-from core.models.bases 	import BaseRenderableModel
-from business.models 	import Category
+from core.models.bases 			import BaseRenderableModel
+from business.models.category 	import Category
 
-# В отдельной функции, а не в clean, чтобы сообщение было прикреплено к полю category
+
 _PRODUCTS_IMGS_BASE_PATH: Path = settings.IMAGES_ROOT / 'products'
 class Product(BaseRenderableModel):
 	photos: models.Manager['ProductPhoto']
@@ -18,10 +19,14 @@ class Product(BaseRenderableModel):
 
 	category = models.ForeignKey(Category, models.CASCADE, related_name = 'products',
 		verbose_name = 'Категория')
-	description = RichTextField('Описание')
+	description = HTMLField('Описание')
 	blueprint_image = models.ImageField('Чертёж', blank = True, upload_to = _PRODUCTS_IMGS_BASE_PATH / 'blueprints')
-	sub_models_table = RichTextField('Таблица под-моделей товара', blank = True,
+	additional_elements_description = HTMLField('Описание в разделе дополнительных элементов и комплектации',
+		blank = True)
+	sub_models_table = HTMLField('Таблица под-моделей товара', blank = True,
 		help_text = 'Создайте и заполните HTML таблицу с под-моделями товара')
+	in_stock = models.BooleanField('В наличии', default = True)
+
 
 	class Meta:
 		verbose_name = 'Товар'
@@ -31,9 +36,9 @@ class Product(BaseRenderableModel):
 		return f'{self.category.name}/{self.name}'
 
 	def clean(self):
-		if self.category.is_parent_category:
-			raise ValidationError({"category":"Продукт нельзя прикрепить к категории для категорий"})
-
+		if self.category:
+			if self.category.is_parent_category:
+				raise ValidationError({"category":"Продукт нельзя прикрепить к категории для категорий"})
 
 
 class ProductPhoto(models.Model):
@@ -50,14 +55,15 @@ class ProductPhoto(models.Model):
 
 
 class ProductCharacteristicType(models.Model):
-	name = models.CharField('Название типа характеристики', max_length = 24)
-	unit_of_measurement = models.CharField('Единицы измерения', max_length = 12, blank = True,
+	name = models.CharField('Название типа характеристики', max_length = 64)
+	unit_of_measurement = models.CharField('Единицы измерения', max_length = 24, blank = True,
 		help_text = 'Например: "мм", "лет", "МПа", "C°" и так далее. Можно оставить пустым.')
 
 	class Meta:
 		unique_together = [('name', 'unit_of_measurement')]
 		verbose_name = 'Тип характеристики'
 		verbose_name_plural = 'Типы характеристик'
+		ordering = ['name', 'unit_of_measurement']
 
 	def __str__(self):
 		return self.name + (f", {self.unit_of_measurement}" if self.unit_of_measurement else '')

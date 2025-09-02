@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ page_info.h1 }}</h1>
+{% for article in object_list %}
+	{% include 'business/components/article.html' %}
+{% endfor %}
+
+<style>
+</style>
+{% endblock content %}

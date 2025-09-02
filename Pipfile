@@ -8,6 +8,7 @@ django = "*"
 django-solo = "*" ### [Models]
 django-mptt = "*"
 django-ckeditor = "*"
+django-tinymce = "*"
 django-ordered-model = "*" 
 django-phonenumber-field = "*" ### [Utils]
 django-cleanup = "*"

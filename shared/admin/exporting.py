@@ -64,7 +64,7 @@ def export_to_excel(
 
 	if verbose_names and len(verbose_names) != len(fields):
 		raise ValueError("verbose_names length must match fields")
-	
+
 	# MARK: ИНИЦИАЛИЗАЦИЯ
 	model_class: Model = queryset.model # для аннотации
 	model_meta = model_class._meta

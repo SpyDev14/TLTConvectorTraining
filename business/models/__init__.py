@@ -1,6 +1,6 @@
 from .services 	import *
-from .catalog 	import *
 from .article 	import *
+from .category 	import *
 
-# For fix circular import
+# Depends on category
 from .products import *

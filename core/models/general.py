@@ -6,20 +6,20 @@ import logging
 
 from django.utils.safestring 	import mark_safe
 from django.core.exceptions 	import ValidationError
-from django.urls 				import resolve, Resolver404
+from django.core.cache 			import cache
+from django.urls 				import resolve, Resolver404, ResolverMatch
 from django.db 					import models
 
-from ckeditor.fields	import RichTextField
+from tinymce.models 	import HTMLField
 import requests
 
-from shared.string_processing 	import camel_to_snake_case
 from shared.models.validators 	import *
 from shared.models.managers 	import IndividualizedBulkOperationsManager
 from shared.telegram.params 	import MessageParseMode
-from shared.reflection 			import typename
 from core.models.bases 			import BaseRenderableModel
-from core.config 				import TELEGRAM_SENDING
-from core.apps 					import CoreConfig
+from core.constants 			import RENDERING_SUPPORTS_TEXT
+from core.config 				import TELEGRAM_SENDING, GENERIC_TEMPLATE
+# from core.views 				import GenericPageView (circular import, used in Page.clean())
 
 _logger = logging.getLogger(__name__)
 
@@ -29,83 +29,122 @@ _logger = logging.getLogger(__name__)
 class Page(BaseRenderableModel):
 	extra_context_manager: models.Manager['ExtraContext']
 
-	is_generic_page = models.BooleanField('Это динамически-генерируемая страница?', default = True,
+	# WARN: Нейминг плохой, не отражает сути, пока нет идей как лучше
+	is_generic_page = models.BooleanField('Это динамически-генерируемая страница?', default = False,
 		help_text = mark_safe(
 			'✅: Будет автоматически доступно по указанному url. Используйте для страниц без логики.<br>'
 			'❌: Выбирайте, когда для обработки страницы нужно использовать кастомный view.<br>'
-			'Влияет на работу логики поля <code>URL path</code>.'))
+			'<br>'
+			'Влияет на работу логики поля <code>URL path</code> & <code>template_name</code>.'))
+	# TODO: Перевести на работу с url name при is_generic_page:❌
+	# TODO: Alt: сменить систему получения page со сложной (относительно) url_path, на простой по slug
+	# Если делать, то не забыть про проверку в clean()
 	#                                                страница на / будет по пути '' vvvv
 	url_path = models.CharField("URL путь", max_length = 64, unique = True, blank = True,
 		validators = [StringStartswith('/', invert = True), StringEndswith('/')],
 		help_text = mark_safe(
-			'<details>'
-			'<summary><code>is_generic_page</code>: ✅</summary>'
-			'URL путь, по которому будет доступна страница. Указав <code>info/about-us/</code> '
-			'здесь, страница будет доступна по адресу <code>$site.$domain/info/about-us/</code>.'
-			'<br><b><u>Крайне рекомендуется</u></b> создавать url <u>на основе slug</u>. '
-			'Например, при slug = <code>about-us</code>, url = <code>info/about-us/</code>).<br>'
+			'<details style="padding-left: 1rem;">'
+				'<summary style="margin-left: -1rem;"><code>is_generic_page</code>: ✅</summary>'
+				'URL путь, по которому будет доступна страница. Указав <code>info/about-us/</code> '
+				'здесь, страница будет доступна по адресу <code>$site.$domain/info/about-us/</code>.'
+				'<br><b><u>Крайне рекомендуется</u></b> создавать url <u>на основе slug</u>. '
+				'Например, при slug = <code>about-us</code>, url = <code>info/about-us/</code>).<br>'
 			'</details>'
 
-			'<details>'
-			'<summary><code>is_generic_page</code>: ❌</summary>'
-			'Название <b>должно</b> соответствовать адресу, по которому можно перейти на страницу '
-			'по кастомному view.<br>'
-			'При ненахождении страницы по указанному url - сохранить изменения / создать страницу '
-			'не удастся.<br>'
+			'<details style="padding-left: 1rem;">'
+				'<summary style="margin-left: -1rem;"><code>is_generic_page</code>: ❌</summary>'
+				'Название <b>должно</b> соответствовать адресу, по которому можно перейти на страницу '
+				'по кастомному view.<br>'
+				'При ненахождении страницы по указанному url - сохранить изменения / создать страницу '
+				'не удастся.<br>'
 			'</details>'
 
 			'<br><b>Всегда</b> отражает реальный адрес страницы.'))
+	# 29.08: Ранее не задумывался об этом. Решил, что в PageBasedView лучше задавать темплейт там же, в классе.
 	template_name = models.CharField('Название django-темплейта',
+		default = GENERIC_TEMPLATE.PAGE,
 		validators = [template_with_this_name_exists],
-		help_text = 'Путь к файлу, включая расширение')
-	# Перевести на TinyMCE так как там куда более удобный редактор, с нормальным Raw просмотром.
-	content = RichTextField('Контент', blank = True,
+		blank = True,
 		help_text = mark_safe(
-			'Будет отрендерено через <code>django-template</code> обработку. '
-			'Это значит, что вы можете обращаться к переменным (напр. <code>{{ page }}</code>) '
-			'использовать теги <code>{% if %}</code>, <code>{% for %}</code>, и другие.<br>'
-			'Будет использован <b>глобальный</b> контекст, т.е тот же, что доступен в самих темплейтах.<br>'
-			'<br>'
-			'<b>ВНИМАНИЕ!</b> Для все теги (напр. <code>if</code> и <code>for</code>) должны быть окружены '
-			'в raw просмотре HTML комментариями вида <code>&lt!-- текст --&gt</code>. <br>'
-			'Иначе этот редактор HTML обернёт их в теги, что может сломать вёрстку.<br>'))
-		# Можно также использовать inline теги через стили без ухода в raw просмотр, но
-		# это может сломать вёрстку, если оно будет находится внутри списка или чего-то похожего.
+			'<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение, <b>должно быть установленно</b>.<br>'
+			'<code>is_generic_page:</code>❌ - Может быть пустым. Будет проигнорировано при работе '
+			'с <code>PageBasedListView</code>.'))
+	content = HTMLField('Контент', blank = True, help_text = RENDERING_SUPPORTS_TEXT)
 		# Это работает вполне себе неплохо, только нужно знать как оно обработается под капотом.
 		# Я тестил - всё гуд.
-		# Но нужно использовать TinyMCE т.к этот редактор максимально всратый.
-		# К тому же, CKEditor устарел не только морально. Он больше неподдерживается и потенциально небезопасен.
-		# Погуглил про CKEditor - он под GPL / LGPL, его вообше нельзя использовать в коммерции.
-		# Так-то только в админке используем и всем до этого нет никакого дела, но TinyMCE под MIT,
-		# и его можно легально использовать почти как угодно.
-	render_content = models.BooleanField('Использовать рендеринг для content?', default = True,
-		help_text = 'Отключите рендеринг content, если это вызывает ошибки. '
-		'Включено по умолчанию потому, что в 99.99% случаев оно НЕ создаёт проблем.')
+		# Но лучше использовать TinyMCE т.к CKEditor4 редактор максимально всра**ый.
+		# К тому же, CKEditor4 устарел не только морально. Он больше неподдерживается и потенциально небезопасен.
+
+		# UPD: Погуглил про CKEditor4 - он под GPL, его вообше нельзя использовать в проприетарном ПО.
+		# GPL - это copyleft лицензия, обязывающая распространаять ПО его использующее под такой-же лицензией,
+		# и обязывает опубликовать весь код в открытый доступ.
+		# Конкретно CKEditor (4 & 5) имеет вторую лицензию для коммерции, но там нужно платить за использование
+		# правообладателю: компании CKSource.
+		# Так-то только в админке используем и почти всем до этого нет никакого дела, но фактически это
+		# нарушение лицензии и закона соответственно. CKEditor НЕЛЬЗЯ использовать в проприетарном ПО на
+		# бесплатных основаниях, "либо платите, либо открывайте исходный код" - вот их условия.
+		# А вот TinyMCE 6.0 под MIT, и его можно легально использовать почти как угодно, включая проприетарное ПО.
+		# Но TinyMCE версии 7 и выше - уже под GPLv2, их нельзя.
+
+		# UPD: Потестил на дебаг странице (рендеринг) - всё работает как по маслу, внутри конечно грязь из тегов,
+		# но это почти ни на что не влияет, жить можно. Главное - помечать for & if как div стиль текста, так как
+		# p по умолчанию идёт с отступами, которые как раз всё и "ломают" (большие отступы между строками)
 
 	class Meta:
 		verbose_name = 'Страница'
 		verbose_name_plural = 'Страницы'
 
 	def clean(self):
-		if not self.is_generic_page:
-			try:
-				resolve(self.get_absolute_url())
-			except Resolver404:
-				raise ValidationError(
-					{'url_path':
-						f'Страница по URL "{self.get_absolute_url()}" не найдена'
-						' (логика работы при is_generic_page = False).'
-					}
-				)
+		from core.views import GenericPageView
+		self_url = self.get_absolute_url()
+
+		# INFO: Должно быть настроено
+		try: match = resolve(self_url)
+		except Resolver404: raise Exception(
+			'Вы забыли добавить GenericPageView в urlpatterns, либо он настроен так, '
+			'что НЕ перехватывает все входящие запросы (path("<path:url_path>", ...)).'
+		)
+
+
+		def resolved_by_generic_view(match: ResolverMatch):
+			if not hasattr(match.func, 'view_class'): # FB-View case
+				return False
+			return match.func.view_class is GenericPageView
+
+		if not self.is_generic_page and resolved_by_generic_view(match):
+			raise ValidationError({
+				'url_path':
+					f'Страница по URL "{self.get_absolute_url()}" не найдена'
+					' (логика работы при is_generic_page:❌).'
+			})
+
+		if self.is_generic_page:
+			if not self.template_name:
+				raise ValidationError({
+					'template_name': 'template_name не может быть пустым при is_generic_page:✅.'
+				})
+
+			# Указано is_generic_page:✅, но также есть перекрывающий (конфликтующий)
+			# view по такому же пути
+			if not resolved_by_generic_view(match):
+				view_f = match.func
+				raise ValidationError({
+					'url_path': (
+						f'Страница по URL "{self.get_absolute_url()}" перекрывается ' +
+						f'{'Class-Based' if hasattr(view_f, 'view_class') else 'Func-Based'} view ' +
+						(f'(url name = {match.view_name})' if match.url_name else '') +
+						' (логика работы при is_generic_page:✅).'
+					)
+				})
+
 
 	def get_absolute_url(self):
 		return f"/{self.url_path}"
 
-	def get_admin_change_url(self):
-		return f'/admin/{CoreConfig.name}/{typename(self).lower()}/{self.pk}/change/'
-
+	# В контексте объект Page живёт только 1 запрос,
+	# но внутри могут много раз обращаться к этому св-ву
 	@cached_property
-	def extra_context(self):
+	def extra_context(self) -> dict:
 		"""Для темплейтов"""
 		return {ctx.key: ctx.value for ctx in self.extra_context_manager.all()}
 
@@ -131,7 +170,8 @@ class ExtraContext(models.Model):
 		else:
 			return f'{self.key} for page "{self.page}"'
 
-
+# TODO: Перевести на встроенное кэширование с инвалидацией, вместо самописного
+# https://chat.deepseek.com/a/chat/s/a35b0278-5152-4e94-87a1-491bbc2f811c
 class TelegramSendingChannel(models.Model):
 	class Specialization(models.TextChoices):
 		NEW_REQUEST_NOTIFICATIONS = (
@@ -204,8 +244,8 @@ class TelegramSendingChannel(models.Model):
 
 		return instance
 
-	# Это не будет меняться в runtime
-	@cached_property
+	# NOTE: может лучше get_token()?
+	@property
 	def _token(self):
 		return getenv(self.token_env_name, '')
 
@@ -224,6 +264,7 @@ class TelegramSendingChannel(models.Model):
 
 	# Если развивать идею, то можно в shared создать класс TelegramAPI,
 	# принимающий токен в конструкторе, реализующий все методы telegram API
+	# Хотя, вроде есть уже готовые библиотеки, с чистыми методами для API
 	def _get_api_url(self, action: str):
 		"""
 		Возвращает полную url-строку с токеном и действием.
@@ -239,10 +280,14 @@ class TelegramSendingChannel(models.Model):
 				'ENV переменная не установлена. Сначала добавьте её в .env-файл, потом указывайте здесь. '
 				'Если вы её уже добавили в .env, то перезагрузите сервер.'
 			)
-		else: # Т.к это метод общей валидации модели, а не только поля с токеном.
+
+		# else потому, что это метод общей валидации модели, а не только поля с токеном.
+		else:
 			# Сейчас я считаю эту проверку неоправданной так как
 			# её реализацая заняла слишком много времени и она всё равно не
 			# даёт гарантии, что токен существует.
+
+			# TODO: Убрать проверку, она нарушает SRP и не имеет смысла
 			try:
 				response = requests.get(
 					url = self._get_api_url('getMe'),
@@ -253,8 +298,6 @@ class TelegramSendingChannel(models.Model):
 					raise ValidationError(
 						'Указанный в ENV-переменной токен не существует в Телеграмм-системе.'
 					)
-			# Вполне возможно, что телеграм бонусом ещё и начнут глушить в скором будущем,
-			# так что проверки на ошибки сети вполне себе оправданы.
 			except requests.RequestException as ex:
 				_logger.error(f'Ошибка при попытке выяснить существует ли токен в Телеграмм-системе: {ex}')
 
@@ -272,7 +315,7 @@ class TelegramSendingChannel(models.Model):
 		# Можно избежать блокировки потока, используя ASGI + async
 		"""
 		**ВНИМАНИЕ!!!** Блокирует поток выполнения!
-		
+
 		Raises:
 			RuntimeError: Токен не установлен в ENV переменную.
 			HTTPError: Статус ответа не был положительным (raise_for_status())

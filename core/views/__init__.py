@@ -1,8 +1,8 @@
 from .bases 	import (
-	BaseRenderableDetailView, BasePageView, ConcretePageView, FormPageView,
-	BasePageBasedListView
+	BaseRenderableDetailView, BasePageView, ConcretePageView, PageWithFormView,
+	PageBasedListView
 )
-from .general 	import GenericPageDetailsView
+from .general 	import GenericPageView, DebugPageView
 from .favicon 	import FaviconView
 
-from .mixins 	import ConcretePageMixin, GenericPageMixin
+# from .mixins 	import PageInfoMixin, ConcretePageMixin, GenericPageMixin

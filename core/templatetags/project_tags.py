@@ -1,4 +1,4 @@
-import logging, json
+# Эти теги по умолчанию добавляются в каждый темплейт (указано в настройках)
 
 from django.utils.safestring 	import mark_safe
 from django.template 			import Template, RequestContext, Library
@@ -22,26 +22,6 @@ def render_as_template(context: RequestContext, template_string: str):
 		template.render(context)
 	)
 
-@register.simple_tag(takes_context = True)
-def log_context(context: RequestContext):
-	"""Выводит в лог весь текущий контекст"""
-	logger = logging.getLogger(LEVEL_ONLY_LOGGER)
-
-	def serialize_obj(obj: object):
-		data = {
-			'type': typename(obj),
-			'repr': repr(obj),
-		}
-
-		if str(obj) != repr(obj):
-			data['str'] = str(obj)
-
-		return data
-
-	context_as_dict = context.flatten()
-	logger.debug(
-		'Current template context:\n%s' %
-		json.dumps(context_as_dict, indent = 4, default = serialize_obj, ensure_ascii = False)
-	)
-
-	return ''
+@register.filter
+def get_attr(obj, attr_name: str):
+	return getattr(obj, attr_name)

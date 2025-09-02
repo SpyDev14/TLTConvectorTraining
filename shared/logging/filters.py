@@ -13,12 +13,12 @@ class TelegramBotTokenFilter(Filter):
 	def filter(self, record):
 		# Обрабатываем основное сообщение
 		record.msg = self.hide_tokens(record.msg)
-		
+
 		# Обрабатываем аргументы форматирования
 		if record.args:
 			record.args = tuple(
 				self.hide_tokens(arg) if isinstance(arg, str) else arg
 				for arg in record.args
 			)
-			
+
 		return True

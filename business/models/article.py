@@ -1,18 +1,23 @@
 from django.conf 	import settings
+from django.urls 	import reverse
 from django.db 		import models
 
 from ckeditor.fields import RichTextField
+from tinymce.models import HTMLField
 
 from core.models.bases import BaseRenderableModel
 
 
+class ArticleManager(models.Manager):
+	def ceo_ordered(self):
+		return self.order_by('-created_at')
+
 class Article(BaseRenderableModel):
-	# У этой модели отдельно заголовок, отдельно название.
-	# NOTE: Может удалить title и использовать name?
-	title = models.CharField(max_length = 128, verbose_name = "Заголовок")
 	image = models.ImageField(upload_to = settings.IMAGES_ROOT/'articles')
-	content = RichTextField(verbose_name = "Содержимое")
+	content = HTMLField("Содержимое")
 	created_at = models.DateTimeField(auto_now_add = True)
+
+	objects: ArticleManager = ArticleManager()
 
 	class Meta:
 		verbose_name = "Статья"

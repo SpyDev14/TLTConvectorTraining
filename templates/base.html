@@ -1,12 +1,29 @@
 {% load static %}
-{% load project_custom_tags %}
+
+{% load debug_tags %}
+
+
 {% if False %}
 	{% log_context %}
 {% endif %}
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{ page.html_title }}</title>
+	<!-- Сейчас используется только на дебаг странице -->
+	{% block html_title_override_block %}
+		<title>{{ page_info.html_title|default:"ТЛТ Конвектор" }}</title>
+	{% endblock %}
+	{% if not page_info and DEBUG %}
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			setTimeout(function() { alert(
+				'Ошибка! page_info отсутствует в контексте! ' +
+				'Бекендеры, проверьте что используете правильный View, ' +
+				'добавляющий page_info в контекст!'
+			)}, 200);
+		});
+	</script>
+	{% endif %}
 	<meta name="description" content="Description">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
@@ -21,6 +38,10 @@
 
 		--light-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		--dark-bg: #0000001F;
+	}
+
+	::selection {
+		background-color: rgba(127, 127, 127, 0.7);
 	}
 
 	html {
@@ -46,6 +67,7 @@
 		display: flex;
 		align-items: center;
 		flex-direction: column;
+		gap: 1rem;
 	}
 
 	hr {
@@ -54,7 +76,7 @@
 		height: 0.1rem;
 		border-radius: 9999rem;
 	}
-	
+
 	a {
 		color: #3B82F6;
 		text-decoration: none;
@@ -63,7 +85,7 @@
 	} a:visited {
 		color: #3B82F6;
 	}
-	
+
 	h1, h2, h3, h4 {
 		margin-bottom: 0.125rem;
 	}
@@ -74,6 +96,10 @@
 		padding-inline: 0.5rem;
 		border-radius: 0.25rem;
 	}
+
+	table { border-collapse: collapse; margin: 10px 0; }
+	td, th { border: 1px solid #ddd; padding: 4px 8px; }
+	th { background-color: var(--dark-bg); }
 
 	form {
 		display: flex;
@@ -106,6 +132,7 @@
 		border-radius: 0.4rem;
 		text-decoration: none;
 		font-weight: 500;
+		transition: background-color 0.2s;
 	}
 	button:hover {
 		text-decoration: none;
@@ -119,18 +146,45 @@
 		border-radius: 0.4rem;
 		text-decoration: none;
 		font-weight: 500;
+		transition: background-color 0.2s;
 	}
 	.button-like a:hover {
 		text-decoration: none;
 		background-color: #4d6bfeD0;
 	}
-	.button-like a.green {
-		background-color: #4CAF50;
-	}
-	.button-like a.green:hover {
-		background-color: #4CAF50D0;
+	.button-like a.green { background-color: #4CAF50; }
+	.button-like a.green:hover { background-color: #4CAF50D0; }
+
+	.button-like a.gray { background-color: #3a3c40; }
+	.button-like a.gray:hover { background-color: #4d6bfeD0; }
+
+	.dark-shell {
+		display: flex;
+		flex-direction: column;
+		gap: 0.8rem;
+		padding: 1.2rem;
+		border-radius: 1rem;
+		background-color: var(--dark-bg);
+		box-shadow: var(--light-shadow);
 	}
 
+	.invisible-link {
+		color: indigo;
+		text-decoration: none;
+	}
+
+	.invisible-link:hover {
+		text-decoration: none;
+	}
+
+	.warn-info-block {
+		color: yellow;
+		font-size: 0.75rem;
+		background-color: var(--dark-bg);
+		border: 0.1rem solid var(--dark-bg);
+		padding: 0.25rem;
+		margin-bottom: 0.5rem;
+	}
 </style>
 <style>
 	/* ВЫПАДАЮЩЕЕ МЕНЮ - ИСПРАВЛЕННАЯ ВЕРСИЯ */
@@ -209,21 +263,38 @@
 </style>
 <body>
 	<div class="content">
-		<div style="display: flex; justify-content: space-between; align-items: center;">
+		<div style="display: flex; justify-content: space-between; align-items: stretch;">
 			<div>
-				Вы на странице: <code>{{ page.name }}</code> |
-				URL: <code>{{ page.get_absolute_url }}</code> |
-				Slug: <code>{{ page.slug }}</code> |
-				Template: <code>{{ page.template_name }}</code>
+				Вы на странице: <code>{{ page_info.name }}</code> |
+				URL: <code>{{ page_info.get_absolute_url }}</code> |
+				Slug: <code>{{ page_info.slug }}</code> |
+				{% if object.template_name %}
+				Template: <code>{{ object.template_name }}</code> |
+				{% endif %}
+				View: <code>{{ view|typename }}</code>
+				</code>
 			</div>
-			<div class="button-like" style="display: flex; gap: 0.5rem; align-items: center;">
-				<a href="{{page.get_admin_change_url}}" class="button-like green">→ Смотреть в админке </a>
+			<div class="button-like" style="display: flex; gap: 0.5rem; align-items: flex-start; flex-shrink: 0;">
+				{% comment %}
+				чтобы если нет page_info можно было сразу перейти в админку, а так
+				page_info гарантируется на каждой странице.
+				{% endcomment %}
+				<a href="{{page_info.get_admin_url|default:'/admin/'}}" class="button-like green">
+					→ Смотреть в админке
+				</a>
 				<div class="dropdown">
 					<a class="dropdown-toggle">Страницы ▼</a>
 					<div class="dropdown-menu right-edge">
-						{% for g_page in global.pages.values %}
-						<a href="{{ g_page.get_absolute_url }}">{{ g_page }}</a>
-						{% endfor %}
+						{% with home=global.pages.home %}
+							<a href="{{ home.get_absolute_url }}">{{ home|truncatechars:18 }}</a>
+							<div><hr style="margin: 0;"></div>
+
+							{% for g_page in global.pages.values %}
+								{% if g_page != home%}
+								<a href="{{ g_page.get_absolute_url }}">{{ g_page|truncatechars:18 }}</a>
+								{% endif %}
+							{% endfor %}
+						{% endwith %}
 					</div>
 				</div>
 			</div>
@@ -231,18 +302,14 @@
 		<div><hr></div>
 		<main>
 			{% block content %}
-			<div>Тут пусто. Ага.</div>
-			<style>
-				main {
-					justify-content: center;
-				}
-				.dark-bg {
-					background-color: var(--dark-bg);
-					padding: 1rem;
-					border-radius: 0.5rem;
-					box-shadow: var(--light-shadow);
-				}
-			</style>
+				<div>Тут пусто. Ага.</div>
+				<div style="color: gray; font-size: 0.75rem;">(наполнение content по умолчанию)</div>
+				<style>
+					main {
+						justify-content: center;
+						gap: 0;
+					}
+				</style>
 			{% endblock %}
 		</main>
 		<footer>

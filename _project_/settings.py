@@ -78,9 +78,12 @@ INSTALLED_APPS = [
 	# Libs
 	'solo',
 	'mptt',
+	'tinymce',
 	'ckeditor',
 	'rangefilter',
 	'debug_toolbar',
+	'django_cleanup',
+	'phonenumber_field',
 
 	# This project
 	'core',
@@ -91,7 +94,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 	# Libs (required top position)
 	*_add_if_debug('debug_toolbar.middleware.DebugToolbarMiddleware'),
-	
+
 	# Django
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
@@ -116,7 +119,12 @@ TEMPLATES = [
 				'django.contrib.messages.context_processors.messages',
 
 				# This project
-				'core.context_processors.global_data_context_processor',
+				'core.context_processors.global_context',
+				'core.context_processors.debug_context',
+			],
+
+			'builtins': [
+				'core.templatetags.project_tags'
 			],
 		},
 	},
@@ -183,8 +191,7 @@ LOGS_DIR = BASE_DIR / str(env('LOGS_DIR'))
 if not LOGS_DIR.exists():
 	LOGS_DIR.mkdir(parents = True)
 
-# WARN: Токен ТГ бота светится в логах при ошибках сети / запросах с DEBUG
-# TODO: Настроить обработчик urllib3.connectionpool в режиме DEBUG
+
 LOGGING = {
 	'version': 1,
 	'disable_existing_loggers': False, # Отключить иные обработчики
@@ -274,21 +281,34 @@ if not 'runserver' in sys.argv:
 	LOGGING['loggers'].pop('shared.admin.model_registration')
 
 # Настройка предупреждений
-SILENCED_SYSTEM_CHECKS = ["ckeditor.W001"]
+SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
 
 
 # MARK: Project
-# FIXME: нельзя указать приложение из этого проекта, иначе - ошибка!
-# Но можно создать ModelAdmin где-нибудь в shared и указать тут - это сработает,
-# но с моделями такое уже не прокатит.
 DEFAULT_MODEL_ADMIN_CLASSES = {
-	'solo.models.SingletonModel': 	'solo.admin.SingletonModelAdmin',
-	'mptt.models.MPTTModel': 		'mptt.admin.DraggableMPTTAdmin',
+	'solo.models.SingletonModel': 'solo.admin.SingletonModelAdmin',
+	'mptt.models.MPTTModel': 'mptt.admin.DraggableMPTTAdmin',
 
 	# Project
 	'core.models.bases.BaseRenderableModel': 'core.admin.bases.BaseRenderableModelAdmin',
 }
 
-
 # MARK: Libs
-PHONENUMBER_DEFAULT_REGION = "RU" # Код страны (ISO 3166-1 alpha-2)
+PHONENUMBER_DEFAULT_REGION = 'RU'
+
+TINYMCE_DEFAULT_CONFIG = {
+	'height': '25vh',
+	'width': '75%',
+	'plugins':
+		'advlist,autolink,lists,link,image,charmap,preview,anchor,'
+		'searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,'
+		'code,help,wordcount',
+	"menubar": "file edit view insert format tools table help",
+	'toolbar':
+		'undo redo | formatblocks | bold italic underline strikethrough | removeformat | '
+		'alignleft aligncenter alignright alignjustify | '
+		'bullist numlist | image media template link | table | code | fullscreen | help',
+	'table_toolbar':
+		'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | '
+		'tableinsertcolbefore tableinsertcolafter tabledeletecol',
+}

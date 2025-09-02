@@ -1,5 +1,8 @@
+from typing import Any
+
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts 		import get_object_or_404
+from django.db.models 		import QuerySet
 
 from core.models.general 	import Page
 from core.models.bases 		import BaseRenderableModel
@@ -24,6 +27,16 @@ class PageInfoMixin:
 				'реализующими метод get_context_data.'
 			)
 
+	# Т.к Python не C# - это будет просто дубликат object, либо page.
+	# boxing-а в Python нет, есть риск того, что фронты будут смешивать
+	# эти сущности и получать данные о странице через object, а информацию
+	# о Page через page_info.
+	# NOTE: Нужно будет где-то чётко объяснить, что page_info - отвечает ТОЛЬКО
+	# за информацию из части от BaseRenderableModel, а object (или кастомное
+	# название в контексте) - за информацию о самом объекте.
+	# Путаница вряд ли возникнет, но риск смешения где-нибудь в template
+	# наследнике от base.html, где по-факту большой разницы нет. Это в base.html
+	# есть разница, вот там важно, чтобы оно всегда было под одним именем.
 	def get_page_info(self) -> BaseRenderableModel:
 		raise NotImplementedError()
 
@@ -38,9 +51,6 @@ class ConcretePageMixin:
 	"""
 	Миксин переопределяющий получение объекта
 	страницы на get_object_or_404 по заранее прописанному во View slug.
-
-	Требует:
-	- Это подкласс BasePageView
 	"""
 	page_slug: str | None = None
 
@@ -49,18 +59,24 @@ class ConcretePageMixin:
 			raise ImproperlyConfigured('page_slug не может быть пуст')
 		return get_object_or_404(Page, slug = self.page_slug)
 
-
-# Врядли будут где-то использовать также, как и ConcretePageMixin,
-# скорее задел на будущее с GenericForeginKey на модели Page чтобы
-# добавлять страницы со списком моделей через админку.
-# В прочем, я бы это и сделал, если бы не было проблемы с кастомными
-# QuerySet-s для большинства таких view.
 class GenericPageMixin:
 	url_kwarg_key: str = 'url_path'
-	kwargs: dict
+
+	# Реализовал не самым лучшим образом, ранее просто всегда проверял
+	# (защита от ситуации, где is_generic_page = False, но ей не присвоили
+	# свой View и оно обрабатывается также через GenericPageView)
+	check_is_generic_page: bool = True
+
+	kwargs: dict[str, Any]
 
 	def get_page(self):
 		if not self.url_kwarg_key:
-			raise ImproperlyConfigured('url_kwarg не может быть пуст')
+			raise ImproperlyConfigured('url_kwarg не может быть пуст!')
 		url_path = self.kwargs[self.url_kwarg_key]
-		return get_object_or_404(Page, url_path = url_path, is_generic_page = True)
+
+		additional_lookups = (
+			{'is_generic_page': True}
+			if self.check_is_generic_page
+			else {}
+		)
+		return get_object_or_404(Page, url_path = url_path, **additional_lookups)
