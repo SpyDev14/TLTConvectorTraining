@@ -98,7 +98,8 @@ class PageWithFormView(ConcretePageView, generic.edit.FormMixin, generic.edit.Pr
 # так как этот метод также должен быть и здесь.
 # Ещё был вариант сделать приватную локальную функцию здесь с нужной стратегией, но
 # мне этот вариант не понравился. Лучше mixin в публичном API, чем такая функция.
-class PageBasedListView(generic.ListView, ConcretePageMixin, PageInfoMixin):
+# NOTE: Порядок наследования важен для добавления page_info!
+class PageBasedListView(ConcretePageMixin, PageInfoMixin, generic.ListView):
 	"""
 	Базовый View для List-страниц, где Page выступает в роли основы.
 	Изначально, я думал делать всё через PageDetail View, но у ListView много
