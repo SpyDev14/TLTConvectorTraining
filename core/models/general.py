@@ -59,9 +59,10 @@ class Page(BaseRenderableModel):
 			'<details style="padding-left: 1rem;">'
 				'<summary style="margin-left: -1rem;"><code>is_generic_page</code>: ✅</summary>'
 				'URL путь, по которому будет доступна страница. Указав <code>info/about-us/</code> '
-				'здесь, страница будет доступна по адресу <code>$site.$domain/info/about-us/</code>.'
+				'здесь, страница будет доступна по адресу <code>/info/about-us/</code>.'
 				'<br><b><u>Крайне рекомендуется</u></b> создавать url <u>на основе slug</u>. '
 				'Например, при slug = <code>about-us</code>, url = <code>info/about-us/</code>).<br>'
+				'<br>'
 			'</details>'
 
 			'<details style="padding-left: 1rem;">'
