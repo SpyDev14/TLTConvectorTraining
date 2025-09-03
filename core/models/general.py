@@ -28,7 +28,9 @@ _logger = logging.getLogger(__name__)
 # для простых кейсов (т.е для маломальски уникальной логики создавать отдельный view)
 # Но может быть и не стоит, это усложнение + могут возникнуть свои подводные камни
 class Page(BaseRenderableModel):
-	extra_context_manager: models.Manager['ExtraContext']
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.extra_context_manager: models.Manager['ExtraContext']
 
 	# WARN: Нейминг плохой, не отражает сути, пока нет идей как лучше
 	is_generic_page = models.BooleanField('Это динамически-генерируемая страница?', default = False,
