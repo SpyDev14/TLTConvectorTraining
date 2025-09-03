@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>
+	{{ page_info.h1 }}
+</h1>
+<div style="display: flex; flex-direction: column; gap: 2rem;">
+	<img src="{{ product.image.url }}" style="max-width: 35vw; max-height: 40vh; margin-inline: auto;">
+	<div style="display: flex; gap: 1rem;">
+		{% for photo in photos %}
+			<img src="{{ photo.image.url }}" style="height: 12rem;">
+		{% endfor %}
+	</div>
+</div>
+<div style="display: flex;">
+	<div>
+		<h3>О продукте</h3>
+		<div>
+			{{ product.description|safe }}
+		</div>
+	</div>
+	<div style="flex-shrink: 0;">
+		<h3>Технические характеристики</h3>
+		{% for characteristic in characteristics %}
+		<p class="warn-info-block">{{characteristic}}</p>
+		{% endfor %}
+	</div>
+</div>
+<div style="width: 100%;">
+	<details open>
+		<summary><h2 style="display: inline;">Техническое описание</h2></summary>
+
+		{% if product.blueprint_image %}
+		<div><img src="{{product.blueprint_image.url}}" style="width: 100%;"></div>
+		{% endif %}
+
+		{{product.sub_models_table|safe}}
+	</details>
+	<details>
+		<summary><h2 style="display: inline;">Дополнительные элементы и комплектация</h2></summary>
+		
+		{% if additional_elements %}
+		<ul>
+			{% for element in additional_elements %}
+				<li>{{ element }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+			<div style="color: gray;">Дополнительных элементов нет</div>
+		{% endif %}
+	</details>
+</div>
+<style>
+	main {
+		max-width: 65vw;
+		margin-inline: auto;
+	}
+
+	img {
+		border-radius: 0.5rem;
+	}
+</style>
+{% endblock %}

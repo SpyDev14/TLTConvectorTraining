@@ -58,9 +58,6 @@ class Category(MPTTModel, BaseRenderableModel):
 			**data
 		)
 
-	def get_absolute_url(self):
-		return "/"
-
 	# NOTE: Не вызывается при перемещении через древо
 	def clean(self):
 		# Не изменение

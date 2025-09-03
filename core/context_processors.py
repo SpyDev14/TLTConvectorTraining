@@ -24,13 +24,15 @@ def _singletons_to_context(singleton_classes: set[type[SingletonModel]]):
 def _model_qs_to_context_by_name[T](
 		qs: QuerySet[T],
 		key_field_name: str,
-		make_name: Callable[[type[T]], str] = \
+		name: Callable[[type[T]], str] | str = \
 			lambda model_type: f"{camel_to_snake_case(typename(model_type))}s"
 	) -> dict[str, T]:
 	if not qs.exists():
 		return {}
 
-	name: str = make_name(qs.model)
+	if not isinstance(name, str):
+		name: str = name(qs.model)
+
 	key_field_value = getattr(qs.first(), key_field_name)
 
 	if not isinstance(key_field_value, str):
@@ -45,11 +47,11 @@ def _model_qs_to_context_by_name[T](
 def _base_renderable_model_qs_to_context(
 		qs: QuerySet[BaseRenderableModel],
 		key_field_name: str = 'slug',
-		make_name: Callable[[type[BaseRenderableModel]], str] | None = None
+		name: Callable[[type[BaseRenderableModel]], str] | str | None = None
 	) -> dict[str, BaseRenderableModel]:
 	return _model_qs_to_context_by_name(
 		qs, key_field_name,
-		*((make_name,) if make_name else ())
+		*((name,) if name else ())
 	)
 
 
@@ -75,6 +77,10 @@ def global_context(request): return {
 		),
 		**_base_renderable_model_qs_to_context(
 			models.Service.objects.all(),
+		),
+		**_base_renderable_model_qs_to_context(
+			models.Category.objects.filter(parent = None),
+			name = 'categories'
 		)
 	},
 }

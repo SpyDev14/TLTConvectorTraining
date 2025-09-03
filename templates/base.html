@@ -88,6 +88,15 @@
 
 	h1, h2, h3, h4 {
 		margin-bottom: 0.125rem;
+		margin-top: 0.5rem;
+	}
+	footer h4 {
+		margin-bottom: 0.5rem;
+		margin-top: 0.25rem;
+	}
+
+	footer {
+		padding-bottom: 2rem;
 	}
 
 	code {
@@ -314,7 +323,39 @@
 		</main>
 		<footer>
 			<hr>
-			<div style="display: flex; justify-content: center;">
+			<div style="display: flex; justify-content: center; gap: 4rem;">
+				<a href="/">
+					<img src="{{ global.site_settings.favicon.url }}" style="height: 40%; border-radius: 0;">
+				</a>
+				<div>
+					<h4>Товары</h4>
+					{% for category in global.categories.values %}
+						<div>
+							<a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
+						</div>
+					{% endfor %}
+				</div>
+				<div>
+					<h4>Услуги</h4>
+					{% for service in global.services.values %}
+						<div>
+							<a href="{{ service.get_absolute_url }}">{{ service.name }}</a>
+						</div>
+					{% endfor %}
+				</div>
+				<div>
+					<h4>О компании</h4>
+					<div>
+						<a href="{{ global.pages.company_contacts.get_absolute_url }}">
+							{{ global.pages.company_contacts.name }}
+						</a>
+					</div>
+					<div>
+						<a href="{{ global.pages.about_us.get_absolute_url }}">
+							{{ global.pages.about_us.name }}
+						</a>
+					</div>
+				</div>
 				<div>
 					<div>
 						Время работы: {{ global.company_contacts.work_time_text }}

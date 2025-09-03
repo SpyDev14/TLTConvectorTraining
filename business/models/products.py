@@ -1,4 +1,5 @@
-from pathlib import Path
+from functools 	import cached_property
+from pathlib 	import Path
 
 from django.core.exceptions import ValidationError
 from django.conf 			import settings
@@ -9,7 +10,7 @@ from tinymce.models 	import HTMLField
 from core.models.bases 			import BaseRenderableModel
 from business.models.category 	import Category
 
-
+# TODO: Нужны рекомендуемые товары
 _PRODUCTS_IMGS_BASE_PATH: Path = settings.IMAGES_ROOT / 'products'
 class Product(BaseRenderableModel):
 	def __init__(self, *args, **kwargs):
@@ -29,15 +30,21 @@ class Product(BaseRenderableModel):
 		help_text = 'Создайте и заполните HTML таблицу с под-моделями товара')
 	in_stock = models.BooleanField('В наличии', default = True)
 
+	@property
+	def html_title(self):
+		return f"Купить {super().html_title}"
+
+	@cached_property
+	def image(self):
+		photo = self.photos.first()
+		return photo.image if photo else None
 
 	class Meta:
 		verbose_name = 'Товар'
 		verbose_name_plural = 'Товары'
 
-	def __str__(self):
-		return f'{self.category.name}/{self.name}'
-
 	def clean(self):
+		# Может быть null в форме
 		if self.category:
 			if self.category.is_parent_category:
 				raise ValidationError({"category":"Продукт нельзя прикрепить к категории для категорий"})

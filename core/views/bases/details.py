@@ -32,6 +32,13 @@ class BaseRenderableDetailView(PageInfoMixin, generic.DetailView):
 	# а не к object. Тем не менее, object остаётся в контексте.
 	def get_context_object_name(self, obj):
 		return make_context_name(obj)
+	
+	def get_template_names(self):
+		names = super().get_template_names()
+
+		# Template по умолчанию
+		names.append(GENERIC_TEMPLATE.MODEL_DETAIL)
+		return names
 
 # MARK: └ Page-detail views
 # View для страниц Page (о нас, политика приватности, главная (как родительская View), и так далее)
@@ -65,8 +72,9 @@ class BasePageView(BaseRenderableDetailView):
 	def get_template_names(self):
 		names = super().get_template_names()
 		
-		# Template по умолчанию
-		names.append(GENERIC_TEMPLATE.PAGE)
+		# Template по умолчанию (предпоследний)
+		names.insert(len(names)-1, GENERIC_TEMPLATE.PAGE)
+		print(names)
 		return names
 
 # Для удобства; подключаю стратегию получения page отдельно, чтобы не засорять
