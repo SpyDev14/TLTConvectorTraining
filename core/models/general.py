@@ -187,10 +187,6 @@ class TelegramSendingChannel(models.Model):
 		LOGS = ('logs', 'Логи')
 		# Добавлять новые специализации тут
 
-	# Ядерный костылище, нарушает SRP
-	_tg_token_validation_warning_message: str | None = None
-	# Используется в админке
-
 	token_env_name = models.CharField('ENV-переменная с токеном', validators = [env_variable_name],
 		help_text = 'Название ENV переменной с токеном этого бота. '
 		'Также проверяется существование токена в телеграм системе.')
@@ -300,32 +296,6 @@ class TelegramSendingChannel(models.Model):
 				'ENV переменная не установлена. Сначала добавьте её в .env-файл, потом указывайте здесь. '
 				'Если вы её уже добавили в .env, то перезагрузите сервер.'
 			)
-
-		# else потому, что это метод общей валидации модели, а не только поля с токеном.
-		else:
-			# Сейчас я считаю эту проверку неоправданной так как
-			# её реализацая заняла слишком много времени и она всё равно не
-			# даёт гарантии, что токен существует.
-
-			# TODO: Убрать проверку, она нарушает SRP и не имеет смысла
-			try:
-				response = requests.get(
-					url = self._get_api_url('getMe'),
-					timeout = TELEGRAM_SENDING.CHECK_TOKEN_EXSISTS_TIMEOUT
-				)
-
-				if not response.json()['ok']:
-					raise ValidationError(
-						'Указанный в ENV-переменной токен не существует в Телеграмм-системе.'
-					)
-			except requests.RequestException as ex:
-				_logger.error(f'Ошибка при попытке выяснить существует ли токен в Телеграмм-системе: {ex}')
-
-				self._tg_token_validation_warning_message = (
-					'Не удалось выяснить, существует ли токен указанный для канала '
-					f'"{self}" в Телеграмм-системе, '
-					'есть риск ошибок в будущем, если был задан некорректный токен.'
-				)
 
 
 	def send_message(
