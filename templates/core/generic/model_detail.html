@@ -13,12 +13,14 @@
 	{% endif %}
 	<h1>{{page_info.h1}}</h1>
 	<div><hr></div>
-	{# т.к в проде мы бы не делали одну общую страницу для всех моделей, тут это уместно #}
-	{% if object.content %}
-		{% render_as_template object.content %}
-	{% elif object.description %}
-		{% render_as_template object.description %}
-	{% endif %}
+	<div>
+		{# т.к в проде мы бы не делали одну общую страницу для всех моделей, тут это уместно #}
+		{% if object.content %}
+			{% render_as_template object.content %}
+		{% elif object.description %}
+			{% render_as_template object.description %}
+		{% endif %}
+	</div>
 </div>
 
 <style>
