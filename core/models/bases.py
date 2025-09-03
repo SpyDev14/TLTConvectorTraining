@@ -2,8 +2,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls 			import reverse, NoReverseMatch
 from django.db 				import models
 
-from shared.reflection import typename
-
 
 class BaseRenderableModel(models.Model):
 	# см. get_absolute_url()

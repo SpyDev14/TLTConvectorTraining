@@ -1,5 +1,5 @@
 from datetime 	import date
-from typing 	import Iterable, Sequence, Callable, Any
+from typing 	import Sequence, Callable, Any
 from io 		import BytesIO
 
 from django.contrib.admin 	import action

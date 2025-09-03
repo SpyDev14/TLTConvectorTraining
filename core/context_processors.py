@@ -1,7 +1,7 @@
-from typing import Callable, overload
+from typing import Callable
 
 from django.conf 		import settings
-from django.db.models 	import QuerySet, Model
+from django.db.models 	import QuerySet
 
 from solo.models 			import SingletonModel
 

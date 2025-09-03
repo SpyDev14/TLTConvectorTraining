@@ -3,7 +3,6 @@ from pathlib import Path
 from django.conf 	import settings
 from django.db 		import models
 
-from ckeditor.fields 	import RichTextField
 from tinymce.models 	import HTMLField
 
 from core.models.bases import BaseRenderableModel

@@ -1,9 +1,7 @@
-from django.contrib.admin 	import ModelAdmin, action
-from django.utils 			import timezone
+from django.contrib.admin 	import ModelAdmin
 
 from rangefilter.filters import DateRangeFilter
 
-from shared.string_processing.resizing 	import truncate_string
 from shared.admin.model_registration 	import AdminModelRegistrator
 from shared.admin.exporting 			import make_export_to_excel_action
 from feedback_requests.models 			import FeedbackRequest

@@ -2,7 +2,7 @@ import logging, json
 
 from django.utils.safestring 	import mark_safe
 from django.utils.html 			import escape
-from django.template 			import Template, RequestContext, Library
+from django.template 			import RequestContext, Library
 from _project_.constants 		import LEVEL_ONLY_LOGGER
 
 from shared.reflection import typename
