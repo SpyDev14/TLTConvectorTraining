@@ -12,8 +12,12 @@ from core.models.bases import BaseRenderableModel
 class Category(MPTTModel, BaseRenderableModel):
 	_custom_url_name = 'subcatalog'
 
-	products: models.Manager # Product (circular import)
-	childrens: models.Manager['Category']
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		from business.models import Product
+
+		self.products: models.Manager[Product]
+		self.childrens: models.Manager['Category']
 
 	parent = TreeForeignKey('self', models.CASCADE, verbose_name = 'Родительская категория',
 		null = True, blank = True,
