@@ -92,8 +92,8 @@ class Page(BaseRenderableModel):
 		# Но TinyMCE версии 7 и выше - уже под GPLv2, их нельзя.
 
 	class Meta:
-		verbose_name = 'страницу'
-		verbose_name_plural = 'Страницы'
+		verbose_name = 'страница'
+		verbose_name_plural = 'страницы'
 
 	def clean(self):
 		from core.views import GenericPageView
