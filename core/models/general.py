@@ -32,8 +32,7 @@ class Page(BaseRenderableModel):
 		super().__init__(*args, **kwargs)
 		self.extra_context_manager: models.Manager['ExtraContext']
 
-	# WARN: Нейминг плохой, не отражает сути, пока нет идей как лучше
-	is_generic_page = models.BooleanField('Это динамически-генерируемая страница?', default = False,
+	is_generic_page = models.BooleanField('Это динамически-добавляемая страница?', default = False,
 		help_text = mark_safe(
 			'✅: Будет автоматически доступно по указанному url, требует заданного '
 			'<code>template_name</code>. Используйте для простых страниц, не требующих своего View.<br>'
