@@ -1,4 +1,5 @@
-from django.contrib import admin, messages
+from django.utils.safestring 	import mark_safe
+from django.contrib 			import admin, messages
 
 from shared.string_processing.resizing 	import truncate_string
 from shared.admin.model_registration 	import AdminModelRegistrator
@@ -30,17 +31,21 @@ class ExtraContextInline(admin.TabularInline):
 
 @registrator.set_for_model(models.Page)
 class PageAdmin(BaseRenderableModelAdmin):
-	list_display = ('page', 'page_url', 'template_name')
+	list_display = ('page', 'slug', 'absolute_url', 'page_template_name', 'is_generic_page',)
 	inlines = [ExtraContextInline]
 	prepopulated_fields = {}
+	ordering = ('name',)
 
 	def page(self, obj):
 		return str(obj)
 	page.short_description = 'Страница'
 
-	def page_url(self, obj: models.Page):
-		return obj.get_absolute_url()
-	page_url.short_description = models.Page._meta.get_field('url_path').verbose_name
+	def page_template_name(self, obj: models.Page):
+		return (
+			obj.template_name or
+			mark_safe('<span style="color: grey;">(не generic страница)</span>')
+		)
+	page_template_name.short_description = models.Page._meta.get_field('template_name').verbose_name
 
 
 @registrator.set_for_model(models.TelegramSendingChannel)
