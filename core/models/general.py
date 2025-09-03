@@ -106,36 +106,44 @@ class Page(BaseRenderableModel):
 			'что НЕ перехватывает все входящие запросы (path("<path:url_path>", ...)).'
 		)
 
-
 		def resolved_by_generic_view(match: ResolverMatch):
 			if not hasattr(match.func, 'view_class'): # FB-View case
 				return False
 			return match.func.view_class is GenericPageView
 
-		if not self.is_generic_page and resolved_by_generic_view(match):
-			raise ValidationError({
-				'url_path':
-					f'Страница по URL "{self.get_absolute_url()}" не найдена'
-					' (логика работы при is_generic_page:❌).'
-			})
-
 		if self.is_generic_page:
 			if not self.template_name:
 				raise ValidationError({
-					'template_name': 'template_name не может быть пустым при is_generic_page:✅.'
+					'template_name': 'template_name не может быть пустым при is_generic_page:✅'
 				})
 
 			# Указано is_generic_page:✅, но также есть перекрывающий (конфликтующий)
 			# view по такому же пути
 			if not resolved_by_generic_view(match):
 				view_f = match.func
+				view_class = getattr(view_f, 'view_class', None)
+				view_name = typename(view_class) if view_class else view_f.__name__
 				raise ValidationError({
 					'url_path': (
 						f'Страница по URL "{self.get_absolute_url()}" перекрывается ' +
-						f'{'Class-Based' if hasattr(view_f, 'view_class') else 'Func-Based'} view ' +
+						f'{view_name}{'' if view_class else '() view'} ' +
 						(f'(url name = {match.view_name})' if match.url_name else '') +
 						' (логика работы при is_generic_page:✅).'
 					)
+				})
+		# elif для читаемости
+		elif not self.is_generic_page:
+			if resolved_by_generic_view(match):
+				raise ValidationError({
+					'url_path':
+						f'Страница по URL "{self.get_absolute_url()}" не найдена'
+						' (логика работы при is_generic_page:❌).'
+				})
+
+			if self.template_name:
+				raise ValidationError({
+					'template_name': 'Должно быть пустым при is_generic_page:❌ так как '
+					'игнорируется (строгое обеспечение явности).'
 				})
 
 
