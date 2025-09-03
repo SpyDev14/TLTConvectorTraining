@@ -1,6 +1,6 @@
-from core.config 	import GENERIC_TEMPLATE
-from core.views 	import BaseRenderableDetailView, PageBasedListView
-from business 		import models
+from core.views.bases 	import BaseRenderableDetailView, PageBasedListView
+from core.config 		import GENERIC_TEMPLATE
+from business 			import models
 
 
 # MARK: Article

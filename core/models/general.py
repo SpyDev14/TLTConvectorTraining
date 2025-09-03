@@ -18,9 +18,9 @@ from shared.models.managers 	import IndividualizedBulkOperationsManager
 from shared.telegram.params 	import MessageParseMode
 from shared.reflection 			import typename
 from core.models.bases 			import BaseRenderableModel
+# from core.views.bases 		import GenericPageView (circular import, locally imported in Page.clean())
 from core.constants 			import RENDERING_SUPPORTS_TEXT
 from core.config 				import TELEGRAM_SENDING, GENERIC_TEMPLATE
-# from core.views 				import GenericPageView (circular import, used in Page.clean())
 
 _logger = logging.getLogger(__name__)
 
