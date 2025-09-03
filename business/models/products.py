@@ -12,9 +12,12 @@ from business.models.category 	import Category
 
 _PRODUCTS_IMGS_BASE_PATH: Path = settings.IMAGES_ROOT / 'products'
 class Product(BaseRenderableModel):
-	photos: models.Manager['ProductPhoto']
-	characteristics: models.Manager['ProductCharacteristic']
-	additional_elements: models.Manager['ProductAdditionalElements']
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.photos: models.Manager['ProductPhoto']
+		self.characteristics: models.Manager['ProductCharacteristic']
+		self.additional_elements: models.Manager['ProductAdditionalElements']
 
 	category = models.ForeignKey(Category, models.CASCADE, related_name = 'products',
 		verbose_name = 'Категория')
