@@ -14,6 +14,7 @@ from django.views 			import generic
 from core.models.general 	import Page
 from core.models.bases 		import BaseRenderableModel
 from core.views.mixins 		import PageInfoMixin, ConcretePageMixin
+from core.config 			import GENERIC_TEMPLATE
 
 from shared.string_processing 	import camel_to_snake_case
 from shared.reflection 			import typename
@@ -76,11 +77,13 @@ class BasePageView(BaseRenderableDetailView):
 
 	def get_object(self, queryset = None):
 		return self.get_page()
-
+	
 	def get_template_names(self):
-		if self.template_name:
-			return [self.template_name]
-		return [self.object.template_name]
+		names = super().get_template_names()
+		
+		# Template по умолчанию
+		names.append(GENERIC_TEMPLATE.PAGE)
+		return names
 
 # Для удобства; подключаю стратегию получения page отдельно, чтобы не засорять
 # базовый класс.
@@ -147,44 +150,57 @@ class RenderableModelBasedListView(PageInfoMixin, generic.ListView):
 		super().__init__(**kwargs)
 		self.renderable_object: BaseRenderableModel | None = None
 
-	def get_renderable_queryset(self):
+	def get_renderable_queryset(self) -> QuerySet:
 		queryset = self.renderable_queryset
 
-		if queryset is not None and (self.renderable_slug or self.renderable_model):
+		# Все проверки находятся здесь, а не в __init_subclass__() потому, что
+		# эти атрибуты потенциально могут быть установлены через **initkwargs в
+		# методе .as_view(), хотя я такое не одобряю, но так в django.
+
+		# Если пробуют simple и advanced способом одновременно, то предупреждаем о логической ошибке
+		# (но игнорируем установленную модель)
+		if queryset is not None and self.renderable_slug:
 			# NOTE: Может быть лучше вызывать исключение?
 			_logger.warning(
-				'Не указывайте и renderable_slug / renderable_model, и queryset одновременно, это '
-				'не имеет смысла и может запутать других разработчиков.'
+				'Не указывайте и renderable_slug c renderable_model, и queryset одновременно, это '
+				'не имеет смысла и может запутать других разработчиков. Метод через queryset имеет '
+				'больший приоритет.'
 			)
 
 		if queryset is None:
-			# Выбрал кратко и без повторения. Лаконично, но не слишком сложночитаемо.
-			# Ps: все ведь шарят за МОРЖевой := оператор?
-			if (no_slug := not self.renderable_slug) or (no_class := not self.renderable_model):
-				both = no_class and no_slug
-				raise ImproperlyConfigured(
-					f"{'renderable_slug' if no_slug else ''} "
-					f"{'и' if both else ''} "
-					f"{'renderable_model' if no_class else ''} "
-					f"не {'могут' if both else 'может'} быть пуст{'ы' if both else ''}"
-					" при пустом queryset."
-					" Либо установите значения в них, либо используйте queryset."
-				)
+			# Первое всегда будет проверено, второе - нет. Поэтому не использую
+			# МОРЖевой оператор := там (or блок, внутренние оптимизации языка)
+			if (no_class := not self.renderable_model) or not self.renderable_slug:
+				# both
+				if no_class and not self.renderable_slug:
+					raise ImproperlyConfigured(
+						'renderable_slug и renderable_model не могут быть пусты '
+						'при пустом queryset. Либо установите значения в них, либо '
+						'сразу используйте свой queryset.'
+					)
+				else:
+					missing_var_name = 'renderable_model' if no_class else 'renderable_slug'
+					raise ImproperlyConfigured(
+						f'{missing_var_name} не может быть пуст при пустом queryset. Либо установите'
+						' значение, либо сразу используйте свой queryset.'
+					)
 
-			queryset = self.renderable_model.objects.filter(
+			queryset = self.renderable_model._default_manager.filter(
 				slug = self.renderable_slug
 			)
-		return queryset
+
+		return queryset.all()
 
 	def get_renderable_object(self):
 		queryset = self.get_renderable_queryset()
 
-		# NOTE: Осознанно ждём ошибку, если указанного объекта нет.
+		# Осознанно ждём ошибку, если указанного объекта нет.
 		return queryset.get()
 
 	def get_page_info(self):
 		return self.renderable_object
 
+	#                                   v                          vvvvvv
 	# Нейминг супер, почему не ...objectS_name() ??! или ..._objects_list_name() ???
 	# Переопределение базового метода
 	def get_context_object_name(self, object_list):
@@ -215,14 +231,6 @@ class RenderableModelBasedListView(PageInfoMixin, generic.ListView):
 
 
 class PageBasedListView(RenderableModelBasedListView):
-	# TODO: Обновить docstring
-	"""
-	Базовый View для List-страниц, где Page выступает в роли основы.
-	Изначально, я думал делать всё через PageDetail View, но у ListView много
-	логики для работы со списком, поэтому так.
+	# TODO: Добавить docstring
 
-	Суть этого View в том, что это стандартный ListView, но с присобаченным объектом
-	page для передачи информации о странице который доступен по тому же ключу, что
-	и в Page Details (информация о странице в `page_info`, объект Page в `page`).
-	"""
 	renderable_model = Page

@@ -33,10 +33,21 @@ class Page(BaseRenderableModel):
 	# WARN: Нейминг плохой, не отражает сути, пока нет идей как лучше
 	is_generic_page = models.BooleanField('Это динамически-генерируемая страница?', default = False,
 		help_text = mark_safe(
-			'✅: Будет автоматически доступно по указанному url. Используйте для страниц без логики.<br>'
+			'✅: Будет автоматически доступно по указанному url, требует заданного '
+			'<code>template_name</code>. Используйте для простых страниц, не требующих своего View.<br>'
 			'❌: Выбирайте, когда для обработки страницы нужно использовать кастомный view.<br>'
 			'<br>'
 			'Влияет на работу логики поля <code>URL path</code> & <code>template_name</code>.'))
+	template_name = models.CharField('Название django-темплейта',
+		# Проверяет только если поле заполнено
+		validators = [template_with_this_name_exists],
+		blank = True,
+		# Ps: я знаю, что DetailView имеет функционал для получения темплейта из поля модели, но я не хочу,
+		# чтобы было 2 разных способа задать темплейт - через модель и во View.
+		# Также, усложнит понимание работы этого поля. Лучше в таких случаях всегда через View.
+		help_text = mark_safe(
+			'<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение, <b>должно быть установленно</b>.<br>'
+			'<code>is_generic_page:</code>❌ - Игнорируется, потому <b>должно быть</b> пустым.'))
 	# TODO: Перевести на работу с url name при is_generic_page:❌
 	# TODO: Alt: сменить систему получения page со сложной (относительно) url_path, на простой по slug
 	# Если делать, то не забыть про проверку в clean()
@@ -61,15 +72,6 @@ class Page(BaseRenderableModel):
 			'</details>'
 
 			'<br><b>Всегда</b> отражает реальный адрес страницы.'))
-	# 29.08: Ранее не задумывался об этом. Решил, что в PageBasedView лучше задавать темплейт там же, в классе.
-	template_name = models.CharField('Название django-темплейта',
-		default = GENERIC_TEMPLATE.PAGE,
-		validators = [template_with_this_name_exists],
-		blank = True,
-		help_text = mark_safe(
-			'<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение, <b>должно быть установленно</b>.<br>'
-			'<code>is_generic_page:</code>❌ - Может быть пустым. Будет проигнорировано при работе '
-			'с <code>PageBasedListView</code>.'))
 	content = HTMLField('Контент', blank = True, help_text = RENDERING_SUPPORTS_TEXT)
 		# Это работает вполне себе неплохо, только нужно знать как оно обработается под капотом.
 		# Я тестил - всё гуд.

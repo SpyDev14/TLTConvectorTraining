@@ -5,7 +5,7 @@ from business 		import models
 
 # MARK: Article
 class ArticleListView(PageBasedListView):
-	page_slug = 'blog'
+	renderable_slug = 'blog'
 	queryset = models.Article.objects.ceo_ordered()
 
 class ArticleDetailView(BaseRenderableDetailView):
@@ -23,13 +23,14 @@ class CategoryDetailView(BaseRenderableDetailView):
 	template_name = GENERIC_TEMPLATE.MODEL_DETAIL
 
 class CatalogPageView(PageBasedListView):
-	page_slug = 'catalog'
+	renderable_slug = 'catalog'
 	model = models.Category
 	template_name = GENERIC_TEMPLATE.MODEL_LIST
 
+
 # MARK: Service
 class ServiceListView(PageBasedListView):
-	page_slug = 'services'
+	renderable_slug = 'services'
 	model = models.Service
 	template_name = GENERIC_TEMPLATE.MODEL_LIST
 
