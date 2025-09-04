@@ -1,6 +1,6 @@
 from core.views.bases 	import BaseRenderableDetailView, PageBasedListView, RenderableModelBasedListView
-from core.config 		import GENERIC_TEMPLATE
 from business 			import models
+from django.db.models 	import Prefetch
 
 
 # MARK: Article
@@ -10,24 +10,25 @@ class ArticleListView(PageBasedListView):
 
 class ArticleDetailView(BaseRenderableDetailView):
 	model = models.Article
-	template_name = GENERIC_TEMPLATE.MODEL_DETAIL
 
 
 # MARK: Product & Category details
 class ProductDetailView(BaseRenderableDetailView):
 	object: models.Product
-	model = models.Product
-
-	# def get_queryset(self):
-	# 	return super().get_queryset().select_related(
-	# 		'photos', 'characteristics', 'additional_elements')
+	queryset = models.Product.objects.prefetch_related(
+		Prefetch('photos'),
+		Prefetch('additional_elements'),
+		Prefetch('characteristics', queryset = models.ProductCharacteristic.objects.select_related('type'))
+	).select_related('category')
 
 	def get_context_data(self, **kwargs):
 		return super().get_context_data(
+			# Kwargs здесь не нужны, это конечный класс
 			photos = self.object.photos.all(),
 			characteristics = self.object.characteristics.all(),
-			additional_elements = self.object.additional_elements.all()
+			additional_elements = self.object.additional_elements.all(),
 		)
+
 
 class CategoryDetailView(RenderableModelBasedListView):
 	renderable_model = models.Category
@@ -42,19 +43,24 @@ class CategoryDetailView(RenderableModelBasedListView):
 		if self.renderable_object.is_parent_category:
 			return self.renderable_object.childrens.all()
 		else:
-			return self.renderable_object.products.all()
+			return self.renderable_object.products.prefetch_related('photos')
 
 class CatalogPageView(PageBasedListView):
 	renderable_slug = 'catalog'
 	queryset = models.Category.objects.filter(parent = None)
-	template_name = GENERIC_TEMPLATE.MODEL_LIST
+
 
 # MARK: Service
 class ServiceListView(PageBasedListView):
 	renderable_slug = 'services'
 	model = models.Service
-	template_name = GENERIC_TEMPLATE.MODEL_LIST
 
 class ServiceDetailView(BaseRenderableDetailView):
-	model = models.Service
-	template_name = GENERIC_TEMPLATE.MODEL_DETAIL
+	queryset = models.Service.objects.prefetch_related('examples', 'advantages')
+	object: models.Service
+
+	def get_context_data(self, **kwargs):
+		return super().get_context_data(
+			advantages = self.object.advantages.all(),
+			examples = self.object.examples.all()
+		)

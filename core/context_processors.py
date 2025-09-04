@@ -27,22 +27,16 @@ def _model_qs_to_context_by_name[T](
 		name: Callable[[type[T]], str] | str = \
 			lambda model_type: f"{camel_to_snake_case(typename(model_type))}s"
 	) -> dict[str, T]:
-	if not qs.exists():
-		return {}
 
 	if not isinstance(name, str):
 		name: str = name(qs.model)
-
-	key_field_value = getattr(qs.first(), key_field_name)
-
-	if not isinstance(key_field_value, str):
-		raise TypeError('Значение из указанного поля для ключа должно быть строкой')
 
 	values_dict = {}
 	for model in qs:
 		key: str = getattr(model, key_field_name)
 		values_dict[key.replace('-', '_')] = model
 	return {name: values_dict}
+
 
 def _base_renderable_model_qs_to_context(
 		qs: QuerySet[BaseRenderableModel],
@@ -69,11 +63,8 @@ def global_context(request): return {
 			ExtraContext.objects.filter(page = None),
 			'key', lambda model_type: camel_to_snake_case(typename(model_type))
 		),
-
 		**_base_renderable_model_qs_to_context(
-			Page.objects
-				.prefetch_related('extra_context_manager')
-				.order_by('name'),
+			Page.objects.order_by('name'),
 		),
 		**_base_renderable_model_qs_to_context(
 			models.Service.objects.all(),
@@ -81,7 +72,13 @@ def global_context(request): return {
 		**_base_renderable_model_qs_to_context(
 			models.Category.objects.filter(parent = None),
 			name = 'categories'
-		)
+		),
+		'recommended': {
+			**_base_renderable_model_qs_to_context(
+				models.Category.objects.recommended(),
+				name = 'categories'
+			),
+		}
 	},
 }
 

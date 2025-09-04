@@ -1,6 +1,8 @@
-from django.core.exceptions import ImproperlyConfigured
-from django.urls 			import reverse, NoReverseMatch
-from django.db 				import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions 			import ImproperlyConfigured
+from django.urls 						import reverse, NoReverseMatch
+from django.db 							import models
 
 
 class BaseRenderableModel(models.Model):

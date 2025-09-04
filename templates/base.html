@@ -96,6 +96,7 @@
 	}
 
 	footer {
+		margin-top: 1rem;
 		padding-bottom: 2rem;
 	}
 
@@ -193,6 +194,23 @@
 		border: 0.1rem solid var(--dark-bg);
 		padding: 0.25rem;
 		margin-bottom: 0.5rem;
+	}
+
+	.path-row {
+		color: darkgray;
+		margin-top: 0.5rem;
+		margin-right: auto;
+		display: flex;
+
+		a {
+			color: darkgray;
+			transition: 1s;
+		}
+		a:hover {
+			color: grey;
+			text-decoration: none;
+			transition: 1s;
+		}
 	}
 </style>
 <style>
@@ -374,6 +392,10 @@
 						{{ global.company_contacts.secondary_phone_number }}
 					</div>
 				</div>
+			</div>
+			<div style="margin-top: 1rem; display: flex; gap: 2rem; justify-content: center;">
+				<a style="opacity: 0.5;" href="{{global.pages.privacy_policy.get_absolute_url}}">{{global.pages.privacy_policy.name}}</a>
+				<a style="opacity: 0.5;" href="{{global.pages.cookie_policy.get_absolute_url}}">{{global.pages.cookie_policy.name}}</a>
 			</div>
 		</footer>
 	</div>

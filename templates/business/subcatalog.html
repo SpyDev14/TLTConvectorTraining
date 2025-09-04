@@ -1,18 +1,22 @@
 {% extends 'core/generic/model_list.html' %}
 
+{% block list_bodytop %}
+{% include 'business/components/catalog_path_row.html' %}
+{% endblock %}
 {% block list_content %}
 	{% for obj in object_list %}
-		{% if category.is_parent_category %}
-			{# <!-- В include тоже есть with, но теги нельзя делать многострочными --> #}
-			{% with title=obj.name desc=obj.summary image=obj.image absolute_url=obj.get_absolute_url %}
-				{% include 'core/generic/components/item_card.html' %}
-			{% endwith %}
-		{% else %}
-			{% with title=obj.name desc=obj.description image=obj.image absolute_url=obj.get_absolute_url %}
-				{% include 'core/generic/components/item_card.html' %}
-			{% endwith %}
-		{% endif %}
+		{% with title=obj.name image=obj.image url=obj.get_absolute_url%}
+			{% if category.is_parent_category %}
+				{% include 'core/generic/components/item_card.html' with desc=obj.summary %}
+			{% else %}
+				{% include 'core/generic/components/item_card.html' with desc=obj.description %}
+			{% endif %}
+		{% endwith %}
 	{% empty %}
-		<h3 style="color: gray; margin-top: 12rem;">Здесь пусто...</h3>
+		<h3 style="color: gray; margin-inline: auto;">Здесь пусто...</h3>
 	{% endfor %}
+{% endblock %}
+
+{% block list_undercontent %}
+	{% include 'business/components/recommended_categories.html' %}
 {% endblock %}

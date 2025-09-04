@@ -1,0 +1,49 @@
+<div class="recommended_categories">
+	<h2>Рекомендуемые категории</h2>
+	<div class="hr"></div>
+	<div class="body">
+		{% for rec_category in global.recommended.categories.values %}
+			{% item_card rec_category.name rec_category.summary rec_category.image url=rec_category.get_absolute_url %}
+		{% endfor %}
+	</div>
+</div>
+<style>
+	.recommended_categories {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		gap: 0.8rem;
+		margin-top: 2rem;
+		padding-inline: 1.2rem;
+		padding-block: 1rem;
+		border: 0.25rem dashed var(--dark-bg);
+		border-radius: 1rem;
+		
+		.hr {
+			border-top: 0.25rem dashed var(--dark-bg);
+		}
+		
+		.body {
+			display: flex;
+			flex-direction: row;
+			overflow-x: auto;
+			padding-bottom: 1rem;
+			padding-top: 0.5rem;
+			gap: 1rem;
+		}
+		
+		.body::-webkit-scrollbar {
+			height: 0.5rem;
+		}
+		
+		.body::-webkit-scrollbar-track {
+			background: var(--dark-bg);
+			border-radius: 999rem;
+		}
+		
+		.body::-webkit-scrollbar-thumb {
+			background: #5a5a5af0;
+			border-radius: 999rem;
+		}
+	}
+</style>

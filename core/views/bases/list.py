@@ -8,6 +8,7 @@ from django.views 			import generic
 from core.models.general 	import Page
 from core.models.bases 		import BaseRenderableModel
 from core.views.mixins 		import PageInfoMixin
+from core.config 			import GENERIC_TEMPLATE
 
 from .make_context_name 	import make_context_name
 
@@ -123,6 +124,13 @@ class RenderableModelBasedListView(PageInfoMixin, generic.ListView):
 		})
 
 		return context
+
+	def get_template_names(self):
+		names = super().get_template_names()
+
+		# Template по умолчанию
+		names.append(GENERIC_TEMPLATE.MODEL_LIST)
+		return names
 
 	def get(self, request, *args, **kwargs):
 		self.renderable_object = self.get_renderable_object()

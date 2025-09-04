@@ -122,10 +122,7 @@ class AdminModelRegistrator:
 
 	Добавьте в **settings.py** словарь (`dict`) с названием `DEFAULT_MODEL_ADMIN_CLASSES`
 	с парами ключ-значение вида: `'$модуль.КлассМодели': '$модуль.АдминКласс'` чтобы задать
-	админ-классы по умолчанию для указанных моделей и их подклассов.
-	Ps: плохо работает с админками и моделями из наших приложений, нужно фиксить (ошибка -
-	приложение ещё не загружено).
-	(Пример ниже).
+	админ-классы по умолчанию для указанных моделей и их подклассов (пример ниже).
 	<hr>
 
 	### Пример использования:
@@ -135,6 +132,7 @@ class AdminModelRegistrator:
 		'solo.models.SingletonModel': 'solo.admin.SingletonModelAdmin'
 	}
 	```
+
 	- **models.py**
 	```
 	class MyModel(Model): ...
@@ -143,9 +141,9 @@ class AdminModelRegistrator:
 	class MyModelForExcludeAlt(Model): ...
 	class MySingletonModel(SingletonModel): ...
 	```
+
 	- **admin.py**
 	```
-
 	registrator = AdminModelRegistrator(
 		app_name = MyAppConfig.name,
 		# Рекомендуемый способ для исключения моделей
@@ -170,6 +168,7 @@ class AdminModelRegistrator:
 	# с учётом всех настроек
 	registrator.register()
 	```
+
 	Теперь в нашей админке будут зарегистрированны все модели из приложения
 	`my_app`, кроме `MyModelForExclude`, `MyModelForExcludeAlt` и `MySpecialModel`.
 	`MyModel` будет зарегистрированна под `MyModelAdmin`, а `MySingletonModel`
@@ -182,6 +181,8 @@ class AdminModelRegistrator:
 			custom_admin_classes_for_models: \
 				dict[type[Model], type[ModelAdmin]] = dict()):
 		"""
+		Документацию об использовании смотрите в документации самого класса
+		(это документация конструктора)
 		Params:
 			app_name:
 				Название приложения, с которым будет вестись работа.

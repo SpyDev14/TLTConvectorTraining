@@ -21,6 +21,7 @@ class Product(BaseRenderableModel):
 		self.additional_elements: models.Manager['ProductAdditionalElements']
 
 	category = models.ForeignKey(Category, models.CASCADE, related_name = 'products',
+		limit_choices_to={'is_parent_category': False},
 		verbose_name = 'Категория')
 	description = HTMLField('Описание')
 	blueprint_image = models.ImageField('Чертёж', blank = True, upload_to = _PRODUCTS_IMGS_BASE_PATH / 'blueprints')
@@ -36,18 +37,13 @@ class Product(BaseRenderableModel):
 
 	@cached_property
 	def image(self):
-		photo = self.photos.first()
+		# all для работы с prefetch_related
+		photo = next(iter(self.photos.all()), None)
 		return photo.image if photo else None
 
 	class Meta:
 		verbose_name = 'Товар'
 		verbose_name_plural = 'Товары'
-
-	def clean(self):
-		# Может быть null в форме
-		if self.category:
-			if self.category.is_parent_category:
-				raise ValidationError({"category":"Продукт нельзя прикрепить к категории для категорий"})
 
 
 class ProductPhoto(models.Model):

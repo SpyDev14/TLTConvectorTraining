@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="path-row">
+	<a href="{{global.pages.services.get_absolute_url}}">{{global.pages.services.name}}</a>
+	/<a href="{{ service.get_absolute_url }}">{{service.name}}</a>
+</div>
+<h1>{{page_info.h1}}</h1>
+<img src="{{ service.image.url }}" style="border-radius: 1rem; max-width: 35vw; max-height: 40vh; margin-inline: auto;">
+<div style="width: 100%;">
+	{{service.description|safe}}
+</div>
+<div>
+	<h2>Наши преимущества</h2>
+	<div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+		{% for advantage in advantages %}
+			<div class="dark-shell" style="width: 16rem;">
+				<img src="{{advantage.image.url}}" style="height: 8rem;">
+				<h4>{{advantage.name}}</h4>
+				{{advantage.description|safe}}
+			</div>
+		{% endfor %}
+	</div>
+</div>
+<style>
+	main {
+		width: 65vw;
+		margin-inline: auto;
+	}
+</style>
+{% endblock %}

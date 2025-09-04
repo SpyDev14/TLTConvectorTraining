@@ -4,10 +4,15 @@ from django.conf 				import settings
 from django.db 					import models
 
 from tinymce.models 	import HTMLField
-from mptt.models 		import MPTTModel, TreeForeignKey
+from mptt.models 		import MPTTModel, TreeForeignKey, TreeManager
 
 from core.models.bases import BaseRenderableModel
 
+
+
+class CategoryManager(TreeManager):
+	def recommended(self):
+		return self.filter(parent = None)[:4]
 
 class Category(MPTTModel, BaseRenderableModel):
 	_custom_url_name = 'subcatalog'
@@ -30,6 +35,8 @@ class Category(MPTTModel, BaseRenderableModel):
 	summary = HTMLField('Краткое описание (summary)', max_length = 1024, blank = True,
 		help_text = 'Краткая информация о категории')
 
+	objects: CategoryManager = CategoryManager()
+
 	class Meta:
 		verbose_name = 'Категория'
 		verbose_name_plural = 'Категории'
@@ -37,24 +44,16 @@ class Category(MPTTModel, BaseRenderableModel):
 	class MPTTMeta:
 		order_insertion_by = ['name']
 
-	# INFO: НЕ ИСПОЛЬЗУЙТЕ НИГДЕ КРОМЕ АДМИНКИ!!!!
-	def __str__(self):
-		linked_objects_count: int = (
-			self.childrens.count()
-			if self.is_parent_category
-			else self.products.count()
-		)
 
-		# см. ниже
+	def __str__(self):
 		data = (
 			{'ico': '🗂', 'spec': 'подкатегорий'}
 			if self.is_parent_category else
 			{'ico': '📦', 'spec': 'товаров'}
 		)
 
-		return "{ico} | {name} (для {spec}) (🔗{count}{ico})".format(
+		return "{ico} | {name} (для {spec})".format(
 			name = self.name,
-			count = linked_objects_count,
 			**data
 		)
 
