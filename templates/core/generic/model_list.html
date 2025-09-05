@@ -6,19 +6,16 @@
 {% endblock %}
 <h1>{{ page_info.h1 }}</h1>
 <div style="max-width: 50vw; margin-bottom: 2rem;">
-	{# в проде были бы свои страницы под каждую модель, я же сделал общую #}
-	{% if based_object.content %}
-		{% render_as_template based_object.content|safe %}
-	{% elif based_object.summary %}
-		{% render_as_template based_object.summary|safe %}
-	{% elif based_object.description %}
-		{% render_as_template based_object.description|safe %}
-	{% else %}
-		Добро пожаловать в каталог продукции «СТС»! Мы предлагаем широкий
-		ассортимент высококачественного оборудования для отопления, инженерных
-		систем и металлообработки, которое идеально подходит для применения
-		в жилых, коммерческих и промышленных объектах.
-	{% endif %}
+	{% block list_pagecontent %}
+		{# в проде были бы свои страницы под каждую модель, я же сделал общую #}
+		{% if based_object.content %}
+			{% render_as_template based_object.content|safe %}
+		{% elif based_object.summary %}
+			{% render_as_template based_object.summary|safe %}
+		{% elif based_object.description %}
+			{% render_as_template based_object.description|safe %}
+		{% endif %}
+	{% endblock %}
 </div>
 
 <div class="list-container">
@@ -42,7 +39,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 1.5rem;
-		justify-content: center;
+		justify-content: space-evenly;
 		max-width: 1200px;
 		margin: 0 auto;
 	}

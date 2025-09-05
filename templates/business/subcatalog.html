@@ -3,6 +3,18 @@
 {% block list_bodytop %}
 {% include 'business/components/catalog_path_row.html' %}
 {% endblock %}
+
+{% block list_pagecontent %}
+	{% if category.summary %}
+		{% render_as_template category.summary %}
+	{% else %}
+		Добро пожаловать в каталог продукции «СТС»! Мы предлагаем широкий
+		ассортимент высококачественного оборудования для отопления, инженерных
+		систем и металлообработки, которое идеально подходит для применения
+		в жилых, коммерческих и промышленных объектах.
+	{% endif %}
+{% endblock %}
+
 {% block list_content %}
 	{% for obj in object_list %}
 		{% with title=obj.name image=obj.image url=obj.get_absolute_url%}

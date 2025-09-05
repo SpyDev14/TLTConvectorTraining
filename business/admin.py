@@ -27,13 +27,11 @@ registrator.exclude_model(models.ProductPhoto)
 class ProductPhotoInline(admin.TabularInline):
 	model = models.ProductPhoto
 	classes = ('collapse',)
-	extra = 2
 
 registrator.exclude_model(models.ProductAdditionalElements)
 class ProductAdditionalElementsInline(admin.TabularInline):
 	model = models.ProductAdditionalElements
 	classes = ('collapse',)
-	extra = 0
 
 @registrator.set_for_model(models.Product)
 class ProductAdmin(BaseRenderableModelAdmin):
@@ -49,7 +47,7 @@ registrator.exclude_model(models.PerformedServiceExample)
 class PerformedServiceExampleInline(admin.TabularInline):
 	model = models.PerformedServiceExample
 	classes = ('collapse',)
-	extra = 1
+	extra = 2
 
 registrator.exclude_model(models.ServiceAdvantage)
 class ServiceAdvantageInline(admin.StackedInline):

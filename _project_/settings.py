@@ -185,12 +185,17 @@ IMAGES_ROOT = MEDIA_ROOT / 'images'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CACHES = {
+	'default': {
+		'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+	}
+}
+
 # Logging             vvv для аннотации
 LOGS_DIR = BASE_DIR / str(env('LOGS_DIR'))
 
 if not LOGS_DIR.exists():
 	LOGS_DIR.mkdir(parents = True)
-
 
 LOGGING = {
 	'version': 1,
@@ -294,6 +299,8 @@ DEFAULT_MODEL_ADMIN_CLASSES = {
 }
 
 # MARK: Libs
+SOLO_CACHE = 'default'
+
 PHONENUMBER_DEFAULT_REGION = 'RU'
 
 TINYMCE_DEFAULT_CONFIG = {
