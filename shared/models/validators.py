@@ -8,6 +8,7 @@ from django.template			import TemplateDoesNotExist
 
 
 __all__ = (
+	'BaseValidator', # Для аннотации
 	'StringStartswith',
 	'StringEndswith',
 	'FullmatchRegexValidator',
@@ -47,21 +48,23 @@ class BaseValidator(metaclass=DeconstructibleMeta):
 				raise AttributeError(f'У класса {self.__class__.__name__} нет атрибута {attr_name}!')
 			setattr(self, attr_name, value)
 
-	def check_is_valid(self, value: Any) -> bool:
+	def _value_is_valid(self, value: Any) -> bool:
 		return True
+
+	def check_is_valid(self, value: Any) -> bool:
+		is_valid = self._value_is_valid(value)
+		if self.invert:
+			is_valid = not is_valid
+		return is_valid
 
 	def build_error_msg(self, value: Any) -> Any:
 		return self.error_msg
 
 	def __call__(self, value: Any):
-		is_valid = self.check_is_valid(value)
-
-		if self.invert:
-			is_valid = not is_valid
-
-		if not is_valid:
-			error_msg = self.build_error_msg(value)
-			raise ValidationError(error_msg)
+		if not self.check_is_valid(value):
+			raise ValidationError(
+				self.build_error_msg(value)
+			)
 
 class TargetValueTypeMixin:
 	# Выбрал бы set, но isinstance работает с tuple
@@ -97,21 +100,21 @@ class BaseStringValidator(TargetValueTypeMixin, BaseValidator):
 		self.check_string = check_string
 
 	# Для аннотации                 vvv
-	def check_is_valid(self, value: str):
-		return super().check_is_valid(value)
+	def _value_is_valid(self, value: str):
+		return super()._value_is_valid(value)
 
 class StringEndswith(BaseStringValidator):
 	def build_error_msg(self, value):
 		return f'Строка {"не" if self.invert else ""} должна заканчиваться на "{self.check_string}"!'
 
-	def check_is_valid(self, value):
+	def _value_is_valid(self, value):
 		return value.endswith(self.check_string)
 
 class StringStartswith(BaseStringValidator):
 	def build_error_msg(self, value):
 		return f'Строка {"не" if self.invert else ""} должна начинаться на "{self.check_string}"!'
 
-	def check_is_valid(self, value):
+	def _value_is_valid(self, value):
 		return value.startswith(self.check_string)
 
 # По итогу всё вернулось к истокам, но уже в изменённом виде
@@ -125,7 +128,7 @@ class FullmatchRegexValidator(TargetValueTypeMixin, BaseValidator):
 		super().__init__(invert=invert, **initkwargs)
 		self.check_regex = check_regex
 
-	def check_is_valid(self, value):
+	def _value_is_valid(self, value):
 		return re.fullmatch(f"^{self.check_regex}$", value) is not None
 
 
