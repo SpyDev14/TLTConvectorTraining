@@ -6,7 +6,7 @@ import logging
 from django.utils.safestring 	import mark_safe
 from django.core.exceptions 	import ValidationError
 from django.core.cache 			import cache
-from django.urls 				import resolve, Resolver404, ResolverMatch
+from django.urls 				import resolve, reverse, NoReverseMatch
 from django.db 					import models
 
 from tinymce.models 	import HTMLField
@@ -48,31 +48,29 @@ class Page(BaseRenderableModel):
 		help_text = mark_safe(
 			'<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение, <b>должно быть установленно</b>.<br>'
 			'<code>is_generic_page:</code>❌ - Игнорируется, потому <b>должно быть</b> пустым.'))
-	# TODO: Перевести на работу с url name при is_generic_page:❌
-	# TODO: Alt: сменить систему получения page со сложной (относительно) url_path, на простой по slug
-	# Если делать, то не забыть про проверку в clean()
-	#                                                страница на / будет по пути '' vvvv
-	url_path = models.CharField("URL путь", max_length = 64, unique = True, blank = True,
-		validators = [StringStartswith('/', invert = True), StringEndswith('/')],
+
+	#                                                  страница на / будет по пути '' vvvv
+	url_source = models.CharField("URL Source", max_length = 64, unique = True, blank = True,
 		help_text = mark_safe(
 			'<details style="padding-left: 1rem;">'
 				'<summary style="margin-left: -1rem;"><code>is_generic_page</code>: ✅</summary>'
-				'URL путь, по которому будет доступна страница. Указав <code>info/about-us/</code> '
-				'здесь, страница будет доступна по адресу <code>/info/about-us/</code>.'
-				'<br><b><u>Крайне рекомендуется</u></b> создавать url <u>на основе slug</u>. '
+				'Полный URL путь, по которому будет доступна страница. Указав <code>info/about-us/</code> '
+				'здесь, страница будет доступна по абсолютному пути <code>/info/about-us/</code><br>'
+				'<code>get_absolute_url()</code> вернёт <code>"/info/about-us/"</code>.'
+				'<br><b><u>Крайне рекомендуется</u></b> создавать url <u>на основе <code>slug</code></u>. '
 				'Например, при slug = <code>about-us</code>, url = <code>info/about-us/</code>).<br>'
 				'<br>'
 			'</details>'
-
 			'<details style="padding-left: 1rem;">'
 				'<summary style="margin-left: -1rem;"><code>is_generic_page</code>: ❌</summary>'
-				'Название <b>должно</b> соответствовать адресу, по которому можно перейти на страницу '
-				'по кастомному view.<br>'
-				'При ненахождении страницы по указанному url - сохранить изменения / создать страницу '
-				'не удастся.<br>'
+				'View name того view, который обрабатывает эту страницу.<br>'
+				'Например, в <code>urlpatterns</code> указан <code>path("fun-path/", ..., name="your-name")</code>, '
+				'тут указываете <code>"your-name"</code>.<br>'
+				'<code>get_absolute_url()</code> вернёт <code>"/fun-path/"</code>.'
 			'</details>'
-
-			'<br><b>Всегда</b> отражает реальный адрес страницы.'))
+			'<br>'
+			'Используется для получения url страницы в методе <code>get_absolute_url()</code>.<br>'
+			'Также значение в этом поле валидируется и проходит проверку на корректность.'))
 	content = HTMLField('Контент', blank = True, help_text = RENDERING_SUPPORTS_TEXT)
 		# Это работает вполне себе неплохо, только нужно знать как оно обработается под капотом.
 		# Я тестил - всё гуд.
@@ -96,58 +94,59 @@ class Page(BaseRenderableModel):
 
 	def clean(self):
 		from core.views import GenericPageView
-		self_url = self.get_absolute_url()
 
-		# INFO: Должно быть настроено
-		try: match = resolve(self_url)
-		except Resolver404: raise Exception(
-			'Вы забыли добавить GenericPageView в urlpatterns, либо он настроен так, '
-			'что НЕ перехватывает все входящие запросы (path("<path:url_path>", ...)).'
-		)
+		# elif для читаемости
+		if self.is_generic_page and not self.template_name:
+			raise ValidationError({
+				'template_name': 'template_name не может быть пустым при is_generic_page:✅'
+			})
+		if not self.is_generic_page and self.template_name:
+			raise ValidationError({
+				'template_name': 'Должно быть пустым при is_generic_page:❌ так как '
+				'игнорируется (строгое обеспечение явности).'
+			})
 
-		def resolved_by_generic_view(match: ResolverMatch):
-			if not hasattr(match.func, 'view_class'): # FB-View case
-				return False
-			return match.func.view_class is GenericPageView
-
+		# Проверка url_source
+		try: self_url = self.get_absolute_url()
+		except NoReverseMatch: raise ValidationError({
+			'url_source': 'View с таким name не существует!'
+		})
 		if self.is_generic_page:
-			if not self.template_name:
-				raise ValidationError({
-					'template_name': 'template_name не может быть пустым при is_generic_page:✅'
+			validators: tuple[BaseValidator] = (
+				StringStartswith('/', invert = True),
+				StringEndswith('/')
+			)
+			for validator in validators:
+				is_valid = validator.check_is_valid(self.url_source)
+
+				if not is_valid: raise ValidationError({
+					'url_source': validator.build_error_msg(self.url_source)
 				})
 
 			# Указано is_generic_page:✅, но также есть перекрывающий (конфликтующий)
 			# view по такому же пути
-			if not resolved_by_generic_view(match):
+			match = resolve(self_url)
+			resolved_by_generic_view = getattr(match.func, 'view_class', None) is GenericPageView
+
+			if not resolved_by_generic_view:
 				view_f = match.func
 				view_class = getattr(view_f, 'view_class', None)
 				view_name = typename(view_class) if view_class else view_f.__name__
 				raise ValidationError({
-					'url_path': (
+					'url_source': (
 						f'Страница по URL "{self.get_absolute_url()}" перекрывается ' +
 						f'{view_name}{'' if view_class else '() view'} ' +
 						(f'(url name = {match.view_name})' if match.url_name else '') +
 						' (логика работы при is_generic_page:✅).'
 					)
 				})
-		# elif для читаемости
-		elif not self.is_generic_page:
-			if resolved_by_generic_view(match):
-				raise ValidationError({
-					'url_path':
-						f'Страница по URL "{self.get_absolute_url()}" не найдена'
-						' (логика работы при is_generic_page:❌).'
-				})
-
-			if self.template_name:
-				raise ValidationError({
-					'template_name': 'Должно быть пустым при is_generic_page:❌ так как '
-					'игнорируется (строгое обеспечение явности).'
-				})
 
 
 	def get_absolute_url(self):
-		return f"/{self.url_path}"
+		if self.is_generic_page:
+			return f"/{self.url_source}"
+
+		return reverse(self.url_source)
 
 	# В контексте объект Page живёт только 1 запрос,
 	# но внутри могут много раз обращаться к этому св-ву
