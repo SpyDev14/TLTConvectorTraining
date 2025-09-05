@@ -57,7 +57,7 @@ class Category(MPTTModel, BaseRenderableModel):
 			**data
 		)
 
-	# NOTE: Не вызывается при перемещении через древо
+	# Не вызывается при перемещении через древо
 	def clean(self):
 		# Не изменение
 		if self.pk is None:

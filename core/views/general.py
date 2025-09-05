@@ -12,10 +12,9 @@ class GenericPageView(BasePageView):
 	def get_template_names(self):
 		return [self.object.template_name]
 
-# FIXME: Переработать! После рефакторинга поля перестало работать.
+
 class DebugPageView(BasePageView):
 	template_name = 'core/debug/page_repr.html'
-	check_is_generic_page = False
 
 	def get_page(self):
 		return get_object_or_404(self.model, slug = self.kwargs['slug'])
