@@ -49,7 +49,6 @@ def _base_renderable_model_qs_to_context(
 	)
 
 
-# Создаёт нагрузку на БД, но я думаю, не такую сильную, так что нормально
 # WARN: Нарушен OCP из SOLID, да и просто выглядит паршиво
 # TODO: Реализовать систему с провайдерами
 # https://chat.deepseek.com/a/chat/s/7cf344f9-d170-4542-9852-2badfc11257b

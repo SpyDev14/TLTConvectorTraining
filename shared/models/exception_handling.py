@@ -35,7 +35,6 @@ class HandleAndLogNotMigratedModelError:
 			logger: Logger | None = None,
 			error_comment: str | None = None):
 		self._model = model
-		# NOTE: А это точно на что-то влияет?
 		self._logger = logger if logger else _logger
 
 		# это удобнее чем всё сообщение целиком с %s для подстановки типа модели

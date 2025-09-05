@@ -10,7 +10,7 @@ from tinymce.models 	import HTMLField
 from core.models.bases 			import BaseRenderableModel
 from business.models.category 	import Category
 
-# TODO: Нужны рекомендуемые товары
+
 _PRODUCTS_IMGS_BASE_PATH: Path = settings.IMAGES_ROOT / 'products'
 class Product(BaseRenderableModel):
 	def __init__(self, *args, **kwargs):
