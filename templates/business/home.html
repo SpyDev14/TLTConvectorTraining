@@ -2,28 +2,52 @@
 
 {% block content %}
 <img class="main-image" src="{{page.extra_context.main_image_url}}">
-<h3>{{page.h1}}</h3>
 <div style="max-width: 60vw;">
-	{{page.content|safe}}
-	<hr>
+	<h1 style="text-align: left;">{{page.h1}}</h1>
+	<div>
+		{{page.content|safe}}
+		<hr>
+	</div>
 </div>
-<h1 style="background-color: darkred;">КАТАЛОГ</h1>
---------------
+<div style="background-color: var(--dark-bg); width: 100vw; padding: 2rem;">
+	<h2 style="text-align: center; font-size: 2rem;">Категории наших товаров</h2>
+	<div style="
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+		justify-content: space-evenly;
+		max-width: 1200px;
+		margin-top: 2rem;
+		margin-inline: auto;
+	">
+		{% for category in global.categories.values %}
+			{% item_card category.name image=category.image url=category.get_absolute_url %}
+		{% endfor %}
+	</div>
+	<div class="button-like" style="margin-top: 1rem; display: flex; justify-content: center;">
+		<a class="green" href="{{ global.pages.catalog.get_absolute_url }}">→ Перейти в каталог</a>
+	</div>
+</div>
 {% if last_articles %}
 	<h3>Наш блог</h3>
 	{% for article in last_articles %}
 	{% include 'business/components/article.html' %}
 	{% endfor %}
 {% endif %}
-{% include 'feedback_requests/feedback-request-form.html' %}
+
+<div style="margin-top: 2rem;">
+	{% include 'feedback_requests/feedback-request-form.html' %}
+</div>
 
 <style>
 	main {
 		gap: 0.5;
 	}
 	.main-image {
-		border-radius: 0.5rem;
-		height: 28rem;
+		width: 100vw;
+		height: 32rem;
+		object-fit: cover;
+		border-radius: 0;
 	}
 </style>
 {% endblock content %}

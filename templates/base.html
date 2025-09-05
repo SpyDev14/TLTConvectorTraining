@@ -306,13 +306,13 @@
 	<div class="content">
 		<div style="display: flex; justify-content: space-between; align-items: stretch;">
 			<div style="align-self: center;">
-				Вы на странице: <code>{{ page_info.name }}</code> |
-				URL: <code>{{ page_info.get_absolute_url }}</code> |
-				Slug: <code>{{ page_info.slug }}</code> |
+				Вы на странице:&nbsp<code>{{ page_info.name }}</code>&nbsp|
+				URL:&nbsp<code>{{ page_info.get_absolute_url }}</code>&nbsp|
+				Slug:&nbsp<code>{{ page_info.slug }}</code>&nbsp|
 				{% if object.template_name %}
-				Template: <code>{{ object.template_name }}</code> |
+				Template:&nbsp<code>{{ object.template_name }}</code>&nbsp|
 				{% endif %}
-				View: <code>{{ view|typename }}</code>
+				View:&nbsp<code>{{ view|typename }}</code>
 				</code>
 			</div>
 			<div class="button-like" style="display: flex; gap: 0.5rem; align-items: flex-start; flex-shrink: 0;">

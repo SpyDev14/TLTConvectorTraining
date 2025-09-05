@@ -29,7 +29,6 @@ class Product(BaseRenderableModel):
 		blank = True)
 	sub_models_table = HTMLField('Таблица под-моделей товара', blank = True,
 		help_text = 'Создайте и заполните HTML таблицу с под-моделями товара')
-	in_stock = models.BooleanField('В наличии', default = True)
 
 	@property
 	def html_title(self):

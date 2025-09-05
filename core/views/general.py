@@ -1,14 +1,24 @@
-from core.views.bases 		import BasePageView
-from core.views.mixins 		import GenericPageMixin
+from core.views.bases import BasePageView
 
-# INFO: Связано хардкод проверкой в Page.clean() поля url_path
-class GenericPageView(GenericPageMixin, BasePageView):
+from django.shortcuts import get_object_or_404
+
+# INFO: Связано хардкод проверкой в Page.clean() поля url_source
+class GenericPageView(BasePageView):
+	def get_page(self):
+		url_path = self.kwargs['urp_path']
+
+		return get_object_or_404(self.model, url_source = url_path, is_generic_page = True)
+
 	def get_template_names(self):
 		return [self.object.template_name]
 
-class DebugPageView(GenericPageMixin, BasePageView):
+# FIXME: Переработать! После рефакторинга поля перестало работать.
+class DebugPageView(BasePageView):
 	template_name = 'core/debug/page_repr.html'
 	check_is_generic_page = False
+
+	def get_page(self):
+		return get_object_or_404(self.model, slug = self.kwargs['slug'])
 
 	def get_template_names(self):
 		return [self.template_name]

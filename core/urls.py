@@ -10,7 +10,7 @@ urlpatterns = [
 if settings.DEBUG:
 	urlpatterns.extend([
 		path('_debug/', views.DebugPageView.as_view(), kwargs={'url_path': ''}, name = 'debug-repr'),
-		path('_debug/<path:url_path>', views.DebugPageView.as_view(), name = 'debug-repr')
+		path('_debug/<slug:slug>/', views.DebugPageView.as_view(), name = 'debug-repr')
 	])
 
 

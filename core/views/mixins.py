@@ -34,26 +34,3 @@ class ConcretePageMixin:
 		if not self.page_slug:
 			raise ImproperlyConfigured('page_slug не может быть пуст!')
 		return Page._default_manager.get(slug = self.page_slug)
-
-
-class GenericPageMixin:
-	url_kwarg_key: str = 'url_path'
-
-	# Реализовал не самым лучшим образом, ранее просто всегда проверял
-	# (защита от ситуации, где is_generic_page = False, но ей не присвоили
-	# свой View и оно обрабатывается также через GenericPageView)
-	check_is_generic_page: bool = True
-
-	kwargs: dict[str, Any]
-
-	def get_page(self):
-		if not self.url_kwarg_key:
-			raise ImproperlyConfigured('url_kwarg не может быть пуст!')
-		url_path = self.kwargs[self.url_kwarg_key]
-
-		additional_lookups = (
-			{'is_generic_page': True}
-			if self.check_is_generic_page
-			else {}
-		)
-		return get_object_or_404(Page, url_path = url_path, **additional_lookups)

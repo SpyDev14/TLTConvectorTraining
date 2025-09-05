@@ -55,7 +55,7 @@ class TelegramSendingChannelAdmin(admin.ModelAdmin):
 	def has_add_permission(self, request):
 		count_of_specializations = len(models.TelegramSendingChannel.Specialization)
 		count_of_channels = models.TelegramSendingChannel.objects.count()
-		# специализация: uniqe = True, blank = False
+		# (специализация uniqe = True, blank = False)
 		return count_of_channels < count_of_specializations
 
 registrator.register()
