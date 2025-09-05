@@ -204,13 +204,27 @@
 
 		a {
 			color: darkgray;
-			transition: 1s;
+			transition: 0.6s;
 		}
 		a:hover {
 			color: grey;
 			text-decoration: none;
-			transition: 1s;
+			transition: 0.6s;
 		}
+	}
+
+	::-webkit-scrollbar {
+		height: 0.5rem;
+	}
+	
+	::-webkit-scrollbar-track {
+		background: var(--dark-bg);
+		border-radius: 999rem;
+	}
+	
+	::-webkit-scrollbar-thumb {
+		background: #5a5a5af0;
+		border-radius: 999rem;
 	}
 </style>
 <style>

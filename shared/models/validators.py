@@ -48,7 +48,7 @@ class BaseValidator(metaclass=DeconstructibleMeta):
 			setattr(self, attr_name, value)
 
 	def check_is_valid(self, value: Any) -> bool:
-		pass
+		return True
 
 	def build_error_msg(self, value: Any) -> Any:
 		return self.error_msg
