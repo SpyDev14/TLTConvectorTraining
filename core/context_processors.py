@@ -72,14 +72,6 @@ def _categories_provider():
 		'categories'
 	)
 
-def _recommended_provider():
-	return {
-		'recommended': _queryset_to_context(
-			business.Category.objects.recommended(),
-			'categories'
-		)
-	}
-
 
 # Я предпочёл явный список со всеми провайдерами вместо
 # декоратора, чтобы код был более понятен для фронтендеров
@@ -90,7 +82,6 @@ GLOBAL_CONTEXT_PROVIDERS: set[Callable[[], dict]] = {
 	_page_provider,
 	_services_provider,
 	_categories_provider,
-	_recommended_provider
 }
 
 SINGLETON_CLASSES_TO_GLOBAL_CONTEXT: set[type[SingletonModel]] = {
