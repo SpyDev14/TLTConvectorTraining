@@ -20,7 +20,7 @@
 		margin-top: 2rem;
 		margin-inline: auto;
 	">
-		{% for category in global.categories.values %}
+		{% for category in global.categories %}
 			{% item_card category.name image=category.image url=category.get_absolute_url %}
 		{% endfor %}
 	</div>
