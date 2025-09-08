@@ -25,7 +25,10 @@
 		{% endfor %}
 	</div>
 	<div class="button-like" style="margin-top: 1rem; display: flex; justify-content: center;">
-		<a class="green" href="{{ global.pages.catalog.get_absolute_url }}">→ Перейти в каталог</a>
+		<a class="green catalog-button-transform" href="{{ global.pages.catalog.get_absolute_url }}" style="
+		padding: 0.5rem 1rem; border-radius: 0.8rem; transition: transform 0.2s ease; transition: 0.3s ease;">
+			Перейти в каталог →
+		</a>
 	</div>
 </div>
 {% if last_articles %}
@@ -48,6 +51,12 @@
 		height: 32rem;
 		object-fit: cover;
 		border-radius: 0;
+	}
+
+	/* Все остальные стили не применялись */
+	.catalog-button-transform:hover {
+		transition: transform 0.2s ease;
+		transform: translateX(0.25rem)
 	}
 </style>
 {% endblock content %}
