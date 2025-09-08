@@ -34,6 +34,8 @@ class Product(BaseRenderableModel):
 	def html_title(self):
 		return f"Купить {super().html_title}"
 
+	# NOTE: Я бы настроил кеширование в бд, добавив поле image к
+	# Product и обновлял бы его при изменениях Product / ProductImage (подумать)
 	@cached_property
 	def image(self):
 		# all для работы с prefetch_related
