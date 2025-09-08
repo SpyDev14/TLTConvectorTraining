@@ -69,21 +69,21 @@ flex-direction: row;">
 	</details>
 
 
-<!-- object section -->
-{% elif object %}
-{% with meta=object|get_attr:"_meta" %}
-<details>
-	<summary><strong>object</strong> ({{ meta.verbose_name }})</summary>
-	<table>
-		<tr><th>Field</th><th>Value</th></tr>
-		{% for field in meta.fields %}
-		<tr>
-			<td>{{ field.name }}</td>
-			<td>{{ field.value_from_object|default:"-" }}</td>
-		</tr>
-		{% endfor %}
-	</table>
-</details>
+	<!-- object section -->
+	{% elif object %}
+	{% with meta=object|get_attr:"_meta" %}
+	<details>
+		<summary><strong>object</strong> ({{ meta.verbose_name }})</summary>
+		<table>
+			<tr><th>Field</th><th>Value</th></tr>
+			{% for field in meta.fields %}
+			<tr>
+				<td>{{ field.name }}</td>
+				<td>{{ field.value_from_object|default:"-" }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</details>
 {% endwith %}
 {% endif %}
 </div>
