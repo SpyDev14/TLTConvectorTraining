@@ -44,6 +44,12 @@ class CategoryDetailView(RenderableModelBasedListView):
 			return self.renderable_object.childrens.all()
 		else:
 			return self.renderable_object.products.prefetch_related('photos')
+		
+	def get_context_data(self, **kwargs):
+		return super().get_context_data(
+			recommended_categories = models.Category.objects.recommended(),
+			**kwargs
+		)
 
 class CatalogPageView(PageBasedListView):
 	renderable_slug = 'catalog'

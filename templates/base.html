@@ -361,7 +361,7 @@
 				</a>
 				<div>
 					<h4>Товары</h4>
-					{% for category in global.categories.values %}
+					{% for category in global.categories %}
 						<div>
 							<a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
 						</div>
@@ -369,7 +369,7 @@
 				</div>
 				<div>
 					<h4>Услуги</h4>
-					{% for service in global.services.values %}
+					{% for service in global.services %}
 						<div>
 							<a href="{{ service.get_absolute_url }}">{{ service.name }}</a>
 						</div>
