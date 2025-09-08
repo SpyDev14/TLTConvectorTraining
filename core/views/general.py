@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 # INFO: Связано проверкой в Page.clean() поля url_source
 class GenericPageView(BasePageView):
 	def get_page(self):
-		url_path = self.kwargs['urp_path']
+		url_path = self.kwargs['url_path']
 
 		return get_object_or_404(self.model, url_source = url_path, is_generic_page = True)
 
