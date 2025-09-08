@@ -14,83 +14,18 @@ from core.models.bases 				import BaseRenderableModel
 from business import models as models
 from business import models as business
 
-
 debug_context = lambda _: {'DEBUG': settings.DEBUG}
 
-def _singletons_to_context(singleton_classes: set[type[SingletonModel]]):
-	return {
-		camel_to_snake_case(typename(model)): model.get_solo()
-		for model in singleton_classes
-	}
 
-def _model_qs_to_context_by_name[T](
-		qs: QuerySet[T],
-		key_field_name: str,
-		name: Callable[[type[T]], str] | str = \
-			lambda model_type: f"{camel_to_snake_case(typename(model_type))}s"
-	) -> dict[str, T]:
-
-	if not isinstance(name, str):
-		name: str = name(qs.model)
-
-	values_dict = {}
-	for model in qs:
-		key: str = getattr(model, key_field_name)
-		values_dict[key.replace('-', '_')] = model
-	return {name: values_dict}
-
-def _base_renderable_model_qs_to_context(
-		qs: QuerySet[BaseRenderableModel],
-		key_field_name: str = 'slug',
-		name: Callable[[type[BaseRenderableModel]], str] | str | None = None
-	) -> dict[str, BaseRenderableModel]:
-	return _model_qs_to_context_by_name(
-		qs, key_field_name,
-		*((name,) if name else ())
-	)
-
-
-# WARN: Нарушен OCP из SOLID, да и просто выглядит паршиво
-def __global_context_legacy(request): return {
-	'global': {
-		**_singletons_to_context({
-			SiteSettings,
-			CompanyContacts
-		}),
-		**_model_qs_to_context_by_name(
-			ExtraContext.objects.filter(page = None),
-			'key', lambda model_type: camel_to_snake_case(typename(model_type))
-		),
-		**_base_renderable_model_qs_to_context(
-			Page.objects.order_by('name'),
-		),
-		**_base_renderable_model_qs_to_context(
-			models.Service.objects.all(),
-		),
-		**_base_renderable_model_qs_to_context(
-			models.Category.objects.filter(parent = None),
-			name = 'categories'
-		),
-		'recommended': {
-			**_base_renderable_model_qs_to_context(
-				models.Category.objects.recommended(),
-				name = 'categories'
-			),
-		}
-	},
-}
-global_context = __global_context_legacy
-
-
-_make_default_name = lambda model: camel_to_snake_case(typename(model))
-
-def _queryset_to_context(qs: QuerySet, name: str | None) -> dict[str, Iterable[Model]]:
+_make_default_name = lambda model: f"{camel_to_snake_case(typename(model))}s"
+def _queryset_to_context(qs: QuerySet, name: str | None = None) -> dict[str, Iterable[Model]]:
 	name = name or _make_default_name(qs.model)
 	return {name: qs}
 
 def _queryset_to_context_as_dict(
-		qs: QuerySet, key_field_name: str,
-		name: str | None) -> dict[str, dict[str, Model]]:
+		qs: QuerySet,
+		key_field_name: str,
+		name: str | None = None) -> dict[str, dict[str, Model]]:
 	name = name or _make_default_name(qs.model)
 
 	context = {}
@@ -104,7 +39,7 @@ def _queryset_to_context_as_dict(
 
 def _base_renderable_model_qs_to_context_as_dict(
 		qs: QuerySet[BaseRenderableModel],
-		name: str | None) -> dict[str, dict[str, BaseRenderableModel]]:
+		name: str | None = None) -> dict[str, dict[str, BaseRenderableModel]]:
 	return _queryset_to_context_as_dict(qs, 'slug', name)
 
 
@@ -117,7 +52,8 @@ def _singletons_provider():
 
 def _extra_context_provider():
 	return _queryset_to_context_as_dict(
-		ExtraContext.objects.filter(page = None), 'key'
+		ExtraContext.objects.filter(page = None), 'key',
+		camel_to_snake_case(typename(ExtraContext))
 	)
 
 def _page_provider():
@@ -162,11 +98,9 @@ SINGLETON_CLASSES_TO_GLOBAL_CONTEXT: set[type[SingletonModel]] = {
 	CompanyContacts
 }
 
-def _global_context_new(request):
+def global_context(request):
 	context = {}
 	for provider in GLOBAL_CONTEXT_PROVIDERS:
 		context.update(provider())
 
-	return context
-
-# global_context = _global_context_new
+	return {'global': context}
