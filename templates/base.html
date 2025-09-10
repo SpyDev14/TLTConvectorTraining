@@ -24,7 +24,9 @@
 		});
 	</script>
 	{% endif %}
-	<meta name="description" content="Description">
+	{% if page_info.html_description %}
+		<meta name="description" content="Description">
+	{% endif %}
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 	<script>{{ global.site_settings.head_script|safe }}</script>
