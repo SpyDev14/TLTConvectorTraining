@@ -32,7 +32,7 @@ class Product(BaseRenderableModel):
 
 	@property
 	def html_title(self):
-		return f"Купить {super().html_title}"
+		return f"Купить {self.name} в Тольятти"
 
 	# NOTE: Я бы настроил кеширование в бд, добавив поле image к
 	# Product и обновлял бы его при изменениях Product / ProductImage (подумать)

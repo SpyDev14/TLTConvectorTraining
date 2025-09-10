@@ -5,17 +5,19 @@ import logging
 
 from django.utils.safestring 	import mark_safe
 from django.core.exceptions 	import ValidationError
+from django.utils.html 			import strip_tags
 from django.core.cache 			import cache
 from django.urls 				import resolve, reverse, NoReverseMatch
 from django.db 					import models
 
-from tinymce.models 	import HTMLField
+from tinymce.models import HTMLField
 import requests
 
 from shared.models.validators 	import *
 from shared.models.managers 	import IndividualizedBulkOperationsManager
 from shared.telegram.params 	import MessageParseMode
 from shared.reflection 			import typename
+from shared.string_processing 	import truncate_string
 from core.models.bases 			import BaseRenderableModel
 # from core.views.bases 		import GenericPageView (circular import, locally imported in Page.clean())
 from core.constants 			import RENDERING_SUPPORTS_TEXT
@@ -30,6 +32,13 @@ class Page(BaseRenderableModel):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.extra_context_manager: models.Manager['ExtraContext']
+
+	h1_override = models.CharField('H1 Заголовок (переопределение)', max_length = 127, blank = True,
+		help_text = 'По умолчанию для H1 используется Name.')
+
+	html_title_override = models.CharField('HTML Title (переопределение)', max_length = 128, blank = True,
+		help_text = 'По умолчанию для HTML Title используется Name.')
+	html_description_override = models.CharField('HTML Description', blank = True)
 
 	is_generic_page = models.BooleanField('Это динамически-добавляемая страница?', default = False,
 		help_text = mark_safe(
@@ -91,6 +100,20 @@ class Page(BaseRenderableModel):
 	class Meta:
 		verbose_name = 'страница'
 		verbose_name_plural = 'страницы'
+
+	@property
+	def h1(self):
+		return self.h1_override or self.name
+	
+	@property
+	def html_title(self):
+		return self.html_title_override or self.name
+	
+	@property
+	def html_description(self):
+		if desc := self.html_description_override:
+			return desc
+		return truncate_string(strip_tags(self.content), 128)
 
 	def clean(self):
 		from core.views import GenericPageView

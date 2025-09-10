@@ -16,12 +16,6 @@ class BaseRenderableModel(models.Model):
 	# slug тут не совсем к месту т.к это про получение объекта на основе запроса,
 	# но опустим этот момент, это слишком мелкая деталь.
 	slug = models.SlugField(max_length = 128, unique = True)
-	h1_override = models.CharField('H1 Заголовок (переопределение)', max_length = 127, blank = True,
-		help_text = 'По умолчанию для H1 используется Name.')
-
-	html_title_override = models.CharField('HTML Title (переопределение)', max_length = 128, blank = True,
-		help_text = 'По умолчанию для HTML Title используется Name.')
-	html_description = models.CharField('HTML Description', blank = True)
 
 	class Meta:
 		abstract = True
@@ -29,13 +23,18 @@ class BaseRenderableModel(models.Model):
 	def __str__(self):
 		return self.name
 
+	# Под переопределение
 	@property
 	def h1(self):
-		return self.h1_override or self.name
+		return self.name
 
 	@property
 	def html_title(self):
-		return self.html_title_override or self.name
+		return self.name
+
+	@property
+	def html_description(self):
+		return str()
 
 	def get_absolute_url(self) -> str:
 		default_url_name = f'{self._meta.model_name}-detail'
