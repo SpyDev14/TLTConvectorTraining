@@ -33,7 +33,6 @@ class BaseRenderableModel(models.Model):
 	def h1(self):
 		return self.h1_override or self.name
 
-	# Я решил сделать так потому, что часто просто дублировал одну и ту же строку в оба поля.
 	@property
 	def html_title(self):
 		return self.html_title_override or self.name
