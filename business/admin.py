@@ -16,10 +16,16 @@ registrator = AdminModelRegistrator(
 class CategoryAdmin(BaseRenderableModelAdmin, MPTTModelAdmin):
 	pass
 
+
 # MARK: Product
+@registrator.set_for_model(models.ProductCharacteristicType)
+class ProductCharacteristicTypeAdmin(admin.ModelAdmin):
+	search_fields = ['name']
+
 registrator.exclude_model(models.ProductCharacteristic)
 class ProductCharacteristicsInline(admin.TabularInline):
 	model = models.ProductCharacteristic
+	autocomplete_fields = ['type']
 	classes = ('collapse',)
 	extra = 4
 
