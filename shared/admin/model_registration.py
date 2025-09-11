@@ -97,7 +97,7 @@ def _load_default_admin_classes_for_models():
 
 	_defaults_loaded = True
 
-
+# PROBLEM: Нельзя реализовать регистрацию моделей по разным файлам
 class AdminModelRegistrator:
 	"""
 	`AdminModelRegistrator` нужен для удобной автоматической регистрации моделей
