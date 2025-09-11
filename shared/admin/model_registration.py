@@ -12,9 +12,9 @@ from shared.reflection 			import typename
 
 _logger = getLogger(__name__)
 
-# Задавать в DEFAULT_MODEL_ADMIN_CLASSES в настройках, подробнее в документации
-# AdminModelRegister.
-# Тем не менее, если указать Model: CustomModelAdmin - это сработает.
+# Задавать в DEFAULT_MODEL_ADMIN_CLASSES в настройках, подробнее
+# в документации AdminModelRegister.
+# Ps: если указать Model: CustomModelAdmin - это сработает.
 _default_admin_classes_for_models: dict[type[Model], type[ModelAdmin]] = { }
 _defaults_loaded: bool = False
 
