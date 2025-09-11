@@ -5,6 +5,7 @@ from django.urls 						import reverse, NoReverseMatch
 from django.db 							import models
 
 
+# TODO: Убрать h1_override и html_title_override, они не нужны в Product и других подобных моделях.
 class BaseRenderableModel(models.Model):
 	# см. get_absolute_url()
 	_custom_url_name: str | None = None
