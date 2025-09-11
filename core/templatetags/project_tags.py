@@ -11,7 +11,7 @@ def render_as_template(context: RequestContext, template_string: str):
 	"""
 	Рендерит строку как шаблон с полным текущим контекстом,
 	после чего помечает строку как безопасную и возвращает результат.
-	Использование: `{% render model.text_field %}`
+	Использование: `{% render_as_template model.text_field %}`
 	"""
 
 	template = Template(str(template_string))
