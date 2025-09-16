@@ -39,7 +39,6 @@ class BaseRenderableModel(models.Model):
 		default_url_name = f'{self._meta.model_name}-detail'
 		url_name = self._custom_url_name or default_url_name
 
-		# raise NotImplementedError('Должно быть реализованно в дочернем классе!')
 		try:
 			return reverse(url_name, kwargs = {self._url_kwarg_name: self.slug})
 		except NoReverseMatch:
