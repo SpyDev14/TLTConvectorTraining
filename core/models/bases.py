@@ -2,9 +2,12 @@ from django.core.exceptions 			import ImproperlyConfigured
 from django.urls 						import reverse, NoReverseMatch
 from django.db 							import models
 
+from shared.seo.og 						import OgType
+
 
 class BaseRenderableModel(models.Model):
 	# см. get_absolute_url()
+	# Под редкое переопределение в подклассах
 	_custom_url_name: str | None = None
 	_url_kwarg_name: str = 'slug'
 
@@ -21,11 +24,16 @@ class BaseRenderableModel(models.Model):
 		help_text = 'По умолчанию для HTML Title используется Name.')
 	html_description = models.CharField('HTML Description', blank = True)
 
+
 	class Meta:
 		abstract = True
 
 	def __str__(self):
 		return self.name
+
+	# Необходимо указать в дочернем классе, но можно оставить пустым
+	# (Пока в разработке)
+	og_type: OgType | None = None
 
 	@property
 	def h1(self):
