@@ -32,7 +32,7 @@ class BaseRenderableModel(models.Model):
 		return self.name
 
 	# Необходимо указать в дочернем классе, но можно оставить пустым
-	# (Пока в разработке)
+	# NOTE: Может сделать по умолчанию website? Как лучше?????????
 	og_type: OgType | None = None
 
 	@property
