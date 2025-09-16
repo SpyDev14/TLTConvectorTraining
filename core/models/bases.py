@@ -31,9 +31,8 @@ class BaseRenderableModel(models.Model):
 	def __str__(self):
 		return self.name
 
-	# Необходимо указать в дочернем классе, но можно оставить пустым
-	# NOTE: Может сделать по умолчанию website? Как лучше?????????
-	og_type: OgType | None = None
+	# Необходимо указать в дочернем классе, но можно оставить по умолчанию
+	og_type: OgType = OgType.WEBSITE
 
 	@property
 	def h1(self):
