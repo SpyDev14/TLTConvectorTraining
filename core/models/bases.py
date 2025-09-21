@@ -1,5 +1,3 @@
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions 			import ImproperlyConfigured
 from django.urls 						import reverse, NoReverseMatch
 from django.db 							import models
@@ -40,7 +38,6 @@ class BaseRenderableModel(models.Model):
 		default_url_name = f'{self._meta.model_name}-detail'
 		url_name = self._custom_url_name or default_url_name
 
-		# raise NotImplementedError('Должно быть реализованно в дочернем классе!')
 		try:
 			return reverse(url_name, kwargs = {self._url_kwarg_name: self.slug})
 		except NoReverseMatch:

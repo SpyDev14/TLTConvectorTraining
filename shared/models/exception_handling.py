@@ -38,7 +38,7 @@ class HandleAndLogNotMigratedModelError:
 		self._logger = logger if logger else _logger
 
 		# это удобнее чем всё сообщение целиком с %s для подстановки типа модели
-		self._error_comment = error_comment 
+		self._error_comment = error_comment
 
 	def __enter__(self):
 		return self
