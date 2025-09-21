@@ -23,16 +23,24 @@ class BaseRenderableModel(models.Model):
 
 	# Под переопределение
 	@property
-	def h1(self):
+	def h1(self) -> str:
 		return self.name
 
 	@property
-	def html_title(self):
+	def html_title(self) -> str:
 		return self.name
 
 	@property
-	def html_description(self):
-		return str()
+	def html_description(self) -> str | None:
+		return None
+
+	@property
+	def og_title(self) -> str:
+		return self.html_title
+
+	@property
+	def og_description(self) -> str | None:
+		return self.html_description
 
 	def get_absolute_url(self) -> str:
 		default_url_name = f'{self._meta.model_name}-detail'
@@ -44,7 +52,6 @@ class BaseRenderableModel(models.Model):
 			raise ImproperlyConfigured(
 				'Вы не настроили get_absolute_url()! Настройте, либо переопределите базовый метод.'
 			)
-
 
 	def get_admin_url(self):
 		return f'/admin/{self._meta.app_label}/{self._meta.model_name}/{self.pk}/change/'
