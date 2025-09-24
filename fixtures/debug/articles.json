@@ -1,0 +1,52 @@
+[
+	{
+		"model": "business.article",
+		"fields": {
+			"name": "Введение в искусственный интеллект",
+			"slug": "vvedenie-v-iskusstvennyj-intellekt",
+			"image": "images/articles/ai_intro.jpg",
+			"content": "<p>Искусственный интеллект (ИИ) революционизирует современные технологии...</p><ul><li>Машинное обучение</li><li>Нейронные сети</li><li>Глубокое обучение</li></ul>",
+			"created_at": "2023-10-15T08:00:00Z"
+		}
+	},
+	{
+		"model": "business.article",
+		"fields": {
+			"name": "Основы веб-разработки на Django",
+			"slug": "osnovy-veb-razrabotki-na-django",
+			"image": "images/articles/django_basics.png",
+			"content": "<p>Django - мощный фреймворк для создания веб-приложений на Python...</p><p>Основные компоненты:</p><ol><li>Модели</li><li>Представления</li><li>Шаблоны</li></ol>",
+			"created_at": "2023-10-17T14:30:00Z"
+		}
+	},
+	{
+		"model": "business.article",
+		"fields": {
+			"name": "Советы по оптимизации производительности Python",
+			"slug": "sovety-po-optimizacii-proizvoditelnosti-python",
+			"image": "images/articles/python_performance.jpg",
+			"content": "<p>Оптимизация кода на Python требует понимания внутренних механизмов языка...</p><p>Ключевые методы:</p><ul><li>Профилирование кода</li><li>Использование генераторов</li><li>Кэширование</li></ul>",
+			"created_at": "2023-10-20T10:15:00Z"
+		}
+	},
+	{
+		"model": "business.article",
+		"fields": {
+			"name": "Лучшие практики безопасности веб-приложений",
+			"slug": "luchshie-praktiki-bezopasnosti-veb-prilozhenij",
+			"image": "images/articles/web_security.png",
+			"content": "<p>Безопасность веб-приложений критически важна в современном цифровом мире...</p><p>Основные угрозы:</p><ol><li>SQL-инъекции</li><li>XSS-атаки</li><li>CSRF</li></ol>",
+			"created_at": "2023-10-22T16:45:00Z"
+		}
+	},
+	{
+		"model": "business.article",
+		"fields": {
+			"name": "Путешествие по национальным паркам Норвегии",
+			"slug": "puteshestvie-po-nacionalnym-parkam-norvegii",
+			"image": "images/articles/norway_parks.jpg",
+			"content": "<p>Норвегия предлагает уникальные возможности для экотуризма...</p><p>Топ-5 парков:</p><ul><li>Йотунхеймен</li><li>Рондане</li><li>Хардангервидда</li></ul>",
+			"created_at": "2023-10-25T12:00:00Z"
+		}
+	}
+]

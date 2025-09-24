@@ -1,12 +1,13 @@
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions 			import ImproperlyConfigured
 from django.urls 						import reverse, NoReverseMatch
 from django.db 							import models
 
+from shared.seo.og 						import OgType
+
 
 class BaseRenderableModel(models.Model):
 	# см. get_absolute_url()
+	# Под редкое переопределение в подклассах
 	_custom_url_name: str | None = None
 	_url_kwarg_name: str = 'slug'
 
@@ -23,33 +24,50 @@ class BaseRenderableModel(models.Model):
 		help_text = 'По умолчанию для HTML Title используется Name.')
 	html_description = models.CharField('HTML Description', blank = True)
 
+
 	class Meta:
 		abstract = True
 
 	def __str__(self):
 		return self.name
 
+
+	# Под переопределение
+	# А вот в C# есть "=>" выражения для создания таких аллиасов (вместо return)!
+	# И в целом там явные св-ва, жалко в python такого нет. Св-ва тут - это дескрипторы,
+	# созданные на основе методов класса (которые тоже являются дескрипторами) через декораторную запись (@)
+	# (вот тут снизу мы создаём объект класса property, передав в него метод h1 через @ и заменяем этим
+	# объектом исходный метод h1 (из-за @))
+
 	@property
-	def h1(self):
+	def h1(self) -> str:
 		return self.h1_override or self.name
 
-	# Я решил сделать так потому, что часто просто дублировал одну и ту же строку в оба поля.
 	@property
-	def html_title(self):
+	def html_title(self) -> str:
 		return self.html_title_override or self.name
+
+	# Необходимо указать в дочернем классе, но можно оставить по умолчанию
+	og_type: OgType = OgType.WEBSITE
+
+	@property
+	def og_title(self) -> str:
+		return self.html_title
+
+	@property
+	def og_description(self) -> str | None:
+		return self.html_description
 
 	def get_absolute_url(self) -> str:
 		default_url_name = f'{self._meta.model_name}-detail'
 		url_name = self._custom_url_name or default_url_name
 
-		# raise NotImplementedError('Должно быть реализованно в дочернем классе!')
 		try:
 			return reverse(url_name, kwargs = {self._url_kwarg_name: self.slug})
 		except NoReverseMatch:
 			raise ImproperlyConfigured(
 				'Вы не настроили get_absolute_url()! Настройте, либо переопределите базовый метод.'
 			)
-
 
 	def get_admin_url(self):
 		return f'/admin/{self._meta.app_label}/{self._meta.model_name}/{self.pk}/change/'
