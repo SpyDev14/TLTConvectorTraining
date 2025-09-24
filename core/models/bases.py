@@ -2,9 +2,12 @@ from django.core.exceptions 			import ImproperlyConfigured
 from django.urls 						import reverse, NoReverseMatch
 from django.db 							import models
 
+from shared.seo.og 						import OgType
+
 
 class BaseRenderableModel(models.Model):
 	# см. get_absolute_url()
+	# Под редкое переопределение в подклассах
 	_custom_url_name: str | None = None
 	_url_kwarg_name: str = 'slug'
 
@@ -21,11 +24,13 @@ class BaseRenderableModel(models.Model):
 		help_text = 'По умолчанию для HTML Title используется Name.')
 	html_description = models.CharField('HTML Description', blank = True)
 
+
 	class Meta:
 		abstract = True
 
 	def __str__(self):
 		return self.name
+
 
 	# Под переопределение
 	# А вот в C# есть "=>" выражения для создания таких аллиасов (вместо return)!
@@ -33,6 +38,7 @@ class BaseRenderableModel(models.Model):
 	# созданные на основе методов класса (которые тоже являются дескрипторами) через декораторную запись (@)
 	# (вот тут снизу мы создаём объект класса property, передав в него метод h1 через @ и заменяем этим
 	# объектом исходный метод h1 (из-за @))
+
 	@property
 	def h1(self) -> str:
 		return self.h1_override or self.name
@@ -40,6 +46,9 @@ class BaseRenderableModel(models.Model):
 	@property
 	def html_title(self) -> str:
 		return self.html_title_override or self.name
+
+	# Необходимо указать в дочернем классе, но можно оставить по умолчанию
+	og_type: OgType = OgType.WEBSITE
 
 	@property
 	def og_title(self) -> str:
