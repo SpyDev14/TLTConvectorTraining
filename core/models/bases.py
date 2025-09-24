@@ -1,5 +1,3 @@
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions 			import ImproperlyConfigured
 from django.urls 						import reverse, NoReverseMatch
 from django.db 							import models
@@ -24,6 +22,11 @@ class BaseRenderableModel(models.Model):
 		return self.name
 
 	# Под переопределение
+	# А вот в C# есть "=>" выражения для создания таких аллиасов (вместо return)!
+	# И в целом там явные св-ва, жалко в python такого нет. Св-ва тут - это дескрипторы,
+	# созданные на основе методов класса (которые тоже являются дескрипторами) через декораторную запись (@)
+	# (вот тут снизу мы создаём объект класса property, передав в него метод h1 через @ и заменяем этим
+	# объектом исходный метод h1 (из-за @))
 	@property
 	def h1(self) -> str:
 		return self.name
@@ -36,18 +39,24 @@ class BaseRenderableModel(models.Model):
 	def html_description(self) -> str | None:
 		return None
 
+	@property
+	def og_title(self) -> str:
+		return self.html_title
+
+	@property
+	def og_description(self) -> str | None:
+		return self.html_description
+
 	def get_absolute_url(self) -> str:
 		default_url_name = f'{self._meta.model_name}-detail'
 		url_name = self._custom_url_name or default_url_name
 
-		# raise NotImplementedError('Должно быть реализованно в дочернем классе!')
 		try:
 			return reverse(url_name, kwargs = {self._url_kwarg_name: self.slug})
 		except NoReverseMatch:
 			raise ImproperlyConfigured(
 				'Вы не настроили get_absolute_url()! Настройте, либо переопределите базовый метод.'
 			)
-
 
 	def get_admin_url(self):
 		return f'/admin/{self._meta.app_label}/{self._meta.model_name}/{self.pk}/change/'
