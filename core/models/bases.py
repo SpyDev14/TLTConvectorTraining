@@ -5,7 +5,6 @@ from django.db 							import models
 from shared.seo.og 						import OgType
 
 
-# TODO: Убрать h1_override и html_title_override, они не нужны в Product и других подобных моделях.
 class BaseRenderableModel(models.Model):
 	# см. get_absolute_url()
 	# Под редкое переопределение в подклассах
