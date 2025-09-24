@@ -25,16 +25,16 @@ class BaseRenderableModel(models.Model):
 
 	# Под переопределение
 	@property
-	def h1(self):
+	def h1(self) -> str:
 		return self.name
 
 	@property
-	def html_title(self):
+	def html_title(self) -> str:
 		return self.name
 
 	@property
-	def html_description(self):
-		return str()
+	def html_description(self) -> str | None:
+		return None
 
 	def get_absolute_url(self) -> str:
 		default_url_name = f'{self._meta.model_name}-detail'
