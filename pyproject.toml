@@ -1,0 +1,33 @@
+[project]
+name = "TTS-Tempering"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+	"django",
+	# [Models]
+	"django-solo",
+	"django-mptt",
+	"django-tinymce",
+	"django-ordered-model",
+	"django-phonenumber-field",
+	# [Utils]
+	"django-cleanup",
+	"django-environ",
+	"django-admin-sortable2",
+	"django-admin-rangefilter",
+	# [Image processing]
+	"pillow",
+	# [Excel]
+	"pandas",
+	"openpyxl",
+	"phonenumbers", # and for django-phonenumber-field
+	# [None-specified]
+	"requests",
+	"psycopg2-binary",
+]
+
+[dependency-groups]
+dev = [
+	"django-debug-toolbar>=6.0.0",
+]
