@@ -42,10 +42,6 @@ class BaseRenderableModel(models.Model):
 		return self.html_title_override or self.name
 
 	@property
-	def html_description(self) -> str | None:
-		return None
-
-	@property
 	def og_title(self) -> str:
 		return self.html_title
 
