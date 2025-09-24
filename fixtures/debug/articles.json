@@ -1,7 +1,6 @@
 [
 	{
 		"model": "business.article",
-		"pk": 1,
 		"fields": {
 			"name": "Введение в искусственный интеллект",
 			"slug": "vvedenie-v-iskusstvennyj-intellekt",
@@ -12,7 +11,6 @@
 	},
 	{
 		"model": "business.article",
-		"pk": 2,
 		"fields": {
 			"name": "Основы веб-разработки на Django",
 			"slug": "osnovy-veb-razrabotki-na-django",
@@ -23,7 +21,6 @@
 	},
 	{
 		"model": "business.article",
-		"pk": 3,
 		"fields": {
 			"name": "Советы по оптимизации производительности Python",
 			"slug": "sovety-po-optimizacii-proizvoditelnosti-python",
@@ -34,7 +31,6 @@
 	},
 	{
 		"model": "business.article",
-		"pk": 4,
 		"fields": {
 			"name": "Лучшие практики безопасности веб-приложений",
 			"slug": "luchshie-praktiki-bezopasnosti-veb-prilozhenij",
@@ -45,7 +41,6 @@
 	},
 	{
 		"model": "business.article",
-		"pk": 5,
 		"fields": {
 			"name": "Путешествие по национальным паркам Норвегии",
 			"slug": "puteshestvie-po-nacionalnym-parkam-norvegii",
