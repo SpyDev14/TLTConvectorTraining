@@ -4,7 +4,7 @@ from business import views
 
 
 urlpatterns = [
-	path('', views.HomePageView.as_view(), name = 'home'),
+	path('', views.HomePageView.as_view(), name = 'index'),
 	path('about-us/', views.AboutUsPageView.as_view(), name = 'about-us'),
 
 	# Models

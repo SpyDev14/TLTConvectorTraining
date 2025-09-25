@@ -5,8 +5,8 @@ from business 				import models
 
 
 class HomePageView(FeedbackRequestFormMixin, PageWithFormView):
-	template_name = 'business/home.html'
-	page_slug = 'home'
+	template_name = 'business/index.html'
+	page_slug = 'index'
 
 	def get_context_data(self, **kwargs):
 		context: dict = super().get_context_data(**kwargs)

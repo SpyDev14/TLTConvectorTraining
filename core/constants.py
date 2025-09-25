@@ -12,7 +12,7 @@ RENDERING_SUPPORTS_TEXT = mark_safe(
 		<li>Теги <code>{% if %}</code>, <code>{% for %}</code> и другие.</li>
 		<li>
 			Переменные, например: <code>{{ page.extra_context }},
-			{{ global.pages.home }}, {{ global.extra_context }}</code> и т.д.
+			{{ global.pages.index }}, {{ global.extra_context }}</code> и т.д.
 		</li>
 		<li>
 			А также теги обработки, например: <code>...|default:"..."</code>,
