@@ -1,5 +1,4 @@
 {% load static %}
-
 {% load debug_tags %}
 <!DOCTYPE html>
 <html>
@@ -41,7 +40,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 	<script>{{ global.site_settings.head_script|safe }}</script>
 </head>
-<!-- Стили сверху, чтобы можно было переопределять в наследующихся темплейтах -->
 <style>
 	:root {
 		font-family: 'JetBrains Mono', 'Segoe UI', system-ui;
@@ -279,16 +277,6 @@
 		gap: 0.3rem;
 	}
 
-	/* Мостик для плавного перехода */
-	/* .dropdown-menu::before {
-		content: "";
-		position: absolute;
-		top: -5px;
-		left: 0;
-		right: 0;
-		height: 5px;
-		} */
-
 	.dropdown:hover .dropdown-menu,
 	.dropdown-menu:hover {
 		display: grid;
@@ -308,7 +296,6 @@
 		text-decoration: none;
 	}
 
-	/* Адаптация под границы экрана */
 	.dropdown-menu.right-edge {
 		left: auto;
 		right: 0;
