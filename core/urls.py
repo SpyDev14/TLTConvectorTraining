@@ -5,6 +5,7 @@ from core 			import views
 
 urlpatterns = [
 	path('favicon.ico', views.FaviconView.as_view()),
+	path('robots.txt', views.RobotsView.as_view()),
 ]
 
 if settings.DEBUG:
