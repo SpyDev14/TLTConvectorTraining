@@ -74,7 +74,6 @@ class BasePageView(BaseRenderableDetailView):
 		
 		# Template по умолчанию (предпоследний)
 		names.insert(len(names)-1, GENERIC_TEMPLATE.PAGE)
-		print(names)
 		return names
 
 # Для удобства; подключаю стратегию получения page отдельно, чтобы не засорять
