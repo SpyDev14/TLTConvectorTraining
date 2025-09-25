@@ -1,2 +1,2 @@
 from .general 	import GenericPageView, DebugPageView
-from .favicon 	import FaviconView
+from .technical import FaviconView
