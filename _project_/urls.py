@@ -37,6 +37,5 @@ if settings.DEBUG:
 
 urlpatterns += [
 	# Приложение Core должно быть в САМОМ низу из-за GenericPageView.
-	# Но тем не менее, выше static т.к мы лучше из-за конфликта не получим картинку, чем страницу.
 	path('', include('core.urls'))
 ]
