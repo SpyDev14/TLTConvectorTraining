@@ -64,6 +64,17 @@ class BaseRenderableModel(models.Model):
 	def og_image_url(self) -> str | None:
 		return None
 	
+	def _get_microdata(self) -> dict[str, Any]:
+		"""Под переопределение, возвращайте здесь нужный объект с данными"""
+		raise NotImplementedError('Переопределите этот метод в дочернем классе!')
+
+	def get_full_microdata(self) -> dict[str, Any]:
+		"""Возвращает self._get_microdata() с подставленным значением по умолчанию"""
+		return {
+			'@context': 'https://schema.org',
+			**self._get_microdata()
+		}
+
 	def get_absolute_url(self) -> str:
 		default_url_name = f'{self._meta.model_name}-detail'
 		url_name = self._custom_url_name or default_url_name
