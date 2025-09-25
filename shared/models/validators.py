@@ -104,7 +104,7 @@ class BaseStringValidator(TargetValueTypeMixin, BaseValidator):
 			return True
 		return super().check_is_valid(value)
 
-	# Для аннотации                 vvv
+	# Для аннотации                  vvv
 	def _value_is_valid(self, value: str):
 		return super()._value_is_valid(value)
 
