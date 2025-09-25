@@ -94,9 +94,15 @@ class TargetValueTypeMixin:
 class BaseStringValidator(TargetValueTypeMixin, BaseValidator):
 	allowed_value_types = (str, )
 
-	def __init__(self, check_string: str, *, invert = False, **initkwargs):
+	def __init__(self, check_string: str, *, invert = False, pass_if_empty = True, **initkwargs):
 		super().__init__(invert=invert, **initkwargs)
 		self.check_string = check_string
+		self.pass_if_empty = pass_if_empty
+
+	def check_is_valid(self, value):
+		if not value and self.pass_if_empty:
+			return True
+		return super().check_is_valid(value)
 
 	# Для аннотации                 vvv
 	def _value_is_valid(self, value: str):
