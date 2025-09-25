@@ -1,40 +1,12 @@
-import logging, json
-
 from django.utils.safestring 	import mark_safe
 from django.utils.html 			import escape
 from django.template 			import RequestContext, Library
-from _project_.constants 		import LEVEL_ONLY_LOGGER
 
 from shared.reflection import typename
 
 
 register = Library()
 register.filter('typename', typename)
-
-
-@register.simple_tag(takes_context = True)
-def log_context(context: RequestContext):
-	"""Выводит в лог весь текущий контекст"""
-	logger = logging.getLogger(LEVEL_ONLY_LOGGER)
-
-	def serialize_obj(obj: object):
-		data = {
-			'type': typename(obj),
-			'repr': repr(obj),
-		}
-
-		if str(obj) != repr(obj):
-			data['str'] = str(obj)
-
-		return data
-
-	context_as_dict = context.flatten()
-	logger.debug(
-		'Current template context:\n%s' %
-		json.dumps(context_as_dict, indent = 4, default = serialize_obj, ensure_ascii = False)
-	)
-
-	return ''
 
 
 @register.simple_tag(takes_context=True)
