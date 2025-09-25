@@ -79,7 +79,6 @@ INSTALLED_APPS = [
 	'solo',
 	'mptt',
 	'tinymce',
-	'ckeditor',
 	'rangefilter',
 	'debug_toolbar',
 	'django_cleanup',
