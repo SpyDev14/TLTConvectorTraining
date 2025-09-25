@@ -8,7 +8,9 @@ from shared.models.validators 		import map_coordinates_format
 
 
 class SiteSettings(SingletonModel):
-	favicon = models.ImageField(blank = True, upload_to = settings.MEDIA_ROOT / 'favicon')
+	site_name = models.CharField('Название сайта', max_length=128, default="JBrony Site",
+		help_text="В основном используется в base.html")
+	favicon = models.ImageField(blank = True, upload_to = 'favicon')
 	robots_txt_content = models.TextField('Содержимое Robots.txt', blank = True)
 	head_script = models.TextField('Скрипт', blank = True,
 		help_text = 'Этот текст будет вставлен в блок &ltscript&gt в &lthead&gt каждой html-страницы сайта')
@@ -18,7 +20,7 @@ class SiteSettings(SingletonModel):
 	def __str__(self): return '⚙ | Настройки сайта'
 
 
-class CompanyContacts(SingletonModel):
+class CompanyInfo(SingletonModel):
 	# Решил не делать отдельную модель для этого, это было бы избыточно
 	first_phone_number     = PhoneNumberField('Первый номер телефона', blank = True)
 	secondary_phone_number = PhoneNumberField('Второй номер телефона', blank = True)

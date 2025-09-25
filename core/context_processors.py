@@ -86,7 +86,7 @@ GLOBAL_CONTEXT_PROVIDERS: set[Callable[[], dict]] = {
 
 SINGLETON_CLASSES_TO_GLOBAL_CONTEXT: set[type[SingletonModel]] = {
 	SiteSettings,
-	CompanyContacts
+	CompanyInfo
 }
 
 def global_context(request):
