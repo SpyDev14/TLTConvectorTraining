@@ -16,6 +16,7 @@ dependencies = [
 	"django-environ",
 	"django-admin-sortable2",
 	"django-admin-rangefilter",
+	"django-debug-toolbar>=6.0.0",
 	# [Image processing]
 	"pillow",
 	# [Excel]
@@ -25,9 +26,4 @@ dependencies = [
 	# [None-specified]
 	"requests",
 	"psycopg2-binary",
-]
-
-[dependency-groups]
-dev = [
-	"django-debug-toolbar>=6.0.0",
 ]
