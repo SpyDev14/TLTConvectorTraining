@@ -2,6 +2,7 @@ from django.shortcuts 	import redirect
 from django.views 		import View
 
 from core.models.singletons import SiteSettings
+from shared 				import typename
 
 
 # Решил выделить в отдельный модуль потому, что это технический View,
@@ -10,3 +11,7 @@ class FaviconView(View):
 	def get(self, request):
 		favicon_url = SiteSettings.get_solo().favicon.url
 		return redirect(favicon_url)
+
+__all__ = [
+	typename(FaviconView),
+]
