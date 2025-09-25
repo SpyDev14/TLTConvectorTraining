@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.core.exceptions 			import ImproperlyConfigured
 from django.urls 						import reverse, NoReverseMatch
 from django.db 							import models
@@ -58,6 +60,10 @@ class BaseRenderableModel(models.Model):
 	def og_description(self) -> str | None:
 		return self.html_description
 
+	@property
+	def og_image_url(self) -> str | None:
+		return None
+	
 	def get_absolute_url(self) -> str:
 		default_url_name = f'{self._meta.model_name}-detail'
 		url_name = self._custom_url_name or default_url_name
