@@ -274,7 +274,9 @@ LOGGING = {
 			'handlers': ['console-level-only'],
 			'level': 'DEBUG',
 			'propagate': False
-		}
+		},
+		# Чтоб не спамил всякой DEBUG ерундой
+		'debug_toolbar.store': {'level': 'INFO',},
 	}
 }
 add_global_filter(LOGGING, 'tg_token')
