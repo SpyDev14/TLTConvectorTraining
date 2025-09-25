@@ -9,10 +9,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- Сейчас используется только на дебаг странице -->
-	{% block html_title_override_block %}
-		<title>{{ page_info.html_title|default:"ТЛТ Конвектор" }}</title>
-	{% endblock %}
 	{% if not page_info and DEBUG %}
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
@@ -24,6 +20,10 @@
 		});
 	</script>
 	{% endif %}
+	
+	{% block html_title_override %}
+		<title>{{ page_info.html_title|default:site_settings.site_name }}</title>
+	{% endblock %}
 	<meta name="description" content="Description">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
