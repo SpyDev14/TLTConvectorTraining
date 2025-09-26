@@ -26,8 +26,9 @@
 	<meta name="og:title" content="{{page_info.og_title}}">
 	{% if page_info.og_description %}
 		<meta name="og:description" content="{{page_info.og_description}}">{% endif %}
-	{% if page_info.og_image_url %}
-		<meta name="og:image" content="{{page_info.og_image_url}}">{% endif %}
+	{% if page_info.og_image_url or global.site_settings.favicon %}
+		<meta name="og:image" content="{{page_info.og_image_url|default:global.site_settings.favicon.url}}">
+	{% endif %}
 	<meta name="og:site_name" content="{{site_settings.site_name}}">
 	<meta name="og:url" content="{{page_info.get_absolute_url}}">
 	<link rel="cannonical" href="{{page_info.get_absolute_url}}">
