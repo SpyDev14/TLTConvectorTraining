@@ -1,6 +1,6 @@
-from functools 		import cached_property
-from typing 		import Self
-from os 			import getenv
+from functools 	import cached_property
+from typing 	import Self
+from os 		import getenv
 import logging
 
 from django.utils.safestring 	import mark_safe
@@ -9,7 +9,7 @@ from django.core.cache 			import cache
 from django.urls 				import resolve, reverse, NoReverseMatch
 from django.db 					import models
 
-from tinymce.models 	import HTMLField
+from tinymce.models import HTMLField
 import requests
 
 from shared.models.validators 	import *
