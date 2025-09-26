@@ -2,7 +2,7 @@ from core.views.bases import BasePageView
 
 from django.shortcuts import get_object_or_404
 
-# INFO: Связано проверкой в Page.clean() поля url_source
+# Связано проверкой в Page.clean() поля url_source
 class GenericPageView(BasePageView):
 	def get_page(self):
 		url_path = self.kwargs['url_path']
