@@ -27,3 +27,8 @@ dependencies = [
 	"requests",
 	"psycopg2-binary",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
