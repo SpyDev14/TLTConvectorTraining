@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from environ import Env
 
-from shared.logging.instruments import add_global_filter
+from shared.logging.config_tools import add_global_filter
 from shared.console.ansi_codes 	import *
 from _project_.constants 		import LEVEL_ONLY_LOGGER
 
