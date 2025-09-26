@@ -1,5 +1,4 @@
 from typing import Any
-import logging
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models 		import QuerySet
@@ -12,7 +11,6 @@ from core.config 			import GENERIC_TEMPLATE
 
 from .make_context_name 	import make_context_name
 
-_logger = logging.getLogger(__name__)
 
 # MARK: BRM-Based List views
 # Реализация get_renderable_object находится сразу здесь потому, что не планируется,
@@ -60,8 +58,7 @@ class RenderableModelBasedListView(PageInfoMixin, generic.ListView):
 		# Если пробуют simple и advanced способом одновременно, то предупреждаем о логической ошибке
 		# (но игнорируем установленную модель)
 		if queryset is not None and self.renderable_slug:
-			# NOTE: Может быть лучше вызывать исключение?
-			_logger.warning(
+			raise ImproperlyConfigured(
 				'Не указывайте и renderable_slug c renderable_model, и queryset одновременно, это '
 				'не имеет смысла и может запутать других разработчиков. Метод через queryset имеет '
 				'больший приоритет.'
