@@ -325,12 +325,12 @@
 				<div class="dropdown">
 					<a class="dropdown-toggle">Страницы ▼</a>
 					<div class="dropdown-menu right-edge">
-						{% with home=global.pages.home %}
-							<a href="{{ home.get_absolute_url }}">{{ home|truncatechars:18 }}</a>
+						{% with index=global.pages.index %}
+							<a href="{{ index.get_absolute_url }}">{{ index.name|truncatechars:18 }}</a>
 							<div><hr style="margin: 0;"></div>
 
 							{% for g_page in global.pages.values %}
-								{% if g_page != home%}
+								{% if g_page != index %}
 								<a href="{{ g_page.get_absolute_url }}">{{ g_page|truncatechars:18 }}</a>
 								{% endif %}
 							{% endfor %}
