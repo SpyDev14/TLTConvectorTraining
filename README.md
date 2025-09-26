@@ -8,22 +8,24 @@ python manage.py migrate
 ```
 5. Загрузите данные через loaddata
 ```bash
-python manage.py loaddata dumpdata.json
+python manage.py loaddata fixtures/initdata/*.json
 ```
-6. Установите `uv`
+6. Если вы разработчик, можете загрузить тестовые данные
+```bash
+python manage.py loaddata fixtures/initdata/dev/*.json
+```
+7. Установите `uv`
 ```bash
 pip install uv
 ```
-7. Установите зависимости
+8. Установите зависимости
 ```bash
 uv sync
 ```
-8. Активируйте venv
+9. Активируйте venv
 ```bash
 .venv/Scripts/activate
 # На linux
 source .venv/Scripts/activate
 ```
 Готово!
-
-Ps: в будущем создам команду initdata которая загрузит все .json данные из папки fixtures/initdata и там будут отдельные файлы под каждую модель (точнее, только необходимые для поднятия).
