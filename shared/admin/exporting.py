@@ -14,6 +14,7 @@ from pandas 		import DataFrame, ExcelWriter
 
 # TODO: разбить на кучу мелких подфункций для улучшения читаемости.
 # (пусть они и не будут нужны ни для чего, кроме использования здесь)
+# TODO: Или ещё лучше - реализовать через класс!
 def export_to_excel(
 	queryset: QuerySet,
 	filename: str,
