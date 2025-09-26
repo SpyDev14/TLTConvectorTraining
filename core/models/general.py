@@ -126,7 +126,6 @@ class Page(BaseRenderableModel):
 					)
 				})
 
-
 	def get_absolute_url(self):
 		if self.is_generic_page:
 			return f"/{self.url_source}"
