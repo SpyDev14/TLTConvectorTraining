@@ -25,7 +25,7 @@ class BaseRenderableModel(models.Model):
 	html_title_override = models.CharField('HTML Title (переопределение)', max_length = 128, blank = True,
 		help_text = 'По умолчанию для HTML Title используется Name.')
 	html_description = models.CharField('HTML Description', blank = True)
-
+	last_modified_time = models.DateTimeField(auto_now=True)
 
 	class Meta:
 		abstract = True
@@ -88,3 +88,7 @@ class BaseRenderableModel(models.Model):
 
 	def get_admin_url(self):
 		return f'/admin/{self._meta.app_label}/{self._meta.model_name}/{self.pk}/change/'
+
+	@classmethod
+	def get_sitemap_queryset(cls):
+		return cls.objects.all()
