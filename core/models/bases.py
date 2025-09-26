@@ -72,7 +72,7 @@ class BaseRenderableModel(models.Model):
 	@property
 	def og_image_url(self) -> str | None:
 		return None
-	
+
 	def _get_microdata(self) -> dict[str, Any]:
 		"""Под переопределение, возвращайте здесь нужный объект с данными"""
 		raise NotImplementedError('Переопределите этот метод в дочернем классе!')
