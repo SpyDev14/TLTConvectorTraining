@@ -1,7 +1,7 @@
-from django.contrib.sitemaps 	import GenericSitemap
+from django.contrib.sitemaps import GenericSitemap
 
-from core.models.bases 		import BaseRenderableModel
-from shared.reflection 		import get_subclasses
+from core.models.bases import BaseRenderableModel
+from shared.reflection import get_subclasses
 
 
 # На случай, если нужен будет кастомный Sitemap для модели
