@@ -1,0 +1,9 @@
+{
+	"python.testing.pytestArgs": ["."],
+	"files.trimTrailingWhitespace": true,
+	"files.insertFinalNewline": true,
+	// Фрондендеры могут баловаться как хотят
+	"[python]": { "editor.insertSpaces": false, },
+	"python.testing.unittestEnabled": true,
+	"python.testing.pytestEnabled": true
+}
