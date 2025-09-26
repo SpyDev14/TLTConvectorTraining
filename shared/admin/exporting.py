@@ -78,8 +78,6 @@ def export_to_excel(
 	# Поля для экспорта
 	else:
 		fields = tuple(field.name for field in model_meta.fields)
-		print(fields)
-
 
 	# Кастомные форматтировщики
 	formatters = formatters or {}
