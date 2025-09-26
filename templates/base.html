@@ -17,7 +17,7 @@
 
 	{% block html_title_override %}
 		<!-- Подразумевается, что page_info.html_title будет всегда -->
-		<title>{{ page_info.html_title|default:site_settings.site_name }}</title>
+		<title>{{ page_info.html_title|default:global.site_settings.site_name }}</title>
 	{% endblock %}
 
 	<meta name="description" content="Description">
@@ -356,7 +356,11 @@
 			<hr>
 			<div style="display: flex; justify-content: center; gap: 4rem;">
 				<a href="/">
+					{% if global.site_settings.favicon %}
 					<img src="{{ global.site_settings.favicon.url }}" style="height: 40%; border-radius: 0;">
+					{% else %}
+					<div style="background-color: gray; aspect-ratio: 1; height: 40%; border-radius: 0.5rem;"></div>
+					{% endif %}
 				</a>
 				<div>
 					<h4>Товары</h4>
