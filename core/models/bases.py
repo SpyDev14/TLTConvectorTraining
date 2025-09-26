@@ -10,7 +10,7 @@ from shared.seo.og 						import OgType
 class BaseRenderableModel(models.Model):
 	# см. get_absolute_url()
 	# Под редкое переопределение в подклассах
-	_custom_url_name: str | None = None
+	_url_name: str | None = None
 	_url_kwarg_name: str = 'slug'
 
 	name = models.CharField('Название', max_length = 64,
@@ -77,7 +77,7 @@ class BaseRenderableModel(models.Model):
 
 	def get_absolute_url(self) -> str:
 		default_url_name = f'{self._meta.model_name}-detail'
-		url_name = self._custom_url_name or default_url_name
+		url_name = self._url_name or default_url_name
 
 		try:
 			return reverse(url_name, kwargs = {self._url_kwarg_name: self.slug})
