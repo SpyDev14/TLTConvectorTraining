@@ -23,10 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 Env.read_env(BASE_DIR / '.env')
-env = Env(
-	DEBUG = (bool, False),
-	LOGS_DIR = (str, 'logs')
-)
+env = Env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -35,7 +32,7 @@ env = Env(
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG')
+DEBUG = env.bool('DEBUG', False)
 def _add_if_debug(obj) -> tuple:
 	"""Используйте вместе с оператором распаковки `*`
 	Пример:
@@ -185,7 +182,7 @@ CACHES = {
 }
 
 # Logging             vvv для аннотации
-LOGS_DIR = BASE_DIR / str(env('LOGS_DIR'))
+LOGS_DIR = BASE_DIR / str(env('LOGS_DIR', 'logs'))
 
 if not LOGS_DIR.exists():
 	LOGS_DIR.mkdir(parents = True)
