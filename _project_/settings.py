@@ -46,19 +46,6 @@ def _add_if_debug(obj) -> tuple:
 	if DEBUG: return (obj,)
 	return ()
 
-def _add_keys_if_debug(dictionary: dict) -> dict:
-	"""Используйте вместе с оператором распаковки `**`
-	Пример:
-	```
-	PARAMS = {
-		'common': 42,
-		**_add_keys_if_debug({'key': '...'})
-	}
-	```
-	"""
-	if DEBUG: return dictionary
-	return {}
-
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
