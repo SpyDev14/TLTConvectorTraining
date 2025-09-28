@@ -14,9 +14,9 @@ import sys
 from pathlib import Path
 from environ import Env
 
-from shared.logging.config_tools import add_global_filter
-from shared.console.ansi_codes 	import *
-from _project_.constants 		import LEVEL_ONLY_LOGGER
+from shared.logging.config_tools 	import add_global_filter
+from shared.console.ansi_codes 		import *
+from _project_.constants 			import LEVEL_ONLY_LOGGER
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
