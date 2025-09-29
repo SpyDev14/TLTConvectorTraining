@@ -151,7 +151,7 @@
         "html_title_override": "",
         "html_description": "",
         "is_generic_page": true,
-        "template_name": "core/contacts.html",
+        "template_name": "business/contacts.html",
         "url_source": "contacts/",
         "content": ""
     }
