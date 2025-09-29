@@ -175,8 +175,8 @@ CACHES = {
 	}
 }
 
-# Logging             vvv для аннотации
-LOGS_DIR = BASE_DIR / str(env('LOGS_DIR', 'logs'))
+# Logging
+LOGS_DIR = BASE_DIR / env.str('LOGS_DIR', 'logs')
 
 if not LOGS_DIR.exists():
 	LOGS_DIR.mkdir(parents = True)
