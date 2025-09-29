@@ -99,7 +99,7 @@ TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
 		'DIRS': (
-			[TEMPLATES_DIR / 'debug', TEMPLATES_DIR]
+			[TEMPLATES_DIR / '_debug', TEMPLATES_DIR]
 			if DEBUG_TEMPLATES_ENABLED else
 			[TEMPLATES_DIR]
 		),
