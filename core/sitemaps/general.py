@@ -10,7 +10,7 @@ _EXCLUDED_MODELS: set = set()
 def get_base_renderables_sitemaps() -> dict[str, GenericSitemap]:
 	return {
 		model._meta.model_name: GenericSitemap({
-			'queryset': model.objects.order_by('last_modified_time'),
+			'queryset': model.objects.order_by('-last_modified_time'),
 			'date_field': 'last_modified_time'
 		})
 		for model in get_subclasses(BaseRenderableModel)
