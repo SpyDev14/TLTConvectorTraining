@@ -32,7 +32,7 @@ class BaseRenderableDetailView(PageInfoMixin, generic.DetailView):
 	# а не к object. Тем не менее, object остаётся в контексте.
 	def get_context_object_name(self, obj):
 		return make_context_name(obj)
-	
+
 	def get_template_names(self):
 		names = super().get_template_names()
 
@@ -68,10 +68,10 @@ class BasePageView(BaseRenderableDetailView):
 
 	def get_object(self, queryset = None):
 		return self.get_page()
-	
+
 	def get_template_names(self):
 		names = super().get_template_names()
-		
+
 		# Template по умолчанию (предпоследний)
 		names.insert(len(names)-1, GENERIC_TEMPLATE.PAGE)
 		return names
