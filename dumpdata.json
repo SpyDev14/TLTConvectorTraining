@@ -146,13 +146,13 @@
     "pk": 11,
     "fields": {
         "name": "Контакты",
-        "slug": "company-contacts",
+        "slug": "contacts",
         "h1_override": "",
         "html_title_override": "",
         "html_description": "",
         "is_generic_page": true,
         "template_name": "core/contacts.html",
-        "url_source": "company-contacts/",
+        "url_source": "contacts/",
         "content": ""
     }
 },
