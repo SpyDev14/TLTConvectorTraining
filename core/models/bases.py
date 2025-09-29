@@ -7,9 +7,6 @@ from django.db 							import models
 from shared.seo.og 						import OgType
 
 # TODO: Добавлять в html_title название сайта к исходному html_title
-# TODO: Вместо свойств для h1 & html_title в BRM использовать обычные
-# поля модели и get методы, а не html_title_override + proptery(html_title),
-# также добавить метод get_html_description
 # TODO: Добавить метод get_parent_object в BRM возвращающий BRM объект,
 # считающийся родительским для этого объекта.
 # NOTE: Название кал, у кого-то есть идеи как это можно переименовать?
@@ -37,10 +34,9 @@ class BaseRenderableModel(models.Model):
 	# slug тут не совсем к месту т.к это про получение объекта на основе запроса,
 	# но опустим этот момент, это слишком мелкая деталь.
 	slug = models.SlugField(max_length = 128, unique = True)
-	h1_override = models.CharField('H1 Заголовок (переопределение)', max_length = 127, blank = True,
+	h1 = models.CharField('H1 Заголовок', max_length = 127, blank = True,
 		help_text = 'По умолчанию для H1 используется Name.')
-
-	html_title_override = models.CharField('HTML Title (переопределение)', max_length = 128, blank = True,
+	html_title = models.CharField('HTML Title', max_length = 128, blank = True,
 		help_text = 'По умолчанию для HTML Title используется Name.')
 	html_description = models.TextField('HTML Description', blank = True)
 	last_modified_time = models.DateTimeField(auto_now=True)
@@ -51,32 +47,25 @@ class BaseRenderableModel(models.Model):
 	def __str__(self):
 		return self.name
 
+	def get_h1(self) -> str:
+		return self.h1 or self.name
 
-	# Под переопределение
-	# А вот в C# есть "=>" выражения для создания таких аллиасов (вместо return)!
-	# И в целом там явные св-ва, жалко в python такого нет. Св-ва тут - это дескрипторы,
-	# созданные на основе методов класса (которые тоже являются дескрипторами) через декораторную запись (@)
-	# (вот тут снизу мы создаём объект класса property, передав в него метод h1 через @ и заменяем этим
-	# объектом исходный метод h1 (из-за @))
+	def get_html_title(self) -> str:
+		return self.html_title or self.name
 
-	@property
-	def h1(self) -> str:
-		return self.h1_override or self.name
-
-	@property
-	def html_title(self) -> str:
-		return self.html_title_override or self.name
+	def get_html_description(self) -> str:
+		return self.html_description
 
 	# Необходимо указать в дочернем классе, но можно оставить по умолчанию
 	og_type: OgType = OgType.WEBSITE
 
 	@property
 	def og_title(self) -> str:
-		return self.html_title
+		return self.get_html_title()
 
 	@property
 	def og_description(self) -> str | None:
-		return self.html_description
+		return self.get_html_description()
 
 	@property
 	def og_image_url(self) -> str | None:

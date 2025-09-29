@@ -17,10 +17,10 @@
 
 	{% block html_title_override %}
 		<!-- Подразумевается, что page_info.html_title будет всегда -->
-		<title>{{ page_info.html_title|default:global.site_settings.site_name }}</title>
+		<title>{{ page_info.get_html_title|default:global.site_settings.site_name }}</title>
 	{% endblock %}
 
-	<meta name="description" content="Description">
+	<meta name="description" content="{{page_info.get_html_description}}">
 	<meta name="og:type" content="{{page_info.og_type}}">
 	{% block custom_og_tags %}{% endblock %}
 	<meta name="og:title" content="{{page_info.og_title}}">
