@@ -92,15 +92,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = '_project_.urls'
 
-# По умолчанию включены при дебаге, но можно зафорсить через конфиг
-DEBUG_TEMPLATES_ENABLED = env.bool('DEBUG_TEMPLATES_ENABLED', default=DEBUG)
+DEBUG_TEMPLATES_MODE_ENABLED = env.bool('DEBUG_TEMPLATES_ENABLED', False)
 TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
 		'DIRS': (
 			[TEMPLATES_DIR / '_debug', TEMPLATES_DIR]
-			if DEBUG_TEMPLATES_ENABLED else
+			if DEBUG_TEMPLATES_MODE_ENABLED else
 			[TEMPLATES_DIR]
 		),
 		'APP_DIRS': True,
