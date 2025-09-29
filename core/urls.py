@@ -9,7 +9,6 @@ _sitemaps = {
 	**get_base_renderables_sitemaps(),
 }
 
-
 urlpatterns = [
 	path('favicon.ico', views.FaviconView.as_view()),
 	path('robots.txt', views.RobotsView.as_view()),
