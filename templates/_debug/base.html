@@ -3,6 +3,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
 	{% if not page_info and DEBUG %}
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
@@ -42,11 +45,123 @@
 	<script>{{ global.site_settings.head_script|safe }}</script>
 </head>
 <style>
+	* { margin: 0; }
 	:root {
-		font-family: 'Cascadia Code', 'JetBrains Mono', 'Roboto Mono';
+		font-family: consolas;
+		background-color: #050505;
+		--primary-text-color: white;
+		--secondary-text-color: gray;
+		color: var(--primary-text-color);
+		--lighting-1: #FFFFFF08;
+		--lighting-2: #FFFFFF10;
+		--lighting-3: #FFFFFF18;
+		--lighting-4: #FFFFFF20;
 	}
+	.main-title {
+		font-family: 'JetBrains Mono', consolas;
+		font-size: 1.5rem;
+		font-weight: 600;
+	}
+
+	body {
+		display: flex;
+		flex-direction: column;
+		width: 100vw;
+		height: 100vh;
+		overflow: hidden;
+	}
+
+	header {
+		/* Хедер растягивается на всю ширину */
+		flex: 0 0 auto; /* Но не растягивается, не сжимается, авто высота */
+		background-color: var(--lighting-2);
+		padding: 1rem;
+		border-bottom: 1px solid var(--lighting-1);
+		min-height: 0; /* Ключевое свойство для работы скролла в flex-контейнере */
+	}
+
+	.content-container {
+		display: flex;
+		flex: 1; /* Занимает все оставшееся пространство */
+		min-height: 0; /* Ключевое свойство для работы скролла в flex-контейнере */
+	}
+
+	.burger {
+		background-color: var(--lighting-1);
+		border-right: 1px solid var(--lighting-1);
+		width: 16rem;
+		padding: 1rem;
+		overflow-y: auto; /* На случай, если меню тоже будет длинным */
+	}
+
+	main {
+		flex: 1; /* Занимает всё доступное пространство */
+		padding: 1rem;
+		overflow-y: auto; /* auto вместо scroll - скролл появится только когда нужно */
+		min-height: 0; /* Также важно для flex-элементов */
+	}
+
+	::-webkit-scrollbar {width: 0.35rem;}
+	::-webkit-scrollbar-track {background-color: var(--lighting-2);}
+	::-webkit-scrollbar-thumb {background-color: var(--lighting-2);}
+	::-webkit-scrollbar-thumb:hover {background-color: var(--lighting-3);}
+	::-webkit-scrollbar-thumb:active {background-color: var(--lighting-4);}
+
+	button {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+		color: inherit;
+		width: inherit;
+	}
+	button, .button {
+		background-color: var(--lighting-1);
+		border: 1px solid var(--lighting-1);
+		padding: 0.5rem;
+		user-select: none;
+		text-align: center;
+		/* for a */
+		color: var(--primary-text-color);
+		text-decoration: none;
+	}
+	.button:hover, .button:active, .button:visited {
+		color: var(--primary-text-color);
+	}
+	button:hover, .button:hover {background-color: var(--lighting-2);}
+	button:active, .button:active {background-color: var(--lighting-3);}
 </style>
 <body>
-1454
+	<header style="color: var(--secondary-text-color);">
+		<span>{{global.site_settings.site_name}}</span>
+		<span>|</span>
+		<span>Главная/Каталог/Коллекторные шкафы/Настенные/ВКБД - 20</span>
+	</header>
+	<div class="content-container">
+		<div class="burger">
+			<h1 class="main-title" style="margin-bottom: 3rem;">
+				Debug UI v0.1
+			</h1>
+			<div style="display: flex; flex-direction: column;gap: 0.5rem;">
+				<a class="button" href="{{page_info.get_admin_url}}">Смотреть в админке</a>
+				<button class="button">Смотреть контекст</button>
+			</div>
+
+			<div>
+				<h3>Страницы</h3>
+				{% for gpage in global.pages.values %}
+				<a class="button" href="{{gpage.get_absolute_url}}">{{ gpage.name }}</a>
+				{% endfor %}
+			</div>
+		</div>
+		<main>
+			main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>
+			<details>
+				main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>
+				main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>
+				main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>
+				main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>main<br>
+			</details>
+		</main>
+	</div>
 </body>
 </html>
