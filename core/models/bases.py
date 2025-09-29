@@ -6,7 +6,8 @@ from django.db 							import models
 
 from shared.seo.og 						import OgType
 
-# Название кал, у кого-то есть идеи как это можно переименовать?
+# TODO: Добавлять в html_title название сайта к исходному html_title
+# NOTE: Название кал, у кого-то есть идеи как это можно переименовать?
 class BaseRenderableModel(models.Model):
 	"""
 	Базовая модель для всех моделей, у которых будут свои detail (и опционально
