@@ -26,13 +26,13 @@
     "pk": 1,
     "fields": {
         "name": "Главная",
-        "slug": "home",
+        "slug": "index",
         "h1_override": "Иди работать",
         "html_title_override": "Главная",
         "html_description": "",
         "is_generic_page": false,
         "template_name": "",
-        "url_source": "home",
+        "url_source": "index",
         "content": "<p><strong>Решился &ndash; и пошёл!</strong>&nbsp;Не оглядываясь, без лишних мыслей. И знаете?&nbsp;<strong>Совершенно НИ О ЧЁМ не жалею!</strong>&nbsp;Это труд, это пот, это реальность &ndash; и это круто! Пусть этот сайт и не про заводскую романтику, но сам мой поступок, моя решимость &ndash; вот о чём стоит кричать!&nbsp;<strong>Хватит искать отмазки! Пора брать ответственность! Забудь про диван &ndash; а ну, подъем! На завод!</strong>&nbsp;Там ждут дела и результат!</p>"
     }
 },
