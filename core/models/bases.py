@@ -21,7 +21,6 @@ class BaseRenderableModel(models.Model):
 	Содержит поля для SEO, для генерации url, методы получения связанных url,
 	**автоматически добавляется в sitemap** (наследники).
 	"""
-
 	# см. get_absolute_url()
 	# Под редкое переопределение в подклассах
 	_url_name: str | None = None
