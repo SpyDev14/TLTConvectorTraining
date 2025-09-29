@@ -8,6 +8,7 @@ from business import views
 # 	{{ item.get_absolute_url }}
 # {% endfor %}
 # {{ global.pages.contacts.get_absolute_url }}
+# NOTE: Может всё-таки разрешить? Надо подумать.
 urlpatterns = [
 	path('', views.HomePageView.as_view(), name = 'index'),
 	path('about-us/', views.AboutUsPageView.as_view(), name = 'about-us'),
