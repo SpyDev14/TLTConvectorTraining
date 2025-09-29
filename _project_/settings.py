@@ -127,6 +127,7 @@ WSGI_APPLICATION = '_project_.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# TODO: Добавить поддержку просто задаваемых параметров или убрать их из .env
 DATABASES = {'default': env.db()}
 
 
