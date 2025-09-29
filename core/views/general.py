@@ -1,25 +1,27 @@
-from core.views.bases import BasePageView
+from django.views.generic 	import DetailView
+from django.shortcuts 		import get_object_or_404
 
-from django.shortcuts import get_object_or_404
+from core.models.general 	import Page
+from core.views.bases 		import BasePageView
+from core.config 			import GENERIC_TEMPLATE
 
-# Связано проверкой в Page.clean() поля url_source
-class GenericPageView(BasePageView):
+class _BasePageGenericView(BasePageView):
+	# TODO: Почистить систему, в ходе развития
+	# хочет вернуться к истокам
 	def get_page(self):
-		url_path = self.kwargs['url_path']
+		# Используем стандартный метод от Details
+		# (забавно система сделана)
+		return DetailView.get_object(self)
 
-		return get_object_or_404(self.model, url_source = url_path, is_generic_page = True)
+class GenericPageView(_BasePageGenericView):
+	# Если забыть указать is_generic_page - всё равно не покажет
+	# not generic страницу с ошибкой [Errno 13] Permission denied.
+	# Поле темплейта в этом кейте должно быть пустым => делает
+	# неправильный путь и пытается открыть папку как файл))) Надёжно!
+	queryset = Page.objects.filter(is_generic_page=True)
 
 	def get_template_names(self):
-		return [self.object.template_name]
+		return [self.object.template_name, GENERIC_TEMPLATE.PAGE]
 
-class DebugPageView(BasePageView):
+class DebugPageView(_BasePageGenericView):
 	template_name = 'core/debug/page_repr.html'
-
-	def get_page(self):
-		return get_object_or_404(self.model, slug = self.kwargs['slug'])
-
-	def get_page(self):
-		return get_object_or_404(self.model, slug = self.kwargs['slug'])
-
-	def get_template_names(self):
-		return [self.template_name]

@@ -22,7 +22,6 @@ if settings.DEBUG:
 
 
 urlpatterns.extend([
-	# Должно быть в САМОМ низу, ловит ВСЕ запросы.
-	path('', views.GenericPageView.as_view(), kwargs={'url_path': ''}),
-	path('<path:url_path>', views.GenericPageView.as_view())
+	# Лучше ставить в самом низу, ловит запросы по url первого уровня.
+	path('<slug:slug>/', views.GenericPageView.as_view())
 ])

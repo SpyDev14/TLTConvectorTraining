@@ -26,111 +26,86 @@ _logger = logging.getLogger(__name__)
 # Можно добавить опциональную связь с другой моделью и добавлять список этих моделей в контекст темплейта
 # для простых кейсов (т.е для маломальски уникальной логики создавать отдельный view)
 # Но может быть и не стоит, это усложнение + могут возникнуть свои подводные камни
+# TODO: Перевести на простой slug при is_generic, вместо сложного URL Source.
+# URL Source переименовать во View name, и разрешить только при is generic False.
 class Page(BaseRenderableModel):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.extra_context_manager: models.Manager['ExtraContext']
 
+	content = HTMLField('Контент', blank = True, help_text = RENDERING_SUPPORTS_TEXT)
 	is_generic_page = models.BooleanField('Это динамически-добавляемая страница?', default = False,
 		help_text = mark_safe(
-			'✅: Будет автоматически доступно по указанному url, требует заданного '
-			'<code>template_name</code>. Используйте для простых страниц, не требующих своего View.<br>'
-			'❌: Выбирайте, когда для обработки страницы нужно использовать кастомный view.<br>'
+			'✅: Будет автоматически доступно по url <code>"/<slug>/"</code>, требует заданного '
+			'<code>Template name</code>. Используйте для простых страниц, которым не нужен свой View.<br>'
+			'❌: Выбирайте, когда для обработки страницы нужно использовать кастомный View.<br>'
 			'<br>'
-			'Влияет на работу логики поля <code>URL path</code> & <code>template_name</code>.'))
+			'Влияет на логику работы полей <code>URL Pathname</code> и <code>Template name</code>.'))
+
+	url_path_name = models.CharField("URL Pathname", max_length = 64, blank = True,
+		help_text = mark_safe(
+			'<code>is_generic_page:</code>✅ - Игнорируется, потому <b>должно быть</b> пустым.'
+			'<br>'
+			'<code>is_generic_page:</code>❌ - <code>name</code> того url path, который обрабатывает эту страницу.'
+			'<details style="padding-left: 1rem;">'
+				'Например, в ваших <code>urlpatterns</code> есть <code>path("fun-path/", some_view, '
+				'name="your-name")</code>, тут указываете <code>"your-name"</code>.<br>'
+				'Вы всё корретно указали, метод <code>get_absolute_url()</code> вернёт ссылку на этот '
+				'path, т.е <code>"/fun-path/"</code>.<br>'
+				'<br>'
+				'Для index страницы по полному пути "/", а также для generic страниц с кастомным '
+				'URL в принципе, увы, но вы вынуждены создавать свои path и view, даже если не '
+				'нужна дополнительная логика.' # В прочем, как-будто бы кому-то не пофиг, раньше
+				# все всегда делали View-ы под каждую страницу
+			'</details>'))
+
 	template_name = models.CharField('Название django-темплейта',
 		# Проверяет только если поле заполнено
 		validators = [template_with_this_name_exists],
 		blank = True,
-		# Ps: я знаю, что DetailView имеет функционал для получения темплейта из поля модели, но я не хочу,
-		# чтобы было 2 разных способа задать темплейт - через модель и во View.
-		# Также, усложнит понимание работы этого поля. Лучше в таких случаях всегда через View.
+		# Ps: DetailView имеет функционал для получения темплейта из поля модели, но я не хочу,
+		# чтобы было 2 разных способа задать темплейт - через модель и в классе View,
+		# это усложнит понимание работы этого поля, поэтому всегда через View.
 		help_text = mark_safe(
 			'<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение, <b>должно быть установленно</b>.<br>'
 			'<code>is_generic_page:</code>❌ - Игнорируется, потому <b>должно быть</b> пустым.'))
-
-	#                                                  страница на / будет по пути '' vvvv
-	url_source = models.CharField("URL Source", max_length = 64, unique = True, blank = True,
-		help_text = mark_safe(
-			'<details style="padding-left: 1rem;">'
-				'<summary style="margin-left: -1rem;"><code>is_generic_page</code>: ✅</summary>'
-				'Полный URL путь, по которому будет доступна страница. Указав <code>info/about-us/</code> '
-				'здесь, страница будет доступна по абсолютному пути <code>/info/about-us/</code><br>'
-				'<code>get_absolute_url()</code> вернёт <code>"/info/about-us/"</code>.'
-				'<br><b><u>Крайне рекомендуется</u></b> создавать url <u>на основе <code>slug</code></u>. '
-				'Например, при slug = <code>about-us</code>, url = <code>info/about-us/</code>).<br>'
-				'<br>'
-			'</details>'
-			'<details style="padding-left: 1rem;">'
-				'<summary style="margin-left: -1rem;"><code>is_generic_page</code>: ❌</summary>'
-				'View name того view, который обрабатывает эту страницу.<br>'
-				'Например, в <code>urlpatterns</code> указан <code>path("fun-path/", ..., name="your-name")</code>, '
-				'тут указываете <code>"your-name"</code>.<br>'
-				'<code>get_absolute_url()</code> вернёт <code>"/fun-path/"</code>.'
-			'</details>'
-			'<br>'
-			'Используется для получения url страницы в методе <code>get_absolute_url()</code>.<br>'
-			'Также значение в этом поле валидируется и проходит проверку на корректность.'))
-	content = HTMLField('Контент', blank = True, help_text = RENDERING_SUPPORTS_TEXT)
 
 	class Meta:
 		verbose_name = 'страница'
 		verbose_name_plural = 'страницы'
 
 	def clean(self):
-		from core.views import GenericPageView
-
-		# elif для читаемости
+		# Проверка template_name
 		if self.is_generic_page and not self.template_name:
 			raise ValidationError({
 				'template_name': 'template_name не может быть пустым при is_generic_page:✅'
 			})
+
 		if not self.is_generic_page and self.template_name:
 			raise ValidationError({
-				'template_name': 'Должно быть пустым при is_generic_page:❌ так как '
+				'template_name': 'Должно быть пустым при is_generic_page:❌, так как '
 				'игнорируется (строгое обеспечение явности).'
 			})
 
 		# Проверка url_source
-		try: self_url = self.get_absolute_url()
-		except NoReverseMatch: raise ValidationError({
-			'url_source': 'View с таким name не существует!'
-		})
-		if self.is_generic_page:
-			validators: tuple[BaseValidator] = (
-				StringStartswith('/', invert = True),
-				StringEndswith('/')
-			)
-			for validator in validators:
-				is_valid = validator.check_is_valid(self.url_source)
+		if self.is_generic_page and self.url_path_name:
+			raise ValidationError({
+				'url_path_name': 'Должно быть пустым при is_generic_page:❌, так как '
+				'игнорируется (строгое обеспечение явности).'
+			})
 
-				if not is_valid: raise ValidationError({
-					'url_source': validator.build_error_msg(self.url_source)
-				})
-
-			# Указано is_generic_page:✅, но также есть перекрывающий (конфликтующий)
-			# view по такому же пути
-			match = resolve(self_url)
-			resolved_by_generic_view = getattr(match.func, 'view_class', None) is GenericPageView
-
-			if not resolved_by_generic_view:
-				view_f = match.func
-				view_class = getattr(view_f, 'view_class', None)
-				view_name = typename(view_class) if view_class else view_f.__name__
-				raise ValidationError({
-					'url_source': (
-						f'Страница по URL "{self.get_absolute_url()}" перекрывается ' +
-						f'{view_name}{'' if view_class else '() view'} ' +
-						(f'(url name = {match.view_name})' if match.url_name else '') +
-						' (логика работы при is_generic_page:✅).'
-					)
-				})
+		if not self.is_generic_page:
+			try: self.get_absolute_url()
+			except NoReverseMatch: raise ValidationError({
+				'url_path_name': 'path с таким name не существует!'
+			})
 
 	def get_absolute_url(self):
 		if self.is_generic_page:
-			return f"/{self.url_source}"
+			# Этот формат должен оставаться неизменным
+			return f'/{self.slug}/'
 
-		return reverse(self.url_source)
+		return reverse(self.url_path_name)
 
 	# В контексте объект Page живёт только 1 запрос,
 	# но внутри могут много раз обращаться к этому св-ву
