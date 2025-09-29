@@ -31,7 +31,7 @@ class ExtraContextInline(admin.TabularInline):
 
 @registrator.set_for_model(models.Page)
 class PageAdmin(BaseRenderableModelAdmin):
-	list_display = ('page', 'slug', 'absolute_url', 'page_template_name', 'is_generic_page',)
+	list_display = ('page', 'slug', 'view_on_site_link', 'page_template_name', 'is_generic_page',)
 	inlines = [ExtraContextInline]
 	prepopulated_fields = {}
 	ordering = ('name',)
