@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load debug_tags %}
 
-
+<!-- This is deprecated and will no longer be supportded -->
 {% block html_title_override %}
 <title>Debug Display of "{{page_info.html_title}}"</title>
 {% endblock %}
@@ -15,6 +15,10 @@ gap: 1rem;
 flex-grow: 1;
 flex-direction: row;">
 <div>
+	<div class="warn-info-block"
+		style="color:red; background-color: #FF000010;">
+		Внимание! Эта страница устарела и больше не будет поддерживаться.
+	</div>
 	<div class="warn-info-block">Внимание! Не отображает информацию из конкретного view, обрабатывающего эту страницу.</div>
 	<details open>
 		<!-- page_info section -->
