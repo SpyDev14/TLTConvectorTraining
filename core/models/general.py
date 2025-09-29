@@ -19,7 +19,7 @@ from shared.reflection 			import typename
 from core.models.bases 			import BaseRenderableModel
 # from core.views.bases 		import GenericPageView (circular import, locally imported in Page.clean())
 from core.constants 			import RENDERING_SUPPORTS_TEXT
-from core.config 				import TELEGRAM_SENDING
+from core.config 				import TELEGRAM_SENDING, GENERIC_TEMPLATE
 
 _logger = logging.getLogger(__name__)
 
@@ -67,7 +67,8 @@ class Page(BaseRenderableModel):
 		# чтобы было 2 разных способа задать темплейт - через модель и в классе View,
 		# это усложнит понимание работы этого поля, поэтому всегда через View.
 		help_text = mark_safe(
-			'<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение, <b>должно быть установленно</b>.<br>'
+			'<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение. '
+			f'По умолчанию используется <code>{GENERIC_TEMPLATE.PAGE}</code><br>'
 			'<code>is_generic_page:</code>❌ - Игнорируется, потому <b>должно быть</b> пустым.'))
 
 	class Meta:
@@ -76,11 +77,6 @@ class Page(BaseRenderableModel):
 
 	def clean(self):
 		# Проверка template_name
-		if self.is_generic_page and not self.template_name:
-			raise ValidationError({
-				'template_name': 'template_name не может быть пустым при is_generic_page:✅'
-			})
-
 		if not self.is_generic_page and self.template_name:
 			raise ValidationError({
 				'template_name': 'Должно быть пустым при is_generic_page:❌, так как '

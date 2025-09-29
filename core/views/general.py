@@ -14,14 +14,8 @@ class _BasePageGenericView(BasePageView):
 		return DetailView.get_object(self)
 
 class GenericPageView(_BasePageGenericView):
-	# Если забыть указать is_generic_page - всё равно не покажет
-	# not generic страницу с ошибкой [Errno 13] Permission denied.
-	# Поле темплейта в этом кейте должно быть пустым => делает
-	# неправильный путь и пытается открыть папку как файл))) Надёжно!
 	queryset = Page.objects.filter(is_generic_page=True)
-
-	def get_template_names(self):
-		return [self.object.template_name, GENERIC_TEMPLATE.PAGE]
+	template_name_field = 'template_name'
 
 class DebugPageView(_BasePageGenericView):
 	template_name = 'core/debug/page_repr.html'
