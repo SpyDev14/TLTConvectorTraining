@@ -1,9 +1,13 @@
+from logging import getLogger
+
 from django.utils.safestring 	import mark_safe
 from django.core.exceptions 	import ImproperlyConfigured
 from django.contrib 			import admin
 
-from core.models.bases import BaseRenderableModel
+from core.models.bases 	import BaseRenderableModel
+from shared 			import typename
 
+_logger = getLogger(__name__)
 
 class BaseRenderableModelAdmin(admin.ModelAdmin):
 	prepopulated_fields = {'slug': ['name']}
@@ -19,4 +23,15 @@ class BaseRenderableModelAdmin(admin.ModelAdmin):
 			)
 		except ImproperlyConfigured:
 			return mark_safe('<span style="color: red;">Не настроено</span>')
+		except Exception as ex:
+			_logger.error(f'Ошибка {typename(ex)}: {ex}', ex)
+			font_family = "'JetBrains Mono', 'Cascadia Code', 'consolas'"
+			return mark_safe(
+				'<details style="color: red; max-width: 10vw;">'
+					f'<summary>Ошибка</summary>'
+					f'<div style="font-weight: 500; font-family: {font_family};">{typename(ex)}</div>'
+					'<div style="background-color: red; height: 1px;"></div>'
+					f'<div style="padding-left: 0.25rem; font-family: consolas">{ex}</div>'
+				f'</details>'
+			)
 	view_on_site_link.short_description = 'Ссылка'
