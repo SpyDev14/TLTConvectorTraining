@@ -363,11 +363,11 @@
 		<footer>
 			<hr>
 			<div style="display: flex; justify-content: center; gap: 4rem;">
-				<a href="/" style="aspect-ratio: 1;">
+				<a href="/">
 					{% if global.site_settings.favicon %}
-					<img src="{{ global.site_settings.favicon.url }}" style="height: 12rem; border-radius: 0.5rem; object-fit: cover;">
+					<img src="{{ global.site_settings.favicon.url }}" style="height: 40%; border-radius: 0;">
 					{% else %}
-					<div style="background-color: gray; height: 40%; border-radius: 0.5rem;"></div>
+					<div style="background-color: gray; aspect-ratio: 1; height: 40%; border-radius: 0.5rem;"></div>
 					{% endif %}
 				</a>
 				<div>
