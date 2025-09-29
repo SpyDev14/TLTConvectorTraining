@@ -176,7 +176,13 @@ CACHES = {
 }
 
 # Logging
-LOGS_DIR = BASE_DIR / env.str('LOGS_DIR', 'logs')
+# Кстати, тут можно было использовать := оператор, но это было бы тяжелочитаемо
+_logs_path = Path(env.str('LOGS_DIR', 'logs'))
+LOGS_DIR = (
+	BASE_DIR / _logs_path
+	if not _logs_path.is_absolute()
+	else _logs_path
+)
 
 if not LOGS_DIR.exists():
 	LOGS_DIR.mkdir(parents = True)
