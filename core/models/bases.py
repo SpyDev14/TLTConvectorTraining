@@ -37,7 +37,7 @@ class BaseRenderableModel(models.Model):
 
 	html_title_override = models.CharField('HTML Title (переопределение)', max_length = 128, blank = True,
 		help_text = 'По умолчанию для HTML Title используется Name.')
-	html_description = models.CharField('HTML Description', blank = True)
+	html_description = models.TextField('HTML Description', blank = True)
 	last_modified_time = models.DateTimeField(auto_now=True)
 
 	class Meta:
