@@ -7,6 +7,11 @@ from django.db 							import models
 from shared.seo.og 						import OgType
 
 # TODO: Добавлять в html_title название сайта к исходному html_title
+# TODO: Вместо свойств для h1 & html_title в BRM использовать обычные
+# поля модели и get методы, а не html_title_override + proptery(html_title),
+# также добавить метод get_html_description
+# TODO: Добавить метод get_parent_object в BRM возвращающий BRM объект,
+# считающийся родительским для этого объекта.
 # NOTE: Название кал, у кого-то есть идеи как это можно переименовать?
 class BaseRenderableModel(models.Model):
 	"""
