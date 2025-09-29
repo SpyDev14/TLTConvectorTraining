@@ -2,14 +2,14 @@
 
 {% block content %}
 <div class="contact-box">
-	<div>Время работы: {{ global.company_contacts.work_time_text }}</div>
-	<div>Почта: {{ global.company_contacts.email }}</div>
-	<div>Адрес: {{ global.company_contacts.addres }}</div>
+	<div>Время работы: {{ global.company_info.work_time_text }}</div>
+	<div>Почта: {{ global.company_info.email }}</div>
+	<div>Адрес: {{ global.company_info.addres }}</div>
 	<div><hr></div>
-	<div>{{ global.company_contacts.first_phone_number }}</div>
-	<div>{{ global.company_contacts.secondary_phone_number }}</div>
+	<div>{{ global.company_info.first_phone_number }}</div>
+	<div>{{ global.company_info.secondary_phone_number }}</div>
 </div>
-<div class="map">{{ global.company_contacts.map_coordinates }}</div>
+<div class="map">{{ global.company_info.map_coordinates }}</div>
 <style>
 	main {
 		display: flex;
