@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from mptt.admin import MPTTModelAdmin
+from mptt.admin import DraggableMPTTAdmin
 
 from shared.admin.model_registration 	import AdminModelRegistrator
 from core.admin.bases 					import BaseRenderableModelAdmin
@@ -13,8 +13,8 @@ registrator = AdminModelRegistrator(
 )
 
 @registrator.set_for_model(models.Category)
-class CategoryAdmin(BaseRenderableModelAdmin, MPTTModelAdmin):
-	pass
+class CategoryAdmin(DraggableMPTTAdmin, BaseRenderableModelAdmin):
+	list_display = DraggableMPTTAdmin.list_display + ('view_on_site_link',)
 
 
 # MARK: Product
