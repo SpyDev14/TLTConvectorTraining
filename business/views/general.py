@@ -23,10 +23,10 @@ class ProductDetailView(BaseRenderableDetailView):
 
 	def get_context_data(self, **kwargs):
 		return super().get_context_data(
-			# Kwargs здесь не нужны, это конечный класс
 			photos = self.object.photos.all(),
 			characteristics = self.object.characteristics.all(),
 			additional_elements = self.object.additional_elements.all(),
+			**kwargs,
 		)
 
 
