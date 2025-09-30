@@ -14,7 +14,8 @@ from core.models.bases 				import BaseRenderableModel
 from business import models as models
 from business import models as business
 
-debug_context = lambda _: {'DEBUG': settings.DEBUG}
+def debug_context(request):
+	return {'DEBUG': settings.DEBUG}
 
 
 _make_default_name = lambda model: f"{camel_to_snake_case(typename(model))}s"
