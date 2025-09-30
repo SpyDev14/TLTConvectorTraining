@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Self
 
 from django.core.exceptions 			import ImproperlyConfigured
 from django.urls 						import reverse, NoReverseMatch
@@ -75,6 +75,28 @@ class BaseRenderableModel(models.Model):
 	@property
 	def og_image_url(self) -> str | None:
 		return None
+
+	# Под переопределение
+	def get_parent_object(self) -> Self | None:
+		"""Возвращает объект, считающийся родительским для этого объекта"""
+		return None
+
+	def get_breadcrumbs(self) -> list[Self]:
+		"""Возвращает "хлебные крошки" для этого объекта, включая сам объект."""
+		breadcrumbs: list[Self] = []
+		seen_pks: set[int] = set()
+
+		current = self
+		while current is not None:
+			if (pk := current.pk) in seen_pks:
+				raise ValueError(f'Циклическая последовательность parent объектов (pk: {pk})')
+
+			seen_pks.add(pk)
+			breadcrumbs.append(current)
+			current = current.get_parent_object()
+
+		breadcrumbs.reverse()
+		return breadcrumbs
 
 	def _get_microdata(self) -> dict[str, Any]:
 		"""Под переопределение, возвращайте здесь нужный объект с данными"""
