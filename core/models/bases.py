@@ -5,6 +5,7 @@ from django.urls 						import reverse, NoReverseMatch
 from django.db 							import models
 
 from shared.seo.og 						import OgType
+from core.models.singletons 			import SiteSettings
 
 # TODO: Добавлять в html_title название сайта к исходному html_title
 # TODO: Добавить метод get_parent_object в BRM возвращающий BRM объект,
@@ -38,6 +39,7 @@ class BaseRenderableModel(models.Model):
 		help_text = 'По умолчанию для H1 используется Name.')
 	html_title = models.CharField('HTML Title', max_length = 128, blank = True,
 		help_text = 'По умолчанию для HTML Title используется Name.')
+	add_sitename_to_html_title = models.BooleanField('Добавить название сайта к HTML Title?', default=True)
 	html_description = models.TextField('HTML Description', blank = True)
 	last_modified_time = models.DateTimeField(auto_now=True)
 
@@ -51,7 +53,12 @@ class BaseRenderableModel(models.Model):
 		return self.h1 or self.name
 
 	def get_html_title(self) -> str:
-		return self.html_title or self.name
+		sitename = SiteSettings.get_solo().site_name
+		return (
+			(self.html_title or self.name)
+			+
+			(f" | {sitename}" if self.add_sitename_to_html_title else '')
+		)
 
 	def get_html_description(self) -> str:
 		return self.html_description
