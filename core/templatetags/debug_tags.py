@@ -9,6 +9,7 @@ register = Library()
 register.filter('typename', typename)
 
 
+# TODO: Модели обрабатывать сериализатором моделей
 @register.simple_tag(takes_context=True)
 def current_context(context: RequestContext):
 	"""Возвращает весь текущий контекст в виде HTML-структуры"""
