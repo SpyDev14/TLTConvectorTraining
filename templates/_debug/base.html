@@ -19,7 +19,7 @@
 	{% endif %}
 
 	{% block html_title_override %}
-		<!-- Подразумевается, что page_info.html_title будет всегда -->
+		<!-- page_info будет всегда, но если был использован неправильный view, пускай будет хоть какой-то -->
 		<title>{{ page_info.get_html_title|default:global.site_settings.site_name }}</title>
 	{% endblock %}
 
@@ -39,40 +39,59 @@
 	<meta charset="utf-8">
 	{% with microdata=page_info.get_microdata_dumped %}
 		{% if microdata %}
-			<script type="application/ld+json">{{microdata}}</script>{% endif %}{% endwith %}
+			<script type="application/ld+json">{{microdata}}</script>
+	{% endif %}{% endwith %}
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 	<script>{{ global.site_settings.head_script|safe }}</script>
 </head>
 <style>
-	* { margin: 0; }
+	/* * { margin: 0; } */
 	:root {
 		font-family: consolas;
 		background-color: #050505;
 		--primary-text-color: white;
 		--secondary-text-color: gray;
+		--secondary-text-color-hover: rgba(128, 128, 128, 0.8);
 		color: var(--primary-text-color);
 		--lighting-1: #FFFFFF08;
 		--lighting-2: #FFFFFF10;
 		--lighting-3: #FFFFFF18;
 		--lighting-4: #FFFFFF20;
+		--lighting-5: #FFFFFF28;
 	}
-	/* h1, h2, h3, h4, h5, h6 {font-family: 'JetBrains Mono', consolas;} */
+	a {color: lightskyblue;}
+	a:hover { color: lightblue;}
+	a:visited { color: lightskyblue;}
+
 	.main-title {
+		margin: 0;
 		font-size: 2rem;
 		font-weight: 600;
+	}
+	.breadcrumbs {
+		font-family: 'Roboto Mono', 'JetBrains Mono', 'Cascadia Code';
+		color: var(--secondary-text-color);
+
+		a {
+			color: var(--secondary-text-color);
+			transition: 0.2s;
+		}
+		a:hover {
+			color: var(--secondary-text-color-hover);
+			transition: 0.2s;
+		}
 	}
 
 	body {
 		display: flex;
-		flex-direction: column;
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
+		margin: 0;
 	}
 
 	header {
-		/* display: none; */
 		/* Хедер растягивается на всю ширину */
 		flex: 0 0 auto; /* Но не растягивается, не сжимается, авто высота */
 		padding: 0.5rem;
@@ -82,6 +101,7 @@
 
 	.content-container {
 		display: flex;
+		flex-direction: column;
 		flex: 1; /* Занимает все оставшееся пространство */
 		min-height: 0; /* Ключевое свойство для работы скролла в flex-контейнере */
 	}
@@ -92,6 +112,9 @@
 		width: 16rem;
 		padding: 1rem;
 		overflow-y: auto; /* На случай, если меню тоже будет длинным */
+		display: flex;
+		flex-direction: column;
+		justify-content: stretch;
 	}
 
 	.pages-list {
@@ -100,6 +123,17 @@
 		flex-direction: column;
 		overflow-y: auto;
 		gap: 0.5rem;
+
+		.body {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+
+			.button.current {background-color: var(--lighting-3);}
+			.button.current:hover {background-color: var(--lighting-4);}
+			.button.current:active {background-color: var(--lighting-5);}
+		}
 	}
 
 	main {
@@ -115,12 +149,13 @@
 	::-webkit-scrollbar-thumb:hover {background-color: var(--lighting-3);}
 	::-webkit-scrollbar-thumb:active {background-color: var(--lighting-4);}
 
-	button {
+	button, .a-inherit {
 		font-family: inherit;
 		font-weight: inherit;
 		font-size: inherit;
 		color: inherit;
 		width: inherit;
+		text-decoration: none;
 	}
 	button, .button {
 		background-color: var(--lighting-1);
@@ -137,61 +172,145 @@
 	}
 	button:hover, .button:hover {background-color: var(--lighting-2);}
 	button:active, .button:active {background-color: var(--lighting-3);}
+	.oneline-text {
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+
+	details summary {user-select: none;}
 </style>
 <body>
-	<header style="color: var(--secondary-text-color);">
-		<!-- Будет генерироваться -->
-		Главная/Каталог/Коллекторные шкафы/Настенные/ВКБД - 20
-	</header>
-	<div class="content-container">
-		<div class="burger">
-			<h1 class="main-title" style="margin-bottom: 2rem;">
-				Debug UI v0.1
-			</h1>
-			<div style="display: flex; flex-direction: column;gap: 0.5rem;">
-				<a class="button" href="{{page_info.get_admin_url}}">Смотреть в админке</a>
-				<button class="button">Смотреть контекст</button>
-			</div>
+	<div class="burger">
+		<h1 class="main-title" style="margin-bottom: 2rem;">
+			Debug UI v0.1
+		</h1>
 
-			<h3 style="margin-block: 1.5rem 0.5rem;">Страницы</h3>
-			<div class="pages-list">
+		<div style="display: flex; flex-direction: column; gap: 0.5rem;">
+			<div style="display: flex; flex-direction: column; gap: 0.5rem;">
+				<a class="button" href="{{page_info.get_admin_url}}">Смотреть в админке</a>
+				<button class="button switch-sound">Смотреть контекст</button>
+			</div>
+			<div style="display: flex; gap: 0.5rem;">
+				<a class="button" style="flex: 1;" href="/sitemap.xml">Sitemap.xml</a>
+				<a class="button" style="flex: 1;" href="/robots.txt">Robots.txt</a>
+			</div>
+		</div>
+
+		<h2 style="margin-block: 1.5rem 0.5rem;">Страницы</h2>
+		<div class="pages-list">
+			<div class="body">
 				{% for gpage in global.pages.values %}
-				<a class="button" style="text-align: left;" href="{{gpage.get_absolute_url}}">{{ gpage.name }}</a>
+				<!-- только для page -->
+				{% with is_current=gpage.pk|is_equal:page.pk %}
+					<a class="button {% if is_current %}current{% endif %} oneline-text"
+						style="text-align: left;"
+						title="{{ gpage.name }}"
+						href="{{gpage.get_absolute_url}}">
+						{% if is_current %}→{% endif %}
+						{{ gpage.name }}
+					</a>
+				{% endwith %}
 				{% endfor %}
 			</div>
 		</div>
+	</div>
+	<div class="content-container">
+		<header class="breadcrumbs">
+			<!-- Будет генерироваться -->
+			<a class="a-inherit" href="/">Главная</a>/Каталог/Коллекторные шкафы/Настенные/ВКБД - 20
+		</header>
 		<main>
-			<style>
-				.debug-card {
-					aspect-ratio: 1;
-					margin: 0.5rem;
-					width: 3vw;
-					background-color: var(--lighting-1);
-					border: 1px solid var(--lighting-1);
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					user-select: none;
-					cursor: pointer;
-				}
-				.debug-card:hover {background-color: var(--lighting-2);}
-				.debug-card:active {background-color: var(--lighting-3);}
-			</style>
-			<div style="display: flex; flex-wrap: wrap;">
-				{% get_range 1 65 as open_range %}
-				{% for i in open_range %}
-				<div class="debug-card">{{i}}</div>
-				{% endfor %}
+			{% block content %}
+			<div style="text-align: center;">
+				<div>Тут пусто. Ага.</div>
+				<div style="color: gray; font-size: 0.75rem;">(наполнение content по умолчанию)</div>
 			</div>
-			<details><summary>Больше элементов</summary>
-				<div style="display: flex; flex-wrap: wrap;">
-					{% get_range 65 451 as closed_range %}
-					{% for i in closed_range %}
-					<div class="debug-card">{{i}}</div>
-					{% endfor %}
-				</div>
-			</details>
+			<style>
+				main {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
+			</style>
+			{% endblock %}
 		</main>
 	</div>
 </body>
+<!-- <div class="volume-controls">
+  <label>Громкость hover
+    <input
+      type="range"
+      min="0" max="1" step="0.1"
+      value="{{ settings.DEBUG_TEMPLATES_HOVER_SOUND_VOLUME }}"
+      class="volume-slider" data-sound="hover"
+    >
+  </label>
+
+  <label>Громкость click
+    <input
+      type="range"
+      min="0" max="1" step="0.1"
+      value="{{ settings.DEBUG_TEMPLATES_CLICK_SOUND_VOLUME }}"
+      class="volume-slider" data-sound="click"
+    >
+  </label>
+  <label>Громкость switch
+    <input
+      type="range"
+      min="0" max="1" step="0.1"
+      value="{{ settings.DEBUG_TEMPLATES_CLICK_SOUND_VOLUME }}"
+      class="volume-slider" data-sound="switch"
+    >
+  </label>
+</div>
+<style>
+.volume-slider {
+	vertical-align: middle;
+}
+</style> -->
+{% if settings.DEBUG_TEMPLATES_SOUNDS_ENABLED %}
+<script>
+	// base64 format
+	const baseUrl = "https://github.com/space-wizards/space-station-14/raw/refs/heads/master/Resources/Audio/";
+	const hoverSound = new Audio(baseUrl + "UserInterface/hover.ogg");
+	const clickSound = new Audio(baseUrl + "UserInterface/click.ogg");
+	const switchSound = new Audio(baseUrl + "Machines/lightswitch.ogg")
+
+	hoverSound.volume = parseFloat("{{ settings.DEBUG_TEMPLATES_HOVER_SOUND_VOLUME }}");
+	clickSound.volume = parseFloat("{{ settings.DEBUG_TEMPLATES_CLICK_SOUND_VOLUME }}");
+	switchSound.volume = 1;
+
+	document.addEventListener('DOMContentLoaded', function() {
+		document.querySelectorAll('.volume-slider').forEach(slider => {
+			slider.addEventListener('input', (e) => {
+				const volume = parseFloat(e.target.value);
+				if (e.target.dataset.sound === 'hover') {
+					hoverSound.volume = volume;
+				} else if (e.target.dataset.sound === 'click') {
+					clickSound.volume = volume;
+				} else if (e.target.dataset.sound === 'switch') {
+					clickSound.volume = volume;
+				}
+			});
+		});
+		document.addEventListener('click', function(event) {
+			if (event.target.closest('.switch-sound')) {
+					switchSound.currentTime = 0;
+					switchSound.play();
+			} else if (event.target.closest('.button') ||
+				event.target.closest('.add-sounds')) {
+					clickSound.play();
+			}
+		});
+		document.addEventListener('mouseover', function(event) {
+			if (event.target.closest('.button') ||
+				event.target.closest('.add-sounds')) {
+					hoverSound.currentTime = 0;
+					hoverSound.play();
+			}
+		});
+	});
+</script>
+{% endif %}
 </html>
