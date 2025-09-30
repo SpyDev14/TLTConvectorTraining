@@ -32,8 +32,6 @@ class BaseRenderableModel(models.Model):
 	name = models.CharField('Название', max_length = 64,
 		help_text = 'Указывайте человеко-читаемый текст. По умолчанию также '
 		'используется для HTML Title и H1.')
-	# slug тут не совсем к месту т.к это про получение объекта на основе запроса,
-	# но опустим этот момент, это слишком мелкая деталь.
 	slug = models.SlugField(max_length = 128, unique = True)
 	h1 = models.CharField('H1 Заголовок', max_length = 127, blank = True,
 		help_text = 'По умолчанию для H1 используется Name.')
