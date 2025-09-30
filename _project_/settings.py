@@ -111,7 +111,7 @@ TEMPLATES = [
 
 				# This project
 				'core.context_processors.global_context',
-				'core.context_processors.debug_context',
+				'core.context_processors.settings_context',
 			],
 
 			'builtins': [

@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	{% if not page_info and DEBUG %}
+	{% if not page_info and settings.DEBUG %}
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
 			setTimeout(function() { alert(

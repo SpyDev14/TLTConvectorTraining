@@ -14,9 +14,8 @@ from core.models.bases 				import BaseRenderableModel
 from business import models as models
 from business import models as business
 
-def debug_context(request):
-	return {'DEBUG': settings.DEBUG}
-
+def settings_context(request):
+	return {'settings': settings}
 
 _make_default_name = lambda model: f"{camel_to_snake_case(typename(model))}s"
 def _queryset_to_context(qs: QuerySet, name: str | None = None) -> dict[str, Iterable[Model]]:
