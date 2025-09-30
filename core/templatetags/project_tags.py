@@ -42,3 +42,7 @@ def item_card(title, desc = None, image = None, *, url):
 @register.simple_tag
 def get_range(*args):
 	return range(*args)
+
+@register.filter
+def is_equal(obj1, obj2):
+	return obj1 == obj2
