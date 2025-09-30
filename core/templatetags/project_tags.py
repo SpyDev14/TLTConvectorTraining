@@ -38,3 +38,7 @@ def item_card(title, desc = None, image = None, *, url):
 		'desc': desc,
 		'image': image,
 	}
+
+@register.simple_tag
+def get_range(*args):
+	return range(*args)
