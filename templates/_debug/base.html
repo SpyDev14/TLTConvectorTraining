@@ -163,15 +163,26 @@
 		padding: 0.5rem;
 		user-select: none;
 		text-align: center;
+		cursor: pointer;
 		/* for a */
 		color: var(--primary-text-color);
 		text-decoration: none;
 	}
+	/* for a */
 	.button:hover, .button:active, .button:visited {
 		color: var(--primary-text-color);
 	}
 	button:hover, .button:hover {background-color: var(--lighting-2);}
 	button:active, .button:active {background-color: var(--lighting-3);}
+	.switch {
+		position: relative;
+		display: inherit;
+		input {display: none;}
+		.button {flex: 1;}
+		input:checked + .button {background-color: var(--lighting-3);}
+		input:checked + .button:hover {background-color: var(--lighting-4);}
+	}
+	
 	.oneline-text {
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -189,7 +200,10 @@
 		<div style="display: flex; flex-direction: column; gap: 0.5rem;">
 			<div style="display: flex; flex-direction: column; gap: 0.5rem;">
 				<a class="button" href="{{page_info.get_admin_url}}">Смотреть в админке</a>
-				<button class="button switch-sound">Смотреть контекст</button>
+				<label class="switch">
+					<input type="checkbox">
+					<span class="button">Смотреть контекст</span>
+				</label>
 			</div>
 			<div style="display: flex; gap: 0.5rem;">
 				<a class="button" style="flex: 1;" href="/sitemap.xml">Sitemap.xml</a>
@@ -218,7 +232,7 @@
 	<div class="content-container">
 		<header class="breadcrumbs">
 			<!-- Будет генерироваться -->
-			<a class="a-inherit" href="/">Главная</a>/Каталог/Коллекторные шкафы/Настенные/ВКБД - 20
+			<a class="a-inherit" href="/">Главная</a>/<a class="a-inherit" href="/">Каталог</a>/<a class="a-inherit" href="/">Коллекторные шкафы</a>/<a class="a-inherit" href="/">Настенные</a>/<a class="a-inherit" href="/">ВКБД - 20</a>
 		</header>
 		<main>
 			{% block content %}
@@ -272,10 +286,10 @@
 {% if settings.DEBUG_TEMPLATES_SOUNDS_ENABLED %}
 <script>
 	// base64 format
-	const baseUrl = "https://github.com/space-wizards/space-station-14/raw/refs/heads/master/Resources/Audio/";
-	const hoverSound = new Audio(baseUrl + "UserInterface/hover.ogg");
-	const clickSound = new Audio(baseUrl + "UserInterface/click.ogg");
-	const switchSound = new Audio(baseUrl + "Machines/lightswitch.ogg")
+	const getUrl = el => `https://github.com/space-wizards/space-station-14/raw/refs/heads/master/Resources/Audio/${el}.ogg`;
+	const hoverSound = new Audio(getUrl("UserInterface/hover"));
+	const clickSound = new Audio(getUrl("UserInterface/click"));
+	const switchSound = new Audio(getUrl("Machines/button"));
 
 	hoverSound.volume = parseFloat("{{ settings.DEBUG_TEMPLATES_HOVER_SOUND_VOLUME }}");
 	clickSound.volume = parseFloat("{{ settings.DEBUG_TEMPLATES_CLICK_SOUND_VOLUME }}");
@@ -294,20 +308,19 @@
 				}
 			});
 		});
+		isButton = event => event.target.closest('.button') || event.target.closest('button') || event.target.closest('.add-sounds');
 		document.addEventListener('click', function(event) {
-			if (event.target.closest('.switch-sound')) {
-					switchSound.currentTime = 0;
-					switchSound.play();
-			} else if (event.target.closest('.button') ||
-				event.target.closest('.add-sounds')) {
-					clickSound.play();
+			if (event.target.closest('.switch')) {
+				switchSound.currentTime = 0;
+				switchSound.play();
+			} else if (isButton(event)) {
+				clickSound.play();
 			}
 		});
 		document.addEventListener('mouseover', function(event) {
-			if (event.target.closest('.button') ||
-				event.target.closest('.add-sounds')) {
-					hoverSound.currentTime = 0;
-					hoverSound.play();
+			if (isButton(event)) {
+				hoverSound.currentTime = 0;
+				hoverSound.play();
 			}
 		});
 	});
