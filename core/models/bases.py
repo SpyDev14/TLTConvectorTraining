@@ -7,9 +7,6 @@ from django.db 							import models
 from shared.seo.og 						import OgType
 from core.models.singletons 			import SiteSettings
 
-# TODO: Добавлять в html_title название сайта к исходному html_title
-# TODO: Добавить метод get_parent_object в BRM возвращающий BRM объект,
-# считающийся родительским для этого объекта.
 # NOTE: Название кал, у кого-то есть идеи как это можно переименовать?
 class BaseRenderableModel(models.Model):
 	"""
