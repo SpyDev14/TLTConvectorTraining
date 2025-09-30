@@ -4,6 +4,7 @@ from django.contrib 			import admin
 from shared.string_processing.resizing 	import truncate_string
 from shared.admin.model_registration 	import AdminModelRegistrator
 from core.admin.bases 					import BaseRenderableModelAdmin
+from core.config 						import GENERIC_TEMPLATE
 from core.apps 							import CoreConfig
 from core 								import models
 
@@ -41,8 +42,12 @@ class PageAdmin(BaseRenderableModelAdmin):
 	page.short_description = 'Страница'
 
 	def page_template_name(self, obj: models.Page):
+		if tname := obj.template_name:
+			return tname
+
 		return (
-			obj.template_name or
+			mark_safe(f'<span title="{GENERIC_TEMPLATE.PAGE}">По умолчанию</span>')
+			if obj.is_generic_page else
 			mark_safe('<span style="color: grey;">(не generic страница)</span>')
 		)
 	page_template_name.short_description = models.Page._meta.get_field('template_name').verbose_name
