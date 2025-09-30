@@ -1,1 +1,24 @@
 {% extends 'base.html' %}
+
+{% block content %}
+<div class="body">
+	<h1>{{ page.h1 }}</h1>
+
+	<div class="formatted-text">
+		{% render_as_template page.content %}
+	</div>
+</div>
+
+<style>
+	main {
+		padding-top: 2rem;
+		padding-bottom: 12rem;
+
+		.body {
+			width: 45vw;
+			margin-inline: auto;
+		}
+	}
+	p {margin: initial;}
+</style>
+{% endblock %}
