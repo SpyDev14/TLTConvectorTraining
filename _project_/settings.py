@@ -288,6 +288,9 @@ DEFAULT_MODEL_ADMIN_CLASSES = {
 	# Project
 	'core.models.bases.BaseRenderableModel': 'core.admin.bases.BaseRenderableModelAdmin',
 }
+DEBUG_TEMPLATES_SOUNDS_ENABLED = env.bool('DEBUG_TEMPLATES_SOUNDS_ENABLED', True)
+DEBUG_TEMPLATES_HOVER_SOUND_VOLUME = str(env.float('DEBUG_TEMPLATES_HOVER_SOUND_VOLUME', 0.2))
+DEBUG_TEMPLATES_CLICK_SOUND_VOLUME = str(env.float('DEBUG_TEMPLATES_CLICK_SOUND_VOLUME', 0.4))
 
 # MARK: Libs
 SOLO_CACHE = 'default'
