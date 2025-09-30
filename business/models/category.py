@@ -15,7 +15,7 @@ class CategoryManager(TreeManager):
 		return self.filter(parent = None)[:4]
 
 class Category(MPTTModel, BaseRenderableModel):
-	_url_name = 'subcatalog'
+	_url_path_name = 'subcatalog'
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
