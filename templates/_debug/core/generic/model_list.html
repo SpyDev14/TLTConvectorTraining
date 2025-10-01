@@ -1,1 +1,38 @@
 {% extends 'base.html' %}
+
+{% block content %}
+<h1 style="margin: 0;">{{ page_info.h1 }}</h1>
+<div>
+	{% block list_pagecontent %}
+		{# в проде были бы свои страницы под каждую модель, я же сделал общую #}
+		{% if based_object.content %}
+			{% render_as_template based_object.content|safe %}
+		{% elif based_object.summary %}
+			{% render_as_template based_object.summary|safe %}
+		{% elif based_object.description %}
+			{% render_as_template based_object.description|safe %}
+		{% endif %}
+	{% endblock %}
+</div>
+<div class="list-container">
+	{% get_range 14 as range %}
+	{% for i in range %}
+		<div class="button item-card">
+			wwd
+		</div>
+	{% endfor %}
+</div>
+<style>
+	.list-container {
+		flex: 1 1 1;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+		gap: 0.5rem;
+	}
+	.item-card {
+		height: 16rem;
+		background-color: rgba(0, 0, 0, 0);
+		border-color: var(--lighting-2);
+	}
+</style>
+{% endblock %}
