@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='page',
             name='template_name',
-            field=models.CharField(blank=True, help_text='<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение. По умолчанию используется <code>core/generic/page.html</code><br><code>is_generic_page:</code>❌ - Игнорируется, потому <b>должно быть</b> пустым.', validators=[shared.models.validators.template_with_this_name_exists], verbose_name='Название django-темплейта'),
+            field=models.CharField(blank=True, help_text='<code>is_generic_page:</code>✅ - Путь к файлу, включая расширение. По умолчанию используется <code>core/generic/page.html</code><br><code>is_generic_page:</code>❌ - Игнорируется, потому <b>должно быть</b> пустым.', validators=[shared.models.validators.template_exists_in_root_directory], verbose_name='Название django-темплейта'),
         ),
     ]

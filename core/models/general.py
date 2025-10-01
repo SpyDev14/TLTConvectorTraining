@@ -58,7 +58,7 @@ class Page(BaseRenderableModel):
 
 	template_name = models.CharField('Название django-темплейта',
 		# Проверяет только если поле заполнено
-		validators = [template_with_this_name_exists],
+		validators = [template_exists_in_root_directory],
 		blank = True,
 		# Ps: DetailView имеет функционал для получения темплейта из поля модели, но я не хочу,
 		# чтобы было 2 разных способа задать темплейт - через модель и в классе View,

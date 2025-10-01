@@ -93,6 +93,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = '_project_.urls'
 
 DEBUG_TEMPLATES_MODE_ENABLED = env.bool('DEBUG_TEMPLATES_MODE_ENABLED', False)
+# Используется в shared.models.validators:template_exists_in_root_directory
 TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
 	{

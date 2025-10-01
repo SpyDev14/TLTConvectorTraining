@@ -1,11 +1,12 @@
-from typing import Any
+from pathlib 	import Path
+from typing 	import Any
 import re
 
 from django.utils.deconstruct 	import deconstructible
 from django.core.exceptions 	import ValidationError
-from django.template.loader 	import get_template
+from django.template 			import Engine
 from django.template			import TemplateDoesNotExist
-
+from django.conf 				import settings
 
 __all__ = (
 	'BaseValidator', # Для аннотации
@@ -13,7 +14,7 @@ __all__ = (
 	'StringEndswith',
 	'FullmatchRegexValidator',
 	'string_is_numeric',
-	'template_with_this_name_exists',
+	'template_exists_in_root_directory',
 	'env_variable_name',
 )
 
@@ -155,12 +156,17 @@ def string_is_numeric(value: str):
 			"Эта строка должна соответствовать целому числу"
 		)
 
-def template_with_this_name_exists(value: str):
+# Было изменено для совместимости с дебаг-темплейтным режимом
+# (Задача - на "проде" темплейты должны существовать, на дебаг режим по барабану)
+def template_exists_in_root_directory(value: str):
 	_raise_if_not_str(value)
 	if not value:
 		return
-	try:
-		get_template(value)
+
+	base_dir: Path = settings.TEMPLATES_DIR
+	engine = Engine(dirs=[base_dir], app_dirs=True)
+
+	try: engine.get_template(value)
 	except TemplateDoesNotExist:
 		raise ValidationError("Темплейта с таким именем не существует!")
 
