@@ -182,4 +182,5 @@ logs/
 
 # Django
 static/
+!*/static/
 media/
