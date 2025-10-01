@@ -1,9 +1,10 @@
+from django.core.exceptions import ImproperlyConfigured
 from django.forms 			import Form, ModelForm
 from django.views 			import generic
 
 from core.models.general 	import Page
 from core.models.bases 		import BaseRenderableModel
-from core.views.mixins 		import PageInfoMixin, ConcretePageMixin
+from core.views.mixins 		import PageInfoMixin
 from core.config 			import GENERIC_TEMPLATE
 
 from .make_context_name 	import make_context_name
@@ -76,12 +77,13 @@ class BasePageView(BaseRenderableDetailView):
 		names.insert(len(names)-1, GENERIC_TEMPLATE.PAGE)
 		return names
 
-# Для удобства; подключаю стратегию получения page отдельно, чтобы не засорять
-# базовый класс.
-class ConcretePageView(
-	ConcretePageMixin,
-	BasePageView
-): pass
+class ConcretePageView(BasePageView):
+	page_slug: str | None = None
+
+	def get_page(self):
+		if not self.page_slug:
+			raise ImproperlyConfigured('page_slug не может быть пуст!')
+		return Page._default_manager.get(slug = self.page_slug)
 
 # Все страницы с формой будут использовать конкретную страницу указываемую в коде,
 # врядли в скором будущем появится функционал добавления таких страниц через админку.

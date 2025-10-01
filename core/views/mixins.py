@@ -1,10 +1,4 @@
-from typing import Any
-
-from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts 		import get_object_or_404
-
-from core.models.general 	import Page
-from core.models.bases 		import BaseRenderableModel
+from core.models.bases import BaseRenderableModel
 
 
 class PageInfoMixin:
@@ -24,13 +18,3 @@ class PageInfoMixin:
 			'page_info': self.get_page_info()
 		})
 		return super().get_context_data(**kwargs)
-
-
-# MARK: Page-details get_page() strategy
-class ConcretePageMixin:
-	page_slug: str | None = None
-
-	def get_page(self):
-		if not self.page_slug:
-			raise ImproperlyConfigured('page_slug не может быть пуст!')
-		return Page._default_manager.get(slug = self.page_slug)
