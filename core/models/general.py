@@ -23,11 +23,8 @@ from core.config 				import TELEGRAM_SENDING, GENERIC_TEMPLATE
 
 _logger = logging.getLogger(__name__)
 
-# Можно добавить опциональную связь с другой моделью и добавлять список этих моделей в контекст темплейта
-# для простых кейсов (т.е для маломальски уникальной логики создавать отдельный view)
-# Но может быть и не стоит, это усложнение + могут возникнуть свои подводные камни
-# TODO: Перевести на простой slug при is_generic, вместо сложного URL Source.
-# URL Source переименовать во View name, и разрешить только при is generic False.
+# TODO: Реализовать метод get_parent_object через FK на саму себя
+# TODO: Сделать Page MPTT моделью (для установки порядка и оптимизации get_parent_object)
 class Page(BaseRenderableModel):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -274,8 +271,6 @@ class TelegramSendingChannel(models.Model):
 		response = requests.post(url, json = payload, timeout = timeout)
 		response.raise_for_status()
 
-	# IDEA: Можно написать кастомный декоратор, делающий try-функции, если
-	# в проектах будет возникать слишком много шаблонного кода
 	def try_send_message(
 			self, text: str, *,
 			parse_mode: MessageParseMode = MessageParseMode.HTML,

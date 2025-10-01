@@ -2,10 +2,10 @@ from django.urls import path
 
 from business import views
 
-# INFO: view names - только для работы ИЗ КОДА!!!
+# INFO: path names - только для работы ИЗ КОДА!!!
 # В темплейтах используйте другие источники: get_absolute_url() от объекта и global объекты
 # {% for item in items %}
-# 	{{ item.get_absolute_url }}
+#     {{ item.get_absolute_url }}
 # {% endfor %}
 # {{ global.pages.contacts.get_absolute_url }}
 # NOTE: Может всё-таки разрешить? Надо подумать.

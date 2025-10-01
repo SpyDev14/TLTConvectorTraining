@@ -12,9 +12,7 @@ from phonenumbers 	import format_number, PhoneNumberFormat, PhoneNumber
 from pandas 		import DataFrame, ExcelWriter
 
 
-# TODO: разбить на кучу мелких подфункций для улучшения читаемости.
-# (пусть они и не будут нужны ни для чего, кроме использования здесь)
-# TODO: Или ещё лучше - реализовать через класс!
+# TODO: Переписать через класс
 def export_to_excel(
 	queryset: QuerySet,
 	filename: str,

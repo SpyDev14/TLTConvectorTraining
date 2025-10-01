@@ -7,7 +7,8 @@ from django.db 							import models
 from shared.seo.og 						import OgType
 from core.models.singletons 			import SiteSettings
 
-# NOTE: Название кал, у кого-то есть идеи как это можно переименовать?
+# NOTE: Может стоит придумать название лучше отражающее суть?
+# Как на счёт Page? А нынешний Page переименовать в GenericPage
 class BaseRenderableModel(models.Model):
 	"""
 	Базовая модель для всех моделей, у которых будут свои detail (и опционально

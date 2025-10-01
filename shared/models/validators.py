@@ -140,9 +140,9 @@ class FullmatchRegexValidator(TargetValueTypeMixin, BaseValidator):
 # MARK: В виде функций
 # (конкретные проверки)
 def _raise_if_not_str(value):
-	# Какое-то "спорное решение", скажем так
-	# TODO: Сделать наоборот, проверяющую функцию и в классе
-	# вызывать её с сохранёнными параметрами, а не наоборот
+	# TODO: Сделать проверяющую функцию и в TargetValueTypeMixin вызывать
+	# её с сохранёнными параметрами, а не наоборот
+	# (raise_if_not_isinstance_of(obj: object, types: tuple[type, ...]) -> None)
 	class _check(TargetValueTypeMixin): allowed_value_types = (str, )
 	_check()(value)
 
