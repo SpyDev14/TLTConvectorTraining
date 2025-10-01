@@ -176,7 +176,6 @@ def env_variable_name(value: str):
 		error_msg = "Это некорректное имя ENV переменной!"
 	)(value)
 
-# Делал ИИ, я на это почти не потратил времени
 def map_coordinates_format(value: str):
 	_raise_if_not_str(value)
 	# Проверка общего формата с помощью регулярного выражения
