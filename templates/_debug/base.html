@@ -50,10 +50,12 @@
 	:root {
 		font-family: consolas;
 		background-color: #050505;
+		color: var(--primary-text-color);
+
 		--primary-text-color: white;
 		--secondary-text-color: gray;
 		--secondary-text-color-hover: rgba(128, 128, 128, 0.8);
-		color: var(--primary-text-color);
+
 		--lighting-1: #FFFFFF08;
 		--lighting-2: #FFFFFF10;
 		--lighting-3: #FFFFFF18;
@@ -113,26 +115,40 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: stretch;
-	}
 
-	.pages-list {
-		display: flex;
-		flex: 1;
-		flex-direction: column;
-		overflow-y: auto;
-		gap: 0.5rem;
+		/* Как идея */
+		--burger-border-radius: 1rem;
 
-		.body {
-			flex: 1;
+		.pages-list {
 			display: flex;
+			flex: 1;
 			flex-direction: column;
+			overflow-y: auto;
 			gap: 0.5rem;
 
-			.button.current {background-color: var(--lighting-3);}
-			.button.current:hover {background-color: var(--lighting-4);}
-			.button.current:active {background-color: var(--lighting-5);}
+			.body {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+
+				.button:first-child {
+					border-top-left-radius: var(--burger-border-radius);
+					border-top-right-radius: var(--burger-border-radius);
+				}
+
+				.button:last-child {
+					border-bottom-left-radius: var(--burger-border-radius);
+					border-bottom-right-radius: var(--burger-border-radius);
+				}
+
+				.button .current {background-color: var(--lighting-3);}
+				.button .current:hover {background-color: var(--lighting-4);}
+				.button .current:active {background-color: var(--lighting-5);}
+			}
 		}
 	}
+
 
 	main {
 		display: flex;
@@ -166,19 +182,25 @@
 		cursor: pointer;
 		color: var(--primary-text-color);
 	}
-	.button:hover, .button:active, .button:visited {
+	button, .button, .button:hover, .button:active, .button:visited {
 		color: var(--primary-text-color);
 	}
 	button:hover, .button:hover {background-color: var(--lighting-2);}
-	button:active, .button:active, .switch input:checked + .button {background-color: var(--lighting-3);}
+	button:active, .button:active, .switch input:checked + .button {
+		background-color: var(--lighting-3);
+	}
 	.switch {
 		position: relative;
 		display: inherit;
 		input {display: none;}
 		.button {flex: 1;}
+		.toggle-marker {
+			display: none;
+		}
 		input:checked + .button {
 			border-color: var(--lighting-4);
 			box-shadow: inset 0 0 0 1px var(--lighting-4);
+			.toggle-marker {display: inline;}
 		}
 		/* input:checked + .button:hover {background-color: var(--lighting-4);} */
 	}
@@ -194,6 +216,12 @@
 	.formatted-text-block {
 		a:hover { text-decoration: underline; }
 	}
+
+	/* shortcut */
+	.sc-flex-column {
+		display: flex;
+		flex-direction: column;
+	}
 </style>
 <body>
 	<div class="burger">
@@ -201,17 +229,30 @@
 			Debug UI v0.1
 		</h1>
 
-		<div style="display: flex; flex-direction: column; gap: 0.5rem;">
-			<div style="display: flex; flex-direction: column; gap: 0.5rem;">
-				<a class="button" href="{{page_info.get_admin_url}}">Смотреть в админке</a>
+		<div class="sc-flex-column" style="gap: 0.5rem;">
+			<div class="sc-flex-column" style="gap: 0.5rem;">
+				<a
+					class="button"
+					href="{{page_info.get_admin_url}}"
+					style="
+						border-top-left-radius: var(--burger-border-radius);
+						border-top-right-radius: var(--burger-border-radius);
+					">Смотреть в админке</a>
 				<label class="switch">
 					<input type="checkbox">
-					<span class="button">Смотреть контекст</span>
+					<span class="button">
+						<span class="toggle-marker">></span>
+						Смотреть контекст
+					</span>
 				</label>
 			</div>
 			<div style="display: flex; gap: 0.5rem;">
-				<a class="button" style="flex: 1;" href="/sitemap.xml">Sitemap.xml</a>
-				<a class="button" style="flex: 1;" href="/robots.txt">Robots.txt</a>
+				<a class="button"
+					style="flex: 1; border-bottom-left-radius: var(--burger-border-radius);"
+					href="/sitemap.xml">Sitemap.xml</a>
+				<a class="button"
+					style="flex: 1; border-bottom-right-radius: var(--burger-border-radius);"
+					href="/robots.txt">Robots.txt</a>
 			</div>
 		</div>
 
@@ -225,7 +266,7 @@
 						style="text-align: left;"
 						title="{{ gpage.name }}"
 						href="{{gpage.get_absolute_url}}">
-						{% if is_current %}→{% endif %}
+						{% if is_current %}>{% endif %}<!-- → -->
 						{{ gpage.name }}
 					</a>
 				{% endwith %}
