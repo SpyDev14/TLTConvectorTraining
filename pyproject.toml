@@ -26,6 +26,7 @@ dependencies = [
 	# [None-specified]
 	"requests",
 	"psycopg2-binary",
+	"django-admin-sortable>=2.3",
 ]
 
 [dependency-groups]
