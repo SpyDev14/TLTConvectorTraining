@@ -61,7 +61,6 @@
 		--lighting-5: #FFFFFF28;
 	}
 	a {color: rgb(80, 156, 255); text-decoration: none;}
-	a:hover { text-decoration: underline;}
 
 	.main-title {
 		margin: 0;
@@ -165,14 +164,10 @@
 		user-select: none;
 		text-align: center;
 		cursor: pointer;
-		/* for a */
 		color: var(--primary-text-color);
-		text-decoration: none;
 	}
 	.button:hover, .button:active, .button:visited {
 		color: var(--primary-text-color);
-		/* for a */
-		text-decoration: none;
 	}
 	button:hover, .button:hover {background-color: var(--lighting-2);}
 	button:active, .button:active, .switch input:checked + .button {background-color: var(--lighting-3);}
@@ -195,6 +190,10 @@
 	}
 
 	details summary {user-select: none;}
+
+	.formatted-text-block {
+		a:hover { text-decoration: underline; }
+	}
 </style>
 <body>
 	<div class="burger">

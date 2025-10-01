@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1 style="margin: 0;">{{ page_info.h1 }}</h1>
-<div>
+<div class="formatted-text-block">
 	{% block list_pagecontent %}
 		{# в проде были бы свои страницы под каждую модель, я же сделал общую #}
 		{% if based_object.content %}
