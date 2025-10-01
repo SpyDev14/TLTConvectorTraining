@@ -2,13 +2,16 @@
 
 {% block content %}
 	<h1>{{ page_info.h1 }}</h1>
-
+<div class="warn-info-block"
+	style="color:red; background-color: #FF000010;">
+	Внимание! Эта страница устарела и больше не будет поддерживаться.
+</div>
 <div class="dark-shell button-like">
 {% for gpage in global.pages.values %}
 	<a
 		class="gray"
 		style="padding-block: 0.3rem;"
-		href="{% url 'debug-repr' gpage.slug %}"
+		href=""
 		>{{gpage.name}}
 	</a>
 {% endfor %}

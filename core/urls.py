@@ -15,12 +15,6 @@ urlpatterns = [
 	path('sitemap.xml', sitemap, kwargs={'sitemaps': _sitemaps})
 ]
 
-if settings.DEBUG:
-	urlpatterns.extend([
-		path('_debug/<slug:slug>/', views.DebugPageView.as_view(), name = 'debug-repr')
-	])
-
-
 urlpatterns.extend([
 	# Лучше ставить в самом низу, ловит запросы по url первого уровня.
 	path('<slug:slug>/', views.GenericPageView.as_view())

@@ -1,2 +1,2 @@
-from .general 	import GenericPageView, DebugPageView
+from .general 	import GenericPageView
 from .technical import *
