@@ -60,9 +60,8 @@
 		--lighting-4: #FFFFFF20;
 		--lighting-5: #FFFFFF28;
 	}
-	a {color: lightskyblue;}
-	a:hover { color: lightblue;}
-	a:visited { color: lightskyblue;}
+	a {color: rgb(80, 156, 255); text-decoration: none;}
+	a:hover { text-decoration: underline;}
 
 	.main-title {
 		margin: 0;
@@ -137,6 +136,8 @@
 	}
 
 	main {
+		display: flex;
+		flex-direction: column;
 		flex: 1; /* Занимает всё доступное пространство */
 		padding: 1rem;
 		overflow-y: auto; /* auto вместо scroll - скролл появится только когда нужно */
@@ -168,21 +169,25 @@
 		color: var(--primary-text-color);
 		text-decoration: none;
 	}
-	/* for a */
 	.button:hover, .button:active, .button:visited {
 		color: var(--primary-text-color);
+		/* for a */
+		text-decoration: none;
 	}
 	button:hover, .button:hover {background-color: var(--lighting-2);}
-	button:active, .button:active {background-color: var(--lighting-3);}
+	button:active, .button:active, .switch input:checked + .button {background-color: var(--lighting-3);}
 	.switch {
 		position: relative;
 		display: inherit;
 		input {display: none;}
 		.button {flex: 1;}
-		input:checked + .button {background-color: var(--lighting-3);}
-		input:checked + .button:hover {background-color: var(--lighting-4);}
+		input:checked + .button {
+			border-color: var(--lighting-4);
+			box-shadow: inset 0 0 0 1px var(--lighting-4);
+		}
+		/* input:checked + .button:hover {background-color: var(--lighting-4);} */
 	}
-	
+
 	.oneline-text {
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -289,11 +294,11 @@
 	const getUrl = el => `https://github.com/space-wizards/space-station-14/raw/refs/heads/master/Resources/Audio/${el}.ogg`;
 	const hoverSound = new Audio(getUrl("UserInterface/hover"));
 	const clickSound = new Audio(getUrl("UserInterface/click"));
-	const switchSound = new Audio(getUrl("Machines/button"));
+	const switchSound = new Audio(getUrl("Machines/lightswitch"));
 
 	hoverSound.volume = parseFloat("{{ settings.DEBUG_TEMPLATES_HOVER_SOUND_VOLUME }}");
 	clickSound.volume = parseFloat("{{ settings.DEBUG_TEMPLATES_CLICK_SOUND_VOLUME }}");
-	switchSound.volume = 1;
+	switchSound.volume = parseFloat("{{ settings.DEBUG_TEMPLATES_SWITCH_SOUND_VOLUME }}");
 
 	document.addEventListener('DOMContentLoaded', function() {
 		document.querySelectorAll('.volume-slider').forEach(slider => {
