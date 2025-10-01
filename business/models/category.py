@@ -24,7 +24,7 @@ class Category(MPTTModel, BaseRenderableModel):
 		self.products: models.Manager[Product]
 		self.childrens: models.Manager['Category']
 
-	parent = TreeForeignKey('self', models.CASCADE, verbose_name = 'Родительская категория',
+	parent = TreeForeignKey('self', models.SET_NULL, verbose_name = 'Родительская категория',
 		null = True, blank = True,
 		related_name = 'childrens')
 	is_parent_category = models.BooleanField('Это родительская категория?', default = True,
