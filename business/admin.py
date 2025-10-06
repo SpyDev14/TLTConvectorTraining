@@ -12,6 +12,7 @@ registrator = AdminModelRegistrator(
 	app_name = BusinessConfig.name
 )
 
+# TODO: Реализовать функционал AMR для ситуаций с множественным наследованием
 @registrator.set_for_model(models.Category)
 class CategoryAdmin(DraggableMPTTAdmin, BaseRenderableModelAdmin):
 	list_display = DraggableMPTTAdmin.list_display + ('view_on_site_link',)
