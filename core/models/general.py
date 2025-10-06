@@ -28,7 +28,7 @@ class Page(BaseRenderableModel):
 		super().__init__(*args, **kwargs)
 		self.extra_context_manager: models.Manager['ExtraContext']
 
-	order = models.PositiveSmallIntegerField(default=0)
+	order = models.PositiveSmallIntegerField(default=0, db_index=True, blank=False, null=False)
 	content = HTMLField('Контент', blank = True, help_text = RENDERING_SUPPORTS_TEXT)
 	is_generic_page = models.BooleanField('Это динамически-добавляемая страница?', default = False,
 		help_text = mark_safe(
