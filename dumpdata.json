@@ -32,7 +32,7 @@
 			"html_description": "",
 			"is_generic_page": false,
 			"template_name": "",
-			"url_path_name": "index",
+			"url_name": "index",
 			"content": "<p><strong>Решился &ndash; и пошёл!</strong>&nbsp;Не оглядываясь, без лишних мыслей. И знаете?&nbsp;<strong>Совершенно НИ О ЧЁМ не жалею!</strong>&nbsp;Это труд, это пот, это реальность &ndash; и это круто! Пусть этот сайт и не про заводскую романтику, но сам мой поступок, моя решимость &ndash; вот о чём стоит кричать!&nbsp;<strong>Хватит искать отмазки! Пора брать ответственность! Забудь про диван &ndash; а ну, подъем! На завод!</strong>&nbsp;Там ждут дела и результат!</p>",
 			"last_modified_time": "2025-09-26"
 		}
@@ -48,7 +48,7 @@
 			"html_description": "",
 			"is_generic_page": true,
 			"template_name": "",
-			"url_path_name": "",
+			"url_name": "",
 			"content": "<p>Вы успешно оставили заявку на обратную связь! Наши специалисты свяжутся с вами в ближайшее время.</p>",
 			"last_modified_time": "2025-09-26"
 		}
