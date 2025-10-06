@@ -3,7 +3,7 @@ from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
 
 from shared.admin.model_registration 	import AdminModelRegistrator
-from core.admin.bases 					import BaseRenderableModelAdmin
+from core.admin.bases 					import BaseRenderableModelAdmin, RenderableMPTTAdmin
 from business.apps 						import BusinessConfig
 from business 							import models
 
@@ -14,8 +14,7 @@ registrator = AdminModelRegistrator(
 
 # TODO: Реализовать функционал AMR для ситуаций с множественным наследованием
 @registrator.set_for_model(models.Category)
-class CategoryAdmin(DraggableMPTTAdmin, BaseRenderableModelAdmin):
-	list_display = DraggableMPTTAdmin.list_display + ('view_on_site_link',)
+class CategoryAdmin(RenderableMPTTAdmin): pass
 
 
 # MARK: Product

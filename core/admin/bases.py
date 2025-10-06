@@ -4,6 +4,8 @@ from django.utils.safestring 	import mark_safe
 from django.core.exceptions 	import ImproperlyConfigured
 from django.contrib 			import admin
 
+from mptt.admin import DraggableMPTTAdmin
+
 from core.models.bases 	import BaseRenderableModel
 from shared 			import typename
 
@@ -35,3 +37,11 @@ class BaseRenderableModelAdmin(admin.ModelAdmin):
 				f'</details>'
 			)
 	view_on_site_link.short_description = 'Ссылка'
+
+# Было нужно, но раз уже сделал, зачем удалять?
+class RenderableMPTTAdmin(DraggableMPTTAdmin, BaseRenderableModelAdmin):
+	append_to_list_display = ('view_on_site_link',)
+
+	@property
+	def list_display(self):
+		return DraggableMPTTAdmin.list_display + self.append_to_list_display
