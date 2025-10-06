@@ -6,7 +6,7 @@ import logging
 from django.utils.safestring 	import mark_safe
 from django.core.exceptions 	import ValidationError
 from django.core.cache 			import cache
-from django.urls 				import resolve, reverse, NoReverseMatch
+from django.urls 				import reverse, NoReverseMatch
 from django.db 					import models
 
 from tinymce.models import HTMLField
