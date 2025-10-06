@@ -62,13 +62,15 @@ INSTALLED_APPS = [
 	'django.contrib.sites',
 
 	# Libs
+	## Models
 	'solo',
 	'mptt',
 	'tinymce',
-	'rangefilter',
-	'debug_toolbar',
 	'django_cleanup',
 	'phonenumber_field',
+	## Admin
+	'rangefilter',
+	'debug_toolbar',
 	'adminsortable2',
 
 	# This project
