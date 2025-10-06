@@ -18,7 +18,7 @@
 	{% get_range 14 as range %}
 	{% for i in range %}
 		<div class="button item-card">
-			wwd
+			Test element #{{i}}
 		</div>
 	{% endfor %}
 </div>
@@ -33,6 +33,9 @@
 		height: 16rem;
 		background-color: rgba(0, 0, 0, 0);
 		border-color: var(--lighting-2);
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 </style>
 {% endblock %}
