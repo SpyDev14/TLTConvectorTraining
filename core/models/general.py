@@ -23,13 +23,12 @@ from core.config 				import TELEGRAM_SENDING, GENERIC_TEMPLATE
 
 _logger = logging.getLogger(__name__)
 
-# TODO: Реализовать метод get_parent_object через FK на саму себя
-# TODO: Сделать Page MPTT моделью (для установки порядка и оптимизации get_parent_object)
 class Page(BaseRenderableModel):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.extra_context_manager: models.Manager['ExtraContext']
 
+	order = models.PositiveSmallIntegerField(default=0)
 	content = HTMLField('Контент', blank = True, help_text = RENDERING_SUPPORTS_TEXT)
 	is_generic_page = models.BooleanField('Это динамически-добавляемая страница?', default = False,
 		help_text = mark_safe(
@@ -71,6 +70,7 @@ class Page(BaseRenderableModel):
 	class Meta:
 		verbose_name = 'страница'
 		verbose_name_plural = 'страницы'
+		ordering = ['order']
 
 	def clean(self):
 		# Проверка template_name
