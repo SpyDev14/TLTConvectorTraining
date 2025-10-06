@@ -1,14 +1,2 @@
-Рефакторинг Page
-1. ✅ Изменить GenericPageView
-2. ✅ Протестировать
-3. ✅ Убрать лишние проверки в Page.clean()
-4. ✅ Запретить задавать URL Source при is generic page в Page.clean()
-5. ✅ Переименовать URL Source во View name
-6. ✅ Поменять очерёдность полей так, чтобы было удобно
-
-- Почистить систему от get_page и get page strategy - миксинов (т.к это больше не используется, лишь эхо древней "битвы")
-- ✅ Разрешить пустое значение Template name для generic Pages, по умолчанию использовать Generic Page Template в самом View
-- ✅ Вместо свойств для h1 & html_title в BRM использовать обычные поля модели и get методы, а не html_title_override + proptery(html_title), также добавить метод get_html_description
-- ✅ Добавить галочку "Добавить название сайта в html title" для BRM (да по умолчанию)
-- Добавить метод get_parent_object в BRM возвращающий BRM объект, считающийся родительским для этого объекта.
-- ✅ Сделать html_description TextField
+- Определить список моделей
+- Определить поля моделей
